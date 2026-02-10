@@ -1,0 +1,172 @@
+<app-headermenu></app-headermenu>
+<app-breadcrumbs></app-breadcrumbs>
+<div class="landing-container">
+  <div class="hero-section">
+    <h1 class="hero-title">Lorem ipsum dolor sit amet consectetur.</h1>
+    <p class="hero-description">
+      Lorem ipsum dolor sit amet consectetur adipiscing elit tempus lacinia, consequat et rutrum ullamcorper curae
+      pharetra turpis cras.
+    </p>
+  </div>
+
+  <div class="content-section" appScrollReveal>
+    <div class="content-block">
+      <div class="content-text">
+        <h2>Texto 1</h2>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore
+          magna aliqua.</p>
+        <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+        </p>
+      </div>
+      <div class="content-image">
+        <div class="image-placeholder">
+          <span>Imagen ilustrativa</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="interactive-section" appScrollReveal>
+    <div class="section-header">
+      <h2>Texto 2</h2>
+    </div>
+
+    <div class="interactive-container">
+      <div class="interactive-item" (click)="openModal(1)">
+        <div class="item-content">
+          <span class="item-text">Texto 1</span>
+          <span class="arrow-icon">></span>
+        </div>
+      </div>
+
+      <div class="interactive-item" (click)="openModal(2)">
+        <div class="item-content">
+          <span class="item-text">Texto 2</span>
+          <span class="arrow-icon">></span>
+        </div>
+      </div>
+
+      <div class="interactive-item" (click)="openModal(3)">
+        <div class="item-content">
+          <span class="item-text">Texto 3</span>
+          <span class="arrow-icon">></span>
+        </div>
+      </div>
+
+      <div class="interactive-item" (click)="openModal(4)">
+        <div class="item-content">
+          <span class="item-text">Texto 4</span>
+          <span class="arrow-icon">></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="gallery-section" appScrollReveal>
+    <div class="section-header">
+      <h2>Texto 3</h2>
+    </div>
+
+    <div class="filter-pills">
+      <button class="pill" [class.active]="activeGalleryTab === 1" (click)="setActiveGalleryTab(1)">Opción 1</button>
+      <button class="pill" [class.active]="activeGalleryTab === 2" (click)="setActiveGalleryTab(2)">Opción 2</button>
+      <button class="pill" [class.active]="activeGalleryTab === 3" (click)="setActiveGalleryTab(3)">Opción 3</button>
+      <button class="pill" [class.active]="activeGalleryTab === 4" (click)="setActiveGalleryTab(4)">Opción 4</button>
+      <button class="pill" [class.active]="activeGalleryTab === 5" (click)="setActiveGalleryTab(5)">Opción 5</button>
+    </div>
+
+    <!-- Slider Container -->
+    <div class="slider-window">
+      <div class="slider-track" [style.transform]="sliderTransform">
+
+        <div class="slide" [class.active]="activeGalleryTab === 1" (click)="setActiveGalleryTab(1)">
+          <div class="image-card">
+            <span>Imagen 1</span>
+          </div>
+        </div>
+
+        <div class="slide" [class.active]="activeGalleryTab === 2" (click)="setActiveGalleryTab(2)">
+          <div class="image-card">
+            <span>Imagen 2</span>
+          </div>
+        </div>
+
+        <div class="slide" [class.active]="activeGalleryTab === 3" (click)="setActiveGalleryTab(3)">
+          <div class="image-card">
+            <span>Imagen 3</span>
+          </div>
+        </div>
+
+        <div class="slide" [class.active]="activeGalleryTab === 4" (click)="setActiveGalleryTab(4)">
+          <div class="image-card">
+            <span>Imagen 4</span>
+          </div>
+        </div>
+
+        <div class="slide" [class.active]="activeGalleryTab === 5" (click)="setActiveGalleryTab(5)">
+          <div class="image-card">
+            <span>Imagen 5</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Dots Navigation -->
+    <div class="dots-container">
+      <button class="dot" [class.active]="activeGalleryTab === 1" (click)="setActiveGalleryTab(1)"></button>
+      <button class="dot" [class.active]="activeGalleryTab === 2" (click)="setActiveGalleryTab(2)"></button>
+      <button class="dot" [class.active]="activeGalleryTab === 3" (click)="setActiveGalleryTab(3)"></button>
+      <button class="dot" [class.active]="activeGalleryTab === 4" (click)="setActiveGalleryTab(4)"></button>
+      <button class="dot" [class.active]="activeGalleryTab === 5" (click)="setActiveGalleryTab(5)"></button>
+    </div>
+  </div>
+
+  <div class="info-section" appScrollReveal>
+    <div class="section-header">
+      <h2>Texto 4</h2>
+    </div>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <p>Lorem ipsum dolor sit amet consectetur adipiscing elit tempus lacinia</p>
+      </div>
+      <div class="info-card">
+        <p>Lorem ipsum dolor sit amet consectetur adipiscing elit tempus lacinia</p>
+      </div>
+      <div class="info-card">
+        <p>Lorem ipsum dolor sit amet consectetur adipiscing elit tempus lacinia</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" [class.active]="isModalOpen" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <button class="modal-close" (click)="closeModal()">×</button>
+
+      <div class="modal-header">
+        <h2>{{modalTitle}}</h2>
+      </div>
+
+      <div class="modal-body">
+        <p>{{modalDescription}}</p>
+
+        <div class="modal-details">
+          <h3>Detalles adicionales</h3>
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et
+            dolore magna aliqua.</p>
+          <ul>
+            <li>Característica importante 1</li>
+            <li>Característica importante 2</li>
+            <li>Característica importante 3</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-primary" (click)="closeModal()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <app-footer></app-footer>

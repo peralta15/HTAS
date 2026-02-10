@@ -1,0 +1,18 @@
+<header class="main-header">
+    <div class="logo">
+        <a routerLink="/landing">HTAS</a>
+    </div>
+    <div class="menu-toggle" (click)="toggleMenu()">
+        {{ isMenuOpen ? 'X' : '☰'}}
+    </div>
+    <nav class="main-nav" [class.active]="isMenuOpen">
+        <ul>
+            <li><a routerLink="/landing" (click)="closeMenu()">Inicio</a></li>
+            <li><a routerLink="/nosotros" (click)="closeMenu()">Acerca de</a></li>
+            <li><a routerLink="/login" (click)="closeMenu()">Iniciar Sesión</a></li>
+        </ul>
+    </nav>
+    <div class="scroll-progress-container">
+        <div class="scroll-progress-bar" [style.width.%]="scrollPercentage"></div>
+    </div>
+</header>

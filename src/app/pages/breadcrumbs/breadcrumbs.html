@@ -1,0 +1,25 @@
+<!-- Contenedor principal de navegación -->
+<!-- aria-label="breadcrumb" mejora la accesibilidad indicando qué es esta sección -->
+<nav class="breadcrumb" aria-label="breadcrumb">
+
+    <!-- Itera sobre cada 'crumb' (miga) en la lista 'crumbs' de component.ts -->
+    <!-- 'let last = last' es una variable local que es true si es el último elemento -->
+    <ng-container *ngFor="let crumb of crumbs; let last = last">
+
+        <!-- Si NO es el último elemento, mostramos un enlace cliqueable -->
+        <!-- [routerLink] asigna la URL de destino -->
+        <a *ngIf="!last" [routerLink]="crumb.url">
+            {{ crumb.label }}
+        </a>
+
+        <!-- Si ES el último elemento, mostramos solo texto (página actual) -->
+        <!-- Usamos una clase diferente para estilarlo distinto -->
+        <span *ngIf="last" class="current">
+            {{ crumb.label }}
+        </span>
+
+        <!-- Separador visual entre elementos (/) -->
+        <!-- Solo se muestra si NO es el último elemento -->
+        <span *ngIf="!last" class="separator">/</span>
+    </ng-container>
+</nav>

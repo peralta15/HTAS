@@ -1,0 +1,75 @@
+<app-headermenu></app-headermenu>
+<app-breadcrumbs></app-breadcrumbs>
+
+<div class="login-container">
+  <div class="container" [class.toggle]="isToggled">
+    <div class="container-form">
+      <form class="sign-in" (submit)="onSubmitSignIn($event)">
+        <h2>Iniciar Sesión</h2>
+        <span>Use su Correo y Contraseña</span>
+
+        <div class="container-input">
+          <ion-icon name="mail-outline"></ion-icon>
+          <input type="email" placeholder="Correo Electrónico" required>
+        </div>
+
+        <div class="container-input">
+          <ion-icon name="lock-closed-outline"></ion-icon>
+          <input type="password" placeholder="Contraseña" required>
+        </div>
+
+        <a href="#" class="forgot-password">¿Olvidaste tu contraseña?</a>
+        <button type="submit" class="button">Iniciar Sesión</button>
+
+        <p class="mobile-toggle">¿No tienes cuenta? <a (click)="toggleToSignUp()">Regístrate</a></p>
+      </form>
+    </div>
+
+    <div class="container-form">
+      <form class="sign-up" (submit)="onSubmitSignUp($event)">
+        <h2>Registrarse</h2>
+        <span>Use su Correo Electrónico para Registrarse</span>
+
+        <div class="container-input">
+          <ion-icon name="person-outline"></ion-icon>
+          <input type="text" placeholder="Nombre" required>
+        </div>
+
+        <div class="container-input">
+          <ion-icon name="mail-outline"></ion-icon>
+          <input type="email" placeholder="Correo Electrónico" required>
+        </div>
+
+        <div class="container-input">
+          <ion-icon name="lock-closed-outline"></ion-icon>
+          <input type="password" placeholder="Contraseña" required>
+        </div>
+
+        <div class="container-input">
+          <ion-icon name="lock-closed-outline"></ion-icon>
+          <input type="password" placeholder="Confirmar Contraseña" required>
+        </div>
+
+        <button type="submit" class="button">Registrarse</button>
+
+        <p class="mobile-toggle">¿Ya tienes cuenta? <a (click)="toggleToSignIn()">Inicia Sesión</a></p>
+      </form>
+    </div>
+
+    <div class="container-welcome">
+      <div class="welcome-sign-up welcome">
+        <h3>¡Bienvenido!</h3>
+        <p>Ingrese sus datos personales para usar todas las funciones del sitio</p>
+        <button class="button" (click)="toggleToSignUp()">Registrarse</button>
+      </div>
+
+      <div class="welcome-sign-in welcome">
+        <h3>¡Hola!</h3>
+        <p>Regístrese con sus datos personales para usar todas las funciones del sitio</p>
+        <button class="button" (click)="toggleToSignIn()">Iniciar Sesión</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-footer></app-footer>
