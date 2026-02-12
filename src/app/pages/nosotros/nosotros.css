@@ -4,7 +4,6 @@
     width: 100%;
     min-height: 100vh;
     padding-top: 0px;
-    background-color: #f8f9fa;
 }
 
 /* Hero Section */
@@ -13,8 +12,10 @@
     color: #ffffff;
     padding: 5rem 5%;
     text-align: center;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    margin-bottom: 2rem;
+    filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.2));
+    margin-bottom: 0;
+    /* Reduced as the peak extends downwards */
+    clip-path: polygon(0 0, 100% 0, 100% 85%, 50% 100%, 0 85%);
     animation: fadeInUp 0.8s ease-out both;
     animation-delay: 0.1s;
 }

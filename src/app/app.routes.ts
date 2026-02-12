@@ -4,6 +4,7 @@ import { Login } from './auth/containers/login/login';
 import { Register } from './auth/containers/register/register';
 import { Breadcrumbs } from './pages/breadcrumbs/breadcrumbs';
 import { Nosotros } from './pages/nosotros/nosotros';
+import { Recursos } from './pages/recursos/recursos';
 
 export const routes: Routes = [
   {
@@ -30,5 +31,9 @@ export const routes: Routes = [
   {
     path: 'nosotros',
     component: Nosotros,
+  },
+  {
+    path: 'recursos',
+    component: Recursos,
   }
 ];

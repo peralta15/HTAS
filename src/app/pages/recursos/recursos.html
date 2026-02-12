@@ -1,0 +1,20 @@
+<app-headermenu></app-headermenu>
+
+<app-breadcrumbs></app-breadcrumbs>
+
+<div class="gallery-wrapper" *ngIf="isBrowser">
+
+    <div #canvasContainer id="canvas-container"></div>
+
+    <div id="ui-layer">
+        @for (slide of slides; track $index) {
+        <div class="slide-content" [id]="'slide-' + $index" [class.active]="currentSlideIndex === $index">
+            <span class="catalogue-number">{{slide.num}} / Proyectos</span>
+            <h1 [innerHTML]="slide.title"></h1>
+            <div class="description">{{slide.description}}</div>
+        </div>
+        }
+    </div>
+</div>
+
+<app-footer></app-footer>

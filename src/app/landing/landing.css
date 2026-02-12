@@ -10,18 +10,23 @@
   min-height: 100vh;
   padding-top: 0px;
   /* Reduced from 70px as breadcrumbs clear the header */
-  background-color: #f8f9fa;
 }
 
 .hero-section {
   background: linear-gradient(135deg, #b0001e 0%, #b0001e 100%);
   color: #ffffff;
-  padding: 5rem 5%;
+  padding: 5rem 5% 8rem;
+  /* Increased bottom padding for the peak */
   text-align: center;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  margin-bottom: 2rem;
+  /* box-shadow doesn't work well with clip-path, using filter instead */
+  filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.2));
+  margin-bottom: 0;
+  /* Reduced as the peak extends downwards */
+  clip-path: polygon(0 0, 100% 0, 100% 85%, 50% 100%, 0 85%);
   animation: fadeInUp 0.8s ease-out both;
   animation-delay: 0.1s;
+  position: relative;
+  z-index: 10;
 }
 
 .hero-title {
@@ -794,6 +799,300 @@
 .dot.active {
   background-color: #b0001e;
   transform: scale(1.2);
+}
+
+/* Sección Principal */
+.bracelet-schematic-section {
+  position: relative;
+  padding: 100px 5%;
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 800px;
+  font-family: 'Montserrat', sans-serif;
+}
+
+/* --- CÍRCULOS TECNOLÓGICOS (ESTILO D-UI) --- */
+.tech-circles-container {
+  position: absolute;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.ellipses-container {
+  width: 580px;
+  height: 580px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ellipses {
+  border-radius: 50%;
+  position: absolute;
+  border-style: solid;
+}
+
+.ellipses__outer--thin {
+  width: 100%;
+  height: 100%;
+  border-width: 1px;
+  border-color: rgba(180, 180, 180, 0.2);
+  animation: ellipsesOrbit 20s linear infinite;
+}
+
+.ellipses__outer--thin:after {
+  content: "";
+  background-image: url('https://s29.postimg.org/5h0r4ftkn/ellipses_dial.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  inset: 0;
+  position: absolute;
+  opacity: 0.15;
+}
+
+.ellipses__outer--thick {
+  width: 98%;
+  height: 98%;
+  border-color: #b0001e transparent;
+  /* Color acento rojo */
+  border-width: 2px;
+  transform: rotate(-45deg);
+  animation: ellipsesRotate 12s ease-in-out infinite;
+  opacity: 0.3;
+}
+
+.ellipses__orbit {
+  width: 2.2rem;
+  height: 2.2rem;
+  border: 1px solid #b0001e;
+  top: 10%;
+  right: 15%;
+}
+
+.ellipses__orbit:before {
+  content: '';
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+  background-color: #b0001e;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 12px rgba(176, 0, 30, 0.6);
+}
+
+/* --- CONTENEDOR PRINCIPAL --- */
+.schematic-container {
+  position: relative;
+  z-index: 10;
+  display: grid;
+  grid-template-columns: 1fr 1.5fr 1fr;
+  align-items: center;
+  width: 100%;
+  max-width: 1400px;
+  gap: 20px;
+}
+
+/* --- BLOQUE CENTRAL (Imagen + Sombra) --- */
+.bracelet-center-display {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.bracelet-hero-img {
+  width: 100%;
+  max-width: 450px;
+  z-index: 5;
+  animation: floatFront 4s ease-in-out infinite;
+}
+
+.bracelet-shadow-ellipse {
+  position: absolute;
+  bottom: -20px;
+  width: 200px;
+  height: 20px;
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0) 70%);
+  filter: blur(8px);
+  animation: shadowPulse 4s ease-in-out infinite;
+}
+
+/* --- CUADROS DE CARACTERÍSTICAS --- */
+.feature-column {
+  display: flex;
+  flex-direction: column;
+  gap: 120px;
+}
+
+.left {
+  align-items: flex-end;
+}
+
+.right {
+  align-items: flex-start;
+}
+
+.feature-mini-box {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+  padding: 20px;
+  border-radius: 15px;
+  width: 240px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  position: relative;
+  transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  cursor: pointer;
+}
+
+.left .feature-mini-box:hover {
+  transform: translateX(-15px) scale(1.05);
+}
+
+.right .feature-mini-box:hover {
+  transform: translateX(15px) scale(1.05);
+}
+
+.feature-mini-box h3 {
+  color: #b0001e;
+  font-size: 1rem;
+  margin-bottom: 5px;
+}
+
+.feature-mini-box p {
+  font-size: 0.85rem;
+  color: #666;
+  margin: 0;
+}
+
+/* --- LÍNEAS CONECTORAS ELÁSTICAS --- */
+.pointer-line {
+  position: absolute;
+  height: 1px;
+  background: rgba(180, 180, 180, 0.4);
+  width: 100px;
+  top: 50%;
+  z-index: -1;
+  transition: all 0.5s ease;
+}
+
+.pointer-line::after {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: #fff;
+  border: 2px solid #b0001e;
+  border-radius: 50%;
+  top: -5px;
+}
+
+.left .pointer-line {
+  right: -100px;
+}
+
+.left .pointer-line::after {
+  right: 0;
+}
+
+.right .pointer-line {
+  left: -100px;
+}
+
+.right .pointer-line::after {
+  left: 0;
+}
+
+/* Estiramiento en Hover */
+.left .feature-mini-box:hover .pointer-line {
+  width: 120px;
+  right: -120px;
+  background: #b0001e;
+}
+
+.right .feature-mini-box:hover .pointer-line {
+  width: 120px;
+  left: -120px;
+  background: #b0001e;
+}
+
+/* --- ANIMACIONES --- */
+@keyframes ellipsesRotate {
+  0% {
+    transform: rotate(-45deg);
+  }
+
+  100% {
+    transform: rotate(-405deg);
+  }
+}
+
+@keyframes ellipsesOrbit {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes floatFront {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-15px);
+  }
+}
+
+@keyframes shadowPulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.4;
+  }
+
+  50% {
+    transform: scale(0.8);
+    opacity: 0.2;
+  }
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .schematic-container {
+    grid-template-columns: 1fr;
+  }
+
+  .feature-column {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+  }
+
+  .pointer-line,
+  .tech-circles-container {
+    display: none;
+  }
 }
 
 /* Removed .big-x class as it's no longer used */

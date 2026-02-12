@@ -1,0 +1,177 @@
+/* ==========================================================================
+   1. Reset y Base
+   ========================================================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Montserrat", sans-serif;
+}
+
+body {
+    /* Evitamos el scroll horizontal por el canvas */
+    overflow-x: hidden;
+}
+
+/* ==========================================================================
+   2. Header y Navegación (Fijo)
+   ========================================================================== */
+.main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 5%;
+    position: fixed;
+    width: 100%;
+    left: 0;
+    top: 0;
+    z-index: 1000;
+    /* El nivel más alto */
+}
+
+/* ==========================================================================
+   3. Breadcrumbs (Ajustados para no buguearse)
+   ========================================================================== */
+app-breadcrumbs {
+    display: block;
+    position: relative;
+    z-index: 900;
+    /* Debajo del header pero arriba del canvas */
+    margin-top: 70px;
+    /* IMPORTANTE: Altura del header para que no se traslape */
+    width: 100%;
+    pointer-events: auto;
+    /* Permite clics en los links */
+}
+
+/* Estilos internos que me pasaste aplicados al componente */
+:host ::ng-deep .breadcrumb {
+    margin: 10px auto !important;
+    /* Reducimos el margen superior ya que el padre tiene 70px */
+    width: 90%;
+    max-width: 1400px;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* ==========================================================================
+   4. Galería Three.js (Contenedor)
+   ========================================================================== */
+.gallery-wrapper {
+    position: relative;
+    width: 100%;
+    /* Calculamos el alto restando el header y un poco del breadcrumb */
+    height: 100%;
+    overflow: hidden;
+}
+
+#canvas-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+/* ==========================================================================
+   5. Capa de Interfaz (Textos sobre el 3D)
+   ========================================================================== */
+#ui-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 5;
+    pointer-events: none;
+    /* Deja pasar el scroll al canvas */
+}
+
+.slide-content {
+    position: absolute;
+    top: 20%;
+    left: 8%;
+    width: 35%;
+    max-width: 480px;
+    opacity: 0;
+    padding: 2.5rem;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+    pointer-events: none;
+
+    /* --- EFECTO CUADRO TRANSPARENTE (Glassmorphism) --- */
+    background: rgba(255, 255, 255, 0.15);
+    /* Fondo blanco muy transparente */
+    backdrop-filter: blur(10px);
+    /* Desenfoque del fondo 3D */
+    -webkit-backdrop-filter: blur(10px);
+    /* Soporte para Safari */
+    border-radius: 20px;
+    /* Bordes redondeados */
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    /* Borde sutil */
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    /* Sombra suave */
+}
+
+.slide-content.active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+    /* Permite interactuar con el texto si tuviera links */
+}
+
+h1 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 400;
+    font-style: italic;
+    font-size: clamp(2.5rem, 4.5vw, 4rem);
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+    color: black;
+}
+
+.catalogue-number {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: #b0001e;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.description {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: black;
+    text-align: justify;
+}
+
+/* ==========================================================================
+   6. Responsive
+   ========================================================================== */
+@media (max-width: 768px) {
+    app-breadcrumbs {
+        margin-top: 60px;
+        /* Header más pequeño en móvil */
+    }
+
+    .gallery-wrapper {
+        height: calc(100vh - 120px);
+    }
+
+    .slide-content {
+        width: 85%;
+        left: 7.5%;
+        top: 50%;
+        padding: 1.5rem;
+        border-radius: 12px;
+    }
+
+    h1 {
+        font-size: 2.2rem;
+    }
+}
