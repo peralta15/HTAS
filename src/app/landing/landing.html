@@ -9,6 +9,9 @@
     </p>
   </div>
 
+  <br>
+  <br>
+
   <div class="content-section" appScrollReveal>
     <div class="content-block">
       <div class="content-text">
@@ -107,6 +110,30 @@
     </div>
   </div>
 
+  <div class="marquee-footer">
+    <div class="marquee-track">
+      <div class="marquee-item"><span>HTAS</span> <span class="heart">❤</span></div>
+      <div class="marquee-item"><span>HTAS</span> <span class="heart">❤</span></div>
+      <div class="marquee-item"><span>HTAS</span> <span class="heart">❤</span></div>
+      <div class="marquee-item"><span>HTAS</span> <span class="heart">❤</span></div>
+      <div class="marquee-item"><span>HTAS</span> <span class="heart">❤</span></div>
+      <div class="marquee-item"><span>HTAS</span> <span class="heart">❤</span></div>
+      <div class="marquee-item"><span>HTAS</span> <span class="heart">❤</span></div>
+      <div class="marquee-item"><span>HTAS</span> <span class="heart">❤</span></div>
+      <div class="marquee-item"><span>HTAS</span> <span class="heart">❤</span></div>
+      <div class="marquee-item"><span>HTAS</span> <span class="heart">❤</span></div>
+      <div class="marquee-item"><span>HTAS</span> <span class="heart">❤</span></div>
+      <div class="marquee-item"><span>HTAS</span> <span class="heart">❤</span></div>
+      <div class="marquee-item"><span>HTAS</span> <span class="heart">❤</span></div>
+      <div class="marquee-item"><span>HTAS</span> <span class="heart">❤</span></div>
+      <div class="marquee-item"><span>HTAS</span> <span class="heart">❤</span></div>
+      <div class="marquee-item"><span>HTAS</span> <span class="heart">❤</span></div>
+    </div>
+  </div>
+
+  <br>
+  <br>
+
   <div class="gallery-section" appScrollReveal>
     <div class="section-header">
       <h2>Texto 3</h2>
@@ -117,7 +144,6 @@
       <button class="pill" [class.active]="activeGalleryTab === 2" (click)="setActiveGalleryTab(2)">Opción 2</button>
       <button class="pill" [class.active]="activeGalleryTab === 3" (click)="setActiveGalleryTab(3)">Opción 3</button>
       <button class="pill" [class.active]="activeGalleryTab === 4" (click)="setActiveGalleryTab(4)">Opción 4</button>
-      <button class="pill" [class.active]="activeGalleryTab === 5" (click)="setActiveGalleryTab(5)">Opción 5</button>
     </div>
 
     <!-- Slider Container -->
@@ -148,12 +174,6 @@
           </div>
         </div>
 
-        <div class="slide" [class.active]="activeGalleryTab === 5" (click)="setActiveGalleryTab(5)">
-          <div class="image-card">
-            <span>Imagen 5</span>
-          </div>
-        </div>
-
       </div>
     </div>
 
@@ -163,7 +183,6 @@
       <button class="dot" [class.active]="activeGalleryTab === 2" (click)="setActiveGalleryTab(2)"></button>
       <button class="dot" [class.active]="activeGalleryTab === 3" (click)="setActiveGalleryTab(3)"></button>
       <button class="dot" [class.active]="activeGalleryTab === 4" (click)="setActiveGalleryTab(4)"></button>
-      <button class="dot" [class.active]="activeGalleryTab === 5" (click)="setActiveGalleryTab(5)"></button>
     </div>
   </div>
 
@@ -171,47 +190,67 @@
     <div class="section-header">
       <h2>Texto 4</h2>
     </div>
-
     <div class="info-grid">
-      <div class="info-card">
-        <p>Lorem ipsum dolor sit amet consectetur adipiscing elit tempus lacinia</p>
-      </div>
-      <div class="info-card">
-        <p>Lorem ipsum dolor sit amet consectetur adipiscing elit tempus lacinia</p>
-      </div>
-      <div class="info-card">
-        <p>Lorem ipsum dolor sit amet consectetur adipiscing elit tempus lacinia</p>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal-overlay" [class.active]="isModalOpen" (click)="closeModal()">
-    <div class="modal-content" (click)="$event.stopPropagation()">
-      <button class="modal-close" (click)="closeModal()">×</button>
-
-      <div class="modal-header">
-        <h2>{{modalTitle}}</h2>
-      </div>
-
-      <div class="modal-body">
-        <p>{{modalDescription}}</p>
-
-        <div class="modal-details">
-          <h3>Detalles adicionales</h3>
-          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et
-            dolore magna aliqua.</p>
-          <ul>
-            <li>Característica importante 1</li>
-            <li>Característica importante 2</li>
-            <li>Característica importante 3</li>
-          </ul>
+      <div class="info-card design">
+        <div class="card-icon">
+          <i class="fas fa-pencil-ruler"></i>
+        </div>
+        <div class="card-body">
+          <h3>DESIGN</h3>
+          <p>Creamos experiencias visuales únicas centradas en el usuario y la identidad de marca.</p>
         </div>
       </div>
 
-      <div class="modal-footer">
-        <button class="btn btn-primary" (click)="closeModal()">Cerrar</button>
+      <div class="info-card development">
+        <div class="card-icon">
+          <i class="fas fa-code"></i>
+        </div>
+        <div class="card-body">
+          <h3>DEVELOPMENT</h3>
+          <p>Desarrollo robusto con las últimas tecnologías para garantizar rendimiento y escalabilidad.</p>
+        </div>
+      </div>
+
+      <div class="info-card launch">
+        <div class="card-icon">
+          <i class="fas fa-rocket"></i>
+        </div>
+        <div class="card-body">
+          <h3>LAUNCH</h3>
+          <p>Estrategias de despliegue y optimización para un lanzamiento exitoso en el mercado.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" [class.active]="isModalOpen" (click)="closeModal()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <button class="modal-close" (click)="closeModal()">×</button>
+
+        <div class="modal-header">
+          <h2>{{modalTitle}}</h2>
+        </div>
+
+        <div class="modal-body">
+          <p>{{modalDescription}}</p>
+
+          <div class="modal-details">
+            <h3>Detalles adicionales</h3>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et
+              dolore magna aliqua.</p>
+            <ul>
+              <li>Característica importante 1</li>
+              <li>Característica importante 2</li>
+              <li>Característica importante 3</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-primary" (click)="closeModal()">Cerrar</button>
+        </div>
       </div>
     </div>
   </div>
+</div>
 
-  <app-footer></app-footer>
+<app-footer></app-footer>

@@ -131,10 +131,8 @@
 /* Info Section (Para Misión, Visión y Valores) */
 .info-section {
     padding: 4rem 5% 5rem;
-    background-color: #ffffff;
     margin-bottom: 2rem;
     border-radius: 10px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
     max-width: 1400px;
     margin-left: auto;
     margin-right: auto;

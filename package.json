@@ -35,9 +35,11 @@
     "@ionic/angular": "^8.7.17",
     "@ionic/core": "^8.7.17",
     "express": "^5.1.0",
+    "gsap": "^3.14.2",
     "rxjs": "~7.8.0",
     "three": "^0.182.0",
-    "tslib": "^2.3.0"
+    "tslib": "^2.3.0",
+    "tweakpane": "^4.0.5"
   },
   "devDependencies": {
     "@angular/build": "^21.0.5",

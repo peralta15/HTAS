@@ -175,3 +175,86 @@ h1 {
         font-size: 2.2rem;
     }
 }
+
+.marquee-footer {
+    background-color: #b0001e;
+    /* El color rojo que pediste */
+    height: 80px;
+    /* Un poco más ancho/alto */
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+    z-index: 1000;
+    border-top: 2px solid rgba(255, 255, 255, 0.2);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.marquee-track {
+    display: flex;
+    width: max-content;
+    animation: marquee-infinite 30s linear infinite;
+    /* 30 segundos para un paso suave */
+}
+
+.marquee-item {
+    display: flex;
+    align-items: center;
+    color: #ffffff;
+    /* Texto blanco */
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    /* Letra bien gruesa */
+    font-size: 2rem;
+    /* Letra grande */
+    letter-spacing: 5px;
+    padding: 0 60px;
+    /* Mucho espacio entre cada HTAS */
+    white-space: nowrap;
+}
+
+.heart {
+    color: #ffffff;
+    /* Corazón también blanco */
+    margin-left: 20px;
+    font-size: 2.2rem;
+    /* Efecto opcional de latido */
+    animation: heart-beat 1.5s ease-in-out infinite;
+}
+
+/* Animación del desplazamiento */
+@keyframes marquee-infinite {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+/* Animación de latido para el corazón */
+@keyframes heart-beat {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.2);
+    }
+}
+
+/* Ajuste para que no se rompa en pantallas pequeñas */
+@media (max-width: 768px) {
+    .marquee-footer {
+        height: 60px;
+    }
+
+    .marquee-item {
+        font-size: 1.3rem;
+        padding: 0 30px;
+    }
+}
