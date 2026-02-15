@@ -2,6 +2,14 @@
 
 <app-breadcrumbs></app-breadcrumbs>
 
+<div class="hero-section" #animateUp>
+    <h1 class="hero-title" #animateUp>Recursos</h1>
+    <p class="hero-description" #animateUp>
+        Conoce más sobre nuestra organización, nuestro propósito y el equipo que trabaja incansablemente para
+        alcanzar la excelencia.
+    </p>
+</div>
+
 <div class="gallery-wrapper" *ngIf="isBrowser">
 
     <div #canvasContainer id="canvas-container"></div>
@@ -38,4 +46,91 @@
     </div>
 </div>
 <br>
+
+<section class="info-section">
+    <div class="main-wrapper">
+        <div class="info-grid">
+
+            <div class="info-card">
+                <div class="card-icon"><i class="bi bi-watch"></i></div>
+                <div class="card-body">
+                    <h3>Pulsera Inteligente</h3>
+                    <p>Monitoreo constante de signos vitales, alertas hápticas y sincronización en tiempo real con
+                        hardware médico especializado.</p>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="card-icon"><i class="bi bi-phone"></i></div>
+                <div class="card-body">
+                    <h3>App Móvil</h3>
+                    <p>Interfaz intuitiva para el seguimiento de datos, gestión de notificaciones de emergencia y panel
+                        de control para el usuario final.</p>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="card-icon"><i class="bi bi-laptop"></i></div>
+                <div class="card-body">
+                    <h3>Plataforma Web</h3>
+                    <p>Panel de administración robusto, análisis de Big Data y reportes detallados para profesionales de
+                        la salud y centros de control.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<section class="accordion-section">
+    <div class="section-header">
+        <h2>Preguntas Frecuentes</h2>
+    </div>
+
+    <div class="accordion-container">
+        <div class="accordion-item">
+            <div class="accordion-header" onclick="this.parentElement.classList.toggle('active')">
+                <div class="accordion-icon-box">
+                    <i class="bi bi-shield-check"></i>
+                </div>
+                <span class="accordion-title">¿Es segura la privacidad de mis datos médicos?</span>
+                <span class="arrow-indicator">+</span>
+            </div>
+            <div class="accordion-content">
+                <p>Implementamos protocolos de cifrado de extremo a extremo y cumplimos con las normativas
+                    internacionales de protección de datos de salud (HIPAA), asegurando que solo tú y tu médico tengan
+                    acceso.</p>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <div class="accordion-header" onclick="this.parentElement.classList.toggle('active')">
+                <div class="accordion-icon-box">
+                    <i class="bi bi-bluetooth"></i>
+                </div>
+                <span class="accordion-title">¿Cómo se conecta la pulsera con la App?</span>
+                <span class="arrow-indicator">+</span>
+            </div>
+            <div class="accordion-content">
+                <p>La pulsera utiliza tecnología Bluetooth Low Energy (BLE) para una sincronización automática y de bajo
+                    consumo de batería, manteniendo tus datos actualizados en tiempo real en la App Móvil.</p>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <div class="accordion-header" onclick="this.parentElement.classList.toggle('active')">
+                <div class="accordion-icon-box">
+                    <i class="bi bi-cloud-arrow-up"></i>
+                </div>
+                <span class="accordion-title">¿La plataforma web requiere instalación?</span>
+                <span class="arrow-indicator">+</span>
+            </div>
+            <div class="accordion-content">
+                <p>No, la plataforma web es totalmente basada en la nube. Puedes acceder desde cualquier navegador en tu
+                    laptop utilizando tus credenciales de seguridad seguras.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
 <app-footer></app-footer>

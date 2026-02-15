@@ -1,38 +1,39 @@
 <app-headermenu></app-headermenu>
 <app-breadcrumbs></app-breadcrumbs>
 <div class="landing-container">
-  <div class="hero-section">
-    <h1 class="hero-title">Lorem ipsum dolor sit amet consectetur.</h1>
-    <p class="hero-description">
-      Lorem ipsum dolor sit amet consectetur adipiscing elit tempus lacinia, consequat et rutrum ullamcorper curae
-      pharetra turpis cras.
+  <div class="hero-section" #animateUp>
+    <h1 class="hero-title" #animateUp>Toma el control de tu salud cardiovascular.</h1>
+    <p class="hero-description" #animateUp>
+      La herramienta integral diseñada para el manejo inteligente de la hipertensión arterial.
+      Empodérate, monitorea tus signos vitales y vive con tranquilidad.
     </p>
   </div>
 
   <br>
   <br>
 
-  <div class="content-section" appScrollReveal>
-    <div class="content-block">
-      <div class="content-text">
-        <h2>Texto 1</h2>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore
-          magna aliqua.</p>
-        <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-        </p>
+  <div class="content-section" #animateUp>
+    <div class="content-block" #animateUp>
+      <div class="content-text" #animateUp>
+        <h2 #animateUp>Tu aliado diario en el control tensional.</h2>
+        <p #animateUp>Nuestra aplicación facilita el autocontrol de tu condición de manera organizada y sencilla.
+          Registra sistemáticamente tus mediciones de presión arterial y frecuencia cardiaca,
+          manteniendo un historial preciso que te ayuda a entender mejor tu salud.</p>
+        <p #animateUp>Más que un registro, es un asistente personal: incorpora recordatorios inteligentes para tu
+          medicación y citas médicas, asegurando que nunca pierdas un paso en tu tratamiento y
+          reduciendo el riesgo de complicaciones a largo plazo.</p>
       </div>
-      <div class="content-image">
-        <div class="image-placeholder">
-          <span>Imagen ilustrativa</span>
+      <div class="content-image" #animateUp>
+        <div class="image-placeholder" #animateUp>
+          <img src="assets/pulsera.png" alt="Monitoreo de salud" class="img-fluid">
         </div>
       </div>
     </div>
   </div>
 
-  <section class="bracelet-schematic-section">
-
-    <div class="tech-circles-container">
-      <div class="ellipses-container">
+  <section class="bracelet-schematic-section" #animateUp>
+    <div class="tech-circles-container" #animateUp>
+      <div class="ellipses-container" #animateUp>
         <div class="ellipses ellipses__outer--thin">
           <div class="ellipses ellipses__orbit"></div>
         </div>
@@ -40,77 +41,77 @@
       </div>
     </div>
 
-    <div class="schematic-container">
-      <div class="feature-column left">
+    <div class="schematic-container" #animateUp>
+      <div class="feature-column left" #animateUp>
         <div class="feature-mini-box">
           <div class="pointer-line"></div>
-          <h3>Material Premium</h3>
-          <p>Titanio de grado aeroespacial.</p>
+          <h3 #animateUp>Presión Arterial</h3>
+          <p #animateUp>Monitoreo sistólico y diastólico en tiempo real.</p>
         </div>
         <div class="feature-mini-box">
           <div class="pointer-line"></div>
-          <h3>Bio-Sensores</h3>
-          <p>Monitoreo cardíaco avanzado.</p>
+          <h3 #animateUp>Bio-Sensores</h3>
+          <p #animateUp>Detección de arritmias y frecuencia cardíaca.</p>
         </div>
       </div>
 
-      <div class="bracelet-center-display">
-        <img src="assets/pulsera.png" class="bracelet-hero-img" alt="Smart Bracelet">
-        <div class="bracelet-shadow-ellipse"></div>
+      <div class="bracelet-center-display" #animateUp>
+        <img src="assets/pulsera.png" class="bracelet-hero-img" alt="Smart Bracelet" #animateUp>
+        <div class="bracelet-shadow-ellipse" #animateUp></div>
       </div>
 
-      <div class="feature-column right">
+      <div class="feature-column right" #animateUp>
         <div class="feature-mini-box">
           <div class="pointer-line"></div>
-          <h3>Batería</h3>
-          <p>15 días de autonomía total.</p>
+          <h3 #animateUp>Sincronización</h3>
+          <p #animateUp>Reportes automáticos directos a la App Móvil.</p>
         </div>
         <div class="feature-mini-box">
           <div class="pointer-line"></div>
-          <h3>Resistencia</h3>
-          <p>Sumergible hasta 50 metros.</p>
+          <h3 #animateUp>Autonomía</h3>
+          <p #animateUp>Batería de larga duración para monitoreo 24/7.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <div class="interactive-section" appScrollReveal>
-    <div class="section-header">
-      <h2>Texto 2</h2>
+  <div class="interactive-section" #animateUp>
+    <div class="section-header" #animateUp>
+      <h2 #animateUp>Control Integral de tu Bienestar</h2>
     </div>
 
-    <div class="interactive-container">
-      <div class="interactive-item" (click)="openModal(1)">
-        <div class="item-content">
-          <span class="item-text">Texto 1</span>
-          <span class="arrow-icon">></span>
+    <div class="interactive-container" #animateUp>
+      <div class="interactive-item" (click)="openModal(1)" #animateUp>
+        <div class="item-content" #animateUp>
+          <span class="item-text" #animateUp>Tu Salud en tus Manos</span>
+          <span class="arrow-icon" #animateUp><i class="bi bi-chevron-right"></i></span>
         </div>
       </div>
 
-      <div class="interactive-item" (click)="openModal(2)">
-        <div class="item-content">
-          <span class="item-text">Texto 2</span>
-          <span class="arrow-icon">></span>
+      <div class="interactive-item" (click)="openModal(2)" #animateUp>
+        <div class="item-content" #animateUp>
+          <span class="item-text" #animateUp>Gestión Inteligente</span>
+          <span class="arrow-icon" #animateUp><i class="bi bi-chevron-right"></i></span>
         </div>
       </div>
 
-      <div class="interactive-item" (click)="openModal(3)">
-        <div class="item-content">
-          <span class="item-text">Texto 3</span>
-          <span class="arrow-icon">></span>
+      <div class="interactive-item" (click)="openModal(3)" #animateUp>
+        <div class="item-content" #animateUp>
+          <span class="item-text" #animateUp>Control Tensional</span>
+          <span class="arrow-icon" #animateUp><i class="bi bi-chevron-right"></i></span>
         </div>
       </div>
 
-      <div class="interactive-item" (click)="openModal(4)">
-        <div class="item-content">
-          <span class="item-text">Texto 4</span>
-          <span class="arrow-icon">></span>
+      <div class="interactive-item" (click)="openModal(4)" #animateUp>
+        <div class="item-content" #animateUp>
+          <span class="item-text" #animateUp>Vivir con Tranquilidad</span>
+          <span class="arrow-icon" #animateUp><i class="bi bi-chevron-right"></i></span>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="marquee-footer">
+  <div class="marquee-footer" #animateUp>
     <div class="marquee-track">
       <div class="marquee-item"><span>HTAS</span> <span class="heart">❤</span></div>
       <div class="marquee-item"><span>HTAS</span> <span class="heart">❤</span></div>
@@ -134,43 +135,40 @@
   <br>
   <br>
 
-  <div class="gallery-section" appScrollReveal>
-    <div class="section-header">
-      <h2>Texto 3</h2>
+  <div class="gallery-section" #animateUp>
+    <div class="section-header" #animateUp>
+      <h2 #animateUp>Nuestra Tecnología en Detalle</h2>
     </div>
 
-    <div class="filter-pills">
-      <button class="pill" [class.active]="activeGalleryTab === 1" (click)="setActiveGalleryTab(1)">Opción 1</button>
-      <button class="pill" [class.active]="activeGalleryTab === 2" (click)="setActiveGalleryTab(2)">Opción 2</button>
-      <button class="pill" [class.active]="activeGalleryTab === 3" (click)="setActiveGalleryTab(3)">Opción 3</button>
-      <button class="pill" [class.active]="activeGalleryTab === 4" (click)="setActiveGalleryTab(4)">Opción 4</button>
+    <div class="filter-pills" #animateUp>
+      <button class="pill" [class.active]="activeGalleryTab === 1" (click)="setActiveGalleryTab(1)" #animateUp>Monitoreo
+        App</button>
+      <button class="pill" [class.active]="activeGalleryTab === 2" (click)="setActiveGalleryTab(2)" #animateUp>Pulsera
+        Inteligente</button>
+      <button class="pill" [class.active]="activeGalleryTab === 3" (click)="setActiveGalleryTab(3)"
+        #animateUp>Plataforma
+        Web</button>
     </div>
 
     <!-- Slider Container -->
-    <div class="slider-window">
+    <div class="slider-window" #animateUp>
       <div class="slider-track" [style.transform]="sliderTransform">
 
         <div class="slide" [class.active]="activeGalleryTab === 1" (click)="setActiveGalleryTab(1)">
           <div class="image-card">
-            <span>Imagen 1</span>
+            <img src="assets/pulsera.png" alt="Monitoreo App" class="gallery-img">
           </div>
         </div>
 
         <div class="slide" [class.active]="activeGalleryTab === 2" (click)="setActiveGalleryTab(2)">
           <div class="image-card">
-            <span>Imagen 2</span>
+            <img src="assets/fondo.jpg" alt="Detalle Pulsera" class="gallery-img">
           </div>
         </div>
 
         <div class="slide" [class.active]="activeGalleryTab === 3" (click)="setActiveGalleryTab(3)">
           <div class="image-card">
-            <span>Imagen 3</span>
-          </div>
-        </div>
-
-        <div class="slide" [class.active]="activeGalleryTab === 4" (click)="setActiveGalleryTab(4)">
-          <div class="image-card">
-            <span>Imagen 4</span>
+            <img src="assets/fondo.jpg" alt="Plataforma Web" class="gallery-img">
           </div>
         </div>
 
@@ -182,75 +180,77 @@
       <button class="dot" [class.active]="activeGalleryTab === 1" (click)="setActiveGalleryTab(1)"></button>
       <button class="dot" [class.active]="activeGalleryTab === 2" (click)="setActiveGalleryTab(2)"></button>
       <button class="dot" [class.active]="activeGalleryTab === 3" (click)="setActiveGalleryTab(3)"></button>
-      <button class="dot" [class.active]="activeGalleryTab === 4" (click)="setActiveGalleryTab(4)"></button>
     </div>
   </div>
 
-  <div class="info-section" appScrollReveal>
-    <div class="section-header">
-      <h2>Texto 4</h2>
+  <div class="info-section" #animateUp>
+    <div class="section-header" #animateUp>
+      <h2 #animateUp>Ecosistema de Cuidado Integral</h2>
     </div>
-    <div class="info-grid">
-      <div class="info-card design">
-        <div class="card-icon">
-          <i class="fas fa-pencil-ruler"></i>
-        </div>
-        <div class="card-body">
-          <h3>DESIGN</h3>
-          <p>Creamos experiencias visuales únicas centradas en el usuario y la identidad de marca.</p>
-        </div>
-      </div>
-
-      <div class="info-card development">
-        <div class="card-icon">
-          <i class="fas fa-code"></i>
-        </div>
-        <div class="card-body">
-          <h3>DEVELOPMENT</h3>
-          <p>Desarrollo robusto con las últimas tecnologías para garantizar rendimiento y escalabilidad.</p>
-        </div>
-      </div>
-
-      <div class="info-card launch">
-        <div class="card-icon">
-          <i class="fas fa-rocket"></i>
-        </div>
-        <div class="card-body">
-          <h3>LAUNCH</h3>
-          <p>Estrategias de despliegue y optimización para un lanzamiento exitoso en el mercado.</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="modal-overlay" [class.active]="isModalOpen" (click)="closeModal()">
-      <div class="modal-content" (click)="$event.stopPropagation()">
-        <button class="modal-close" (click)="closeModal()">×</button>
-
-        <div class="modal-header">
-          <h2>{{modalTitle}}</h2>
-        </div>
-
-        <div class="modal-body">
-          <p>{{modalDescription}}</p>
-
-          <div class="modal-details">
-            <h3>Detalles adicionales</h3>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et
-              dolore magna aliqua.</p>
-            <ul>
-              <li>Característica importante 1</li>
-              <li>Característica importante 2</li>
-              <li>Característica importante 3</li>
-            </ul>
+    <div class="main-wrapper" #animateUp>
+      <div class="info-grid" #animateUp>
+        <div class="info-card design" #animateUp>
+          <div class="card-icon" #animateUp>
+          </div>
+          <div class="card-body" #animateUp>
+            <h3 #animateUp>MONITOREO</h3>
+            <p #animateUp>Captura constante de presión arterial y frecuencia cardíaca mediante nuestra pulsera
+              inteligente de alta precisión.</p>
           </div>
         </div>
 
-        <div class="modal-footer">
-          <button class="btn btn-primary" (click)="closeModal()">Cerrar</button>
+        <div class="info-card development" #animateUp>
+          <div class="card-icon" #animateUp>
+          </div>
+          <div class="card-body" #animateUp>
+            <h3 #animateUp>ANÁLISIS</h3>
+            <p #animateUp>Procesamiento inteligente de datos para generar reportes detallados que facilitan la labor del
+              profesional sanitario.
+            </p>
+          </div>
+        </div>
+
+        <div class="info-card launch" #animateUp>
+          <div class="card-icon" #animateUp>
+          </div>
+          <div class="card-body" #animateUp>
+            <h3 #animateUp>BIENESTAR</h3>
+            <p #animateUp>Adherencia al tratamiento y educación en hábitos saludables para reducir riesgos
+              cardiovasculares a largo plazo.</p>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
 
-<app-footer></app-footer>
+  <div class="modal-overlay" [class.active]="isModalOpen" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()" *ngIf="selectedModal">
+      <button class="modal-close" (click)="closeModal()">×</button>
+
+      <div class="modal-header">
+        <h2>{{ selectedModal.title }}</h2>
+      </div>
+
+      <div class="modal-body">
+        <p class="main-description">{{ selectedModal.description }}</p>
+
+        <div class="modal-details">
+          <h3>{{ selectedModal.additionalTitle }}</h3>
+
+          <p>{{ selectedModal.additionalText }}</p>
+
+          <ul>
+            <li *ngFor="let feature of selectedModal.features">
+              {{ feature }}
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-primary" (click)="closeModal()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <app-footer></app-footer>
