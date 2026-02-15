@@ -3,29 +3,35 @@
 <app-breadcrumbs></app-breadcrumbs>
 
 <div class="hero-section" #animateUp>
-    <h1 class="hero-title" #animateUp>Recursos</h1>
+    <h1 class="hero-title" #animateUp>Recursos Tecnológicos</h1>
     <p class="hero-description" #animateUp>
-        Conoce más sobre nuestra organización, nuestro propósito y el equipo que trabaja incansablemente para
-        alcanzar la excelencia.
+        Explora las herramientas tecnológicas diseñadas para el control preciso de la hipertensión y el seguimiento
+        constante de tu salud cardiovascular.
     </p>
 </div>
 
-<div class="gallery-wrapper" *ngIf="isBrowser">
-
+<div class="gallery-wrapper" *ngIf="isBrowser" #animateUp>
     <div #canvasContainer id="canvas-container"></div>
 
     <div id="ui-layer">
         @for (slide of slides; track $index) {
         <div class="slide-content" [id]="'slide-' + $index" [class.active]="currentSlideIndex === $index">
-            <span class="catalogue-number">{{slide.num}} / Proyectos</span>
+            <span class="catalogue-number">Módulo {{slide.num}} / Sistema</span>
             <h1 [innerHTML]="slide.title"></h1>
             <div class="description">{{slide.description}}</div>
         </div>
         }
+
+        <div class="nav-dots">
+            @for (slide of slides; track $index) {
+            <div class="dot" [class.active]="currentSlideIndex === $index" (click)="goToSlide($index)">
+            </div>
+            }
+        </div>
     </div>
 </div>
 
-<div class="marquee-footer">
+<div class="marquee-footer" #animateUp>
     <div class="marquee-track">
         <div class="marquee-item"><span>HTAS</span> <span class="heart">❤</span></div>
         <div class="marquee-item"><span>HTAS</span> <span class="heart">❤</span></div>
@@ -47,34 +53,37 @@
 </div>
 <br>
 
-<section class="info-section">
-    <div class="main-wrapper">
-        <div class="info-grid">
+<section class="info-section" #animateUp>
+    <div class="main-wrapper" #animateUp>
+        <div class="info-grid" #animateUp>
 
-            <div class="info-card">
+            <div class="info-card" #animateUp>
                 <div class="card-icon"><i class="bi bi-watch"></i></div>
                 <div class="card-body">
-                    <h3>Pulsera Inteligente</h3>
-                    <p>Monitoreo constante de signos vitales, alertas hápticas y sincronización en tiempo real con
-                        hardware médico especializado.</p>
+                    <h3 #animateUp>Dispositivo Wearable</h3>
+                    <p #animateUp>Sensor de grado clínico diseñado para la captura continua de presión arterial
+                        sistólica y
+                        diastólica, con tecnología de oximetría avanzada y alertas preventivas ante arritmias.</p>
                 </div>
             </div>
 
-            <div class="info-card">
+            <div class="info-card" #animateUp>
                 <div class="card-icon"><i class="bi bi-phone"></i></div>
                 <div class="card-body">
-                    <h3>App Móvil</h3>
-                    <p>Interfaz intuitiva para el seguimiento de datos, gestión de notificaciones de emergencia y panel
-                        de control para el usuario final.</p>
+                    <h3 #animateUp>Gestión Personal (App)</h3>
+                    <p #animateUp>Centro de control del paciente donde se visualizan tendencias diarias, se gestiona la
+                        adherencia
+                        al tratamiento farmacológico y se activan protocolos de emergencia geolocalizados.</p>
                 </div>
             </div>
 
-            <div class="info-card">
+            <div class="info-card" #animateUp>
                 <div class="card-icon"><i class="bi bi-laptop"></i></div>
                 <div class="card-body">
-                    <h3>Plataforma Web</h3>
-                    <p>Panel de administración robusto, análisis de Big Data y reportes detallados para profesionales de
-                        la salud y centros de control.</p>
+                    <h3 #animateUp>Portal Especialista</h3>
+                    <p #animateUp>Plataforma de telemonitorización para médicos que utiliza analítica avanzada para
+                        predecir crisis
+                        hipertensivas y generar informes de riesgo cardiovascular automatizados.</p>
                 </div>
             </div>
 
@@ -82,52 +91,57 @@
     </div>
 </section>
 
-<section class="accordion-section">
-    <div class="section-header">
-        <h2>Preguntas Frecuentes</h2>
+<section class="accordion-section" #animateUp>
+    <div class="section-header" #animateUp>
+        <h2 #animateUp>Centro de Información HTAS</h2>
     </div>
 
-    <div class="accordion-container">
+    <div class="accordion-container" #animateUp>
         <div class="accordion-item">
             <div class="accordion-header" onclick="this.parentElement.classList.toggle('active')">
                 <div class="accordion-icon-box">
-                    <i class="bi bi-shield-check"></i>
+                    <i class="bi bi-activity"></i>
                 </div>
-                <span class="accordion-title">¿Es segura la privacidad de mis datos médicos?</span>
+                <span class="accordion-title">¿Qué es la Hipertensión Arterial Sistémica (HTAS)?</span>
                 <span class="arrow-indicator">+</span>
             </div>
-            <div class="accordion-content">
-                <p>Implementamos protocolos de cifrado de extremo a extremo y cumplimos con las normativas
-                    internacionales de protección de datos de salud (HIPAA), asegurando que solo tú y tu médico tengan
-                    acceso.</p>
+            <div class="accordion-content" #animateUp>
+                <p>La HTAS es una enfermedad crónica donde la fuerza de la sangre contra las paredes de las
+                    arterias es
+                    demasiado alta de forma sostenida. Nuestra plataforma ayuda a monitorear este "asesino silencioso",
+                    permitiendo detectar a tiempo variaciones que podrían causar daños en el corazón, cerebro o riñones.
+                </p>
             </div>
         </div>
 
-        <div class="accordion-item">
+        <div class="accordion-item" #animateUp>
             <div class="accordion-header" onclick="this.parentElement.classList.toggle('active')">
                 <div class="accordion-icon-box">
-                    <i class="bi bi-bluetooth"></i>
+                    <i class="bi bi-cpu"></i>
                 </div>
-                <span class="accordion-title">¿Cómo se conecta la pulsera con la App?</span>
+                <span class="accordion-title">¿Cómo integra el ecosistema mis niveles de salud?</span>
                 <span class="arrow-indicator">+</span>
             </div>
-            <div class="accordion-content">
-                <p>La pulsera utiliza tecnología Bluetooth Low Energy (BLE) para una sincronización automática y de bajo
-                    consumo de batería, manteniendo tus datos actualizados en tiempo real en la App Móvil.</p>
+            <div class="accordion-content" #animateUp>
+                <p>El ecosistema vincula el hardware de medición con nuestra arquitectura en la nube mediante
+                    tecnología
+                    BLE. Esto permite que cada toma de presión se analice instantáneamente, comparándola con tus rangos
+                    históricos para enviarte recomendaciones personalizadas o alertas de riesgo en tiempo real.</p>
             </div>
         </div>
 
-        <div class="accordion-item">
+        <div class="accordion-item" #animateUp>
             <div class="accordion-header" onclick="this.parentElement.classList.toggle('active')">
                 <div class="accordion-icon-box">
-                    <i class="bi bi-cloud-arrow-up"></i>
+                    <i class="bi bi-shield-lock"></i>
                 </div>
-                <span class="accordion-title">¿La plataforma web requiere instalación?</span>
+                <span class="accordion-title">¿Cómo protegen mis registros clínicos?</span>
                 <span class="arrow-indicator">+</span>
             </div>
-            <div class="accordion-content">
-                <p>No, la plataforma web es totalmente basada en la nube. Puedes acceder desde cualquier navegador en tu
-                    laptop utilizando tus credenciales de seguridad seguras.</p>
+            <div class="accordion-content" #animateUp>
+                <p>Utilizamos estándares de encriptación AES-256 para asegurar que tu historial de presión arterial y
+                    datos biométricos sean privados. Cumplimos con las normativas internacionales de protección de datos
+                    de salud, garantizando que tú tienes el control total sobre quién accede a tu información.</p>
             </div>
         </div>
     </div>

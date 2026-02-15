@@ -1,9 +1,9 @@
-import { Component, ElementRef, ViewChild, AfterViewInit, OnDestroy, HostListener, Inject, PLATFORM_ID } from '@angular/core';
+import { Component, ElementRef, ViewChild, ViewChildren, QueryList, AfterViewInit, OnDestroy, HostListener, Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser, CommonModule } from '@angular/common';
 import { Headermenu } from "../../template/headermenu/headermenu";
 import { Footer } from "../../template/footer/footer";
-import * as THREE from 'three';
 import { Breadcrumbs } from "../breadcrumbs/breadcrumbs";
+import * as THREE from 'three';
 
 @Component({
   selector: 'app-recursos',
@@ -13,23 +13,40 @@ import { Breadcrumbs } from "../breadcrumbs/breadcrumbs";
   styleUrl: './recursos.css',
 })
 export class Recursos implements AfterViewInit, OnDestroy {
+  // Referencias para Three.js
   @ViewChild('canvasContainer') canvasContainer!: ElementRef;
 
+  // Referencias para animaciones de Scroll (estilo Nosotros)
+  @ViewChildren('animateUp') elementsToAnimate!: QueryList<ElementRef>;
+  @ViewChildren('infoCard') infoCards!: QueryList<ElementRef>;
+
   slides = [
-    { num: '01', title: 'Pulsera <br>Inteligente', description: 'Un dispositivo wearable diseñado para el monitoreo hemodinámico constante. Esta pieza integra sensores de alta precisión que traducen los signos vitales en datos accionables, permitiendo una supervisión silenciosa pero rigurosa de la presión arterial en tiempo real.' },
-    { num: '02', title: 'Aplicación <br>Móvil', description: 'El núcleo del ecosistema digital. Esta interfaz transforma la complejidad de los datos médicos en una experiencia de usuario intuitiva, facilitando el seguimiento histórico y la generación de alertas preventivas mediante algoritmos de análisis predictivo.' },
-    { num: '03', title: 'Pagina <br>Web', description: 'Un centro de control integral orientado al análisis clínico profundo. Diseñada para la visualización de grandes volúmenes de datos, esta solución web permite a los profesionales de la salud gestionar diagnósticos con una claridad estructural sin precedentes.' }
+    {
+      num: '01',
+      title: 'Monitoreo <br>Wearable',
+      description: 'Dispositivo biomédico de pulso diseñado para la captura de constantes hemodinámicas. Utiliza sensores PPG de alta resolución para el seguimiento continuo de la presión arterial sistólica y diastólica.'
+    },
+    {
+      num: '02',
+      title: 'Ecosistema <br>Móvil',
+      description: 'Interfaz de gestión para el paciente que centraliza el registro de presiones. Actúa como el puente de comunicación mediante Bluetooth BLE, procesando datos para alertas preventivas.'
+    },
+    {
+      num: '03',
+      title: 'Plataforma <br>Web',
+      description: 'Panel web de alta fidelidad diseñado para especialistas en cardiología. Integra herramientas de Big Data para visualizar tendencias históricas y reportes detallados.'
+    }
   ];
 
   currentSlideIndex = 0;
   isBrowser: boolean;
 
+  // Propiedades de Three.js
   private scene!: THREE.Scene;
   private camera!: THREE.PerspectiveCamera;
   private renderer!: THREE.WebGLRenderer;
   private galleryGroup = new THREE.Group();
   private paintingGroups: THREE.Group[] = [];
-
   private currentScroll = 0;
   private targetScroll = 0;
   private snapTimer: any;
@@ -56,59 +73,87 @@ export class Recursos implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit() {
     if (this.isBrowser) {
-      // El pequeño delay asegura que Angular haya terminado de renderizar el layout
+      // Iniciamos ambos sistemas: Three.js y Observadores de Scroll
       setTimeout(() => {
         this.initThree();
         this.animate();
-        this.onResize(); // Forzar ajuste inicial
-      }, 50);
+        this.onResize();
+        this.initScrollAnimations(); // <-- Implementación de Nosotros
+        this.initCard3DAnimations();   // <-- Implementación de Nosotros
+      }, 100);
     }
   }
 
-  ngOnDestroy() {
-    if (this.isBrowser) {
-      if (this.animationId) cancelAnimationFrame(this.animationId);
-      if (this.renderer) {
-        this.renderer.dispose();
-        this.renderer.forceContextLoss();
-      }
-    }
+  /* ==========================================================================
+     1. LÓGICA DE ANIMACIONES DE SCROLL (HEREDADA DE NOSOTROS)
+     ========================================================================== */
+
+  private initScrollAnimations() {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.animate([
+            { opacity: 0, transform: 'translateY(60px)' },
+            { opacity: 1, transform: 'translateY(0)' }
+          ], {
+            duration: 800,
+            easing: 'ease-out',
+            fill: 'forwards'
+          });
+        }
+      });
+    }, { threshold: 0.1 });
+
+    this.elementsToAnimate.forEach(el => observer.observe(el.nativeElement));
   }
+
+  private initCard3DAnimations() {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.animate([
+            { transform: 'perspective(1000px) rotateX(25deg) scale(0.9)', opacity: 0 },
+            { transform: 'perspective(1000px) rotateX(0deg) scale(1)', opacity: 1 }
+          ], {
+            duration: 900,
+            easing: 'ease-out',
+            fill: 'forwards'
+          });
+        }
+      });
+    }, { threshold: 0.1 });
+
+    this.infoCards.forEach(card => observer.observe(card.nativeElement));
+  }
+
+  /* ==========================================================================
+     2. LÓGICA DE THREE.JS (GALLERY)
+     ========================================================================== */
 
   private initThree() {
     if (!this.canvasContainer) return;
-
-    // 1. Escena y Niebla
     this.scene = new THREE.Scene();
 
-    // 2. Cámara
     const aspect = window.innerWidth / window.innerHeight;
     this.camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 1000);
     this.camera.position.set(0, 0, this.CONFIG.camZ);
 
-    // 3. Renderer con mejoras de color
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-    // Configuración para que las imágenes no se vean descoloridas
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
 
-    // Limpiar contenedor antes de insertar (evita duplicados en recargas de desarrollo)
     this.canvasContainer.nativeElement.innerHTML = '';
     this.canvasContainer.nativeElement.appendChild(this.renderer.domElement);
 
-    // 4. Luces
     this.scene.add(new THREE.AmbientLight(0xffffff, 1.2));
     this.scene.add(this.galleryGroup);
 
-    // 5. Creación de Cuadros
     const textureLoader = new THREE.TextureLoader();
     const planeGeo = new THREE.PlaneGeometry(this.CONFIG.pWidth, this.CONFIG.pHeight);
     const frameGeo = new THREE.BoxGeometry(this.CONFIG.pWidth + 0.8, this.CONFIG.pHeight + 0.8, 0.5);
     const frameMat = new THREE.MeshBasicMaterial({ color: this.CONFIG.frameColor });
 
-    // Asegúrate de que esta ruta sea accesible desde tu servidor local
     const images = ['assets/pulsera.png', 'assets/pulsera.png', 'assets/pulsera.png'];
 
     for (let i = 0; i < this.CONFIG.slideCount; i++) {
@@ -116,20 +161,13 @@ export class Recursos implements AfterViewInit, OnDestroy {
       group.position.set(i * this.CONFIG.spacingX, 0, 0);
 
       const texture = textureLoader.load(images[i]);
-      texture.colorSpace = THREE.SRGBColorSpace; // Corrección de gama
+      texture.colorSpace = THREE.SRGBColorSpace;
 
-      const mat = new THREE.MeshBasicMaterial({
-        map: texture,
-        transparent: true,
-        side: THREE.DoubleSide
-      });
-
+      const mat = new THREE.MeshBasicMaterial({ map: texture, transparent: true, side: THREE.DoubleSide });
       const mesh = new THREE.Mesh(planeGeo, mat);
       mesh.position.z = 0.31;
 
       const frame = new THREE.Mesh(frameGeo, frameMat);
-      frame.position.z = 0;
-
       const shadowGeo = new THREE.PlaneGeometry(this.CONFIG.pWidth + 1, this.CONFIG.pHeight + 1);
       const shadowMat = new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.12 });
       const shadow = new THREE.Mesh(shadowGeo, shadowMat);
@@ -144,9 +182,17 @@ export class Recursos implements AfterViewInit, OnDestroy {
     this.galleryGroup.position.x = 8;
   }
 
+  goToSlide(index: number) {
+    if (!this.isBrowser) return;
+    const diff = index - this.currentSlideIndex;
+    this.targetScroll += diff * this.CONFIG.spacingX;
+  }
+
   @HostListener('window:wheel', ['$event'])
   onWheel(e: WheelEvent) {
     if (!this.isBrowser) return;
+    // Detenemos el scroll si estamos dentro del área del canvas para controlar la galería
+    // Opcional: e.preventDefault();
     this.targetScroll += e.deltaY * 0.1;
     if (this.snapTimer) clearTimeout(this.snapTimer);
     this.snapTimer = setTimeout(() => this.snapToNearest(), this.CONFIG.snapDelay);
@@ -166,8 +212,6 @@ export class Recursos implements AfterViewInit, OnDestroy {
 
   private animate = () => {
     this.animationId = requestAnimationFrame(this.animate);
-
-    // Suavizado de scroll (Lerp)
     this.currentScroll += (this.targetScroll - this.currentScroll) * this.CONFIG.lerpSpeed;
 
     const xMove = this.currentScroll * Math.cos(this.CONFIG.wallAngleY);
@@ -176,7 +220,6 @@ export class Recursos implements AfterViewInit, OnDestroy {
     this.camera.position.x = xMove;
     this.camera.position.z = this.CONFIG.camZ - zMove;
 
-    // Sistema de carrusel infinito
     this.paintingGroups.forEach((group, i) => {
       const originalX = i * this.CONFIG.spacingX;
       const distFromCam = this.currentScroll - originalX;
@@ -184,11 +227,9 @@ export class Recursos implements AfterViewInit, OnDestroy {
       group.position.x = originalX + shift;
     });
 
-    // Pequeño movimiento de cámara con el mouse
     this.camera.rotation.x = this.mouse.y * 0.05;
     this.camera.rotation.y = -this.mouse.x * 0.05;
 
-    // Actualizar índice de diapositiva actual
     const rawIndex = Math.round(this.currentScroll / this.CONFIG.spacingX);
     this.currentSlideIndex = ((rawIndex % this.CONFIG.slideCount) + this.CONFIG.slideCount) % this.CONFIG.slideCount;
 
@@ -201,5 +242,15 @@ export class Recursos implements AfterViewInit, OnDestroy {
     this.camera.aspect = window.innerWidth / window.innerHeight;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(window.innerWidth, window.innerHeight);
+  }
+
+  ngOnDestroy() {
+    if (this.isBrowser) {
+      if (this.animationId) cancelAnimationFrame(this.animationId);
+      if (this.renderer) {
+        this.renderer.dispose();
+        this.renderer.forceContextLoss();
+      }
+    }
   }
 }

@@ -6,7 +6,7 @@
     padding-top: 0px;
 }
 
-/* Hero Section */
+/* ===== HERO SECTION ===== */
 .hero-section {
     background: linear-gradient(135deg, #b0001e 0%, #b0001e 100%);
     color: #ffffff;
@@ -37,7 +37,7 @@
     font-weight: 400;
 }
 
-/* Content Section */
+/* ===== CONTENT SECTION ===== */
 .content-section {
     padding: 4rem 5% 5rem;
     background-color: #ffffff;
@@ -98,26 +98,39 @@
     min-width: 300px;
 }
 
+/* Image Placeholder */
 .image-placeholder {
     width: 100%;
-    height: 380px;
-    background: linear-gradient(135deg, #f0f2f5, #e0e4e9);
-    border-radius: 12px;
+    height: 400px;
+    background: radial-gradient(circle, #ffffff 0%, #f0f2f5 100%);
+    border-radius: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #666;
-    font-size: 1.3rem;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.03);
+    transition: all 0.3s ease;
 }
 
 .image-placeholder:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+    transform: translateY(-8px);
+    box-shadow: 0 15px 40px rgba(176, 0, 30, 0.1);
 }
 
-/* Section Header通用 */
+.image-placeholder:hover .img-fluid-nosotros {
+    transform: scale(1.05);
+}
+
+.img-fluid-nosotros {
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.15));
+    transition: transform 0.4s ease;
+}
+
+/* ===== SECTION HEADER (通用) ===== */
 .section-header {
     text-align: center;
     margin-bottom: 3rem;
@@ -146,7 +159,7 @@
     border-radius: 2px;
 }
 
-/* Purpose Section (Misión y Visión) - Mismos estilos que valores */
+/* ===== PURPOSE SECTION (Misión y Visión) ===== */
 .purpose-section {
     width: 100%;
     padding: 50px 20px;
@@ -237,7 +250,7 @@
     font-size: 1.6rem;
 }
 
-/* Methodology Section */
+/* ===== METHODOLOGY SECTION ===== */
 .methodology-section {
     padding: 4rem 5%;
     background-color: #ffffff;
@@ -300,7 +313,7 @@
     margin: 0;
 }
 
-/* Values Section - Mismos estilos que propósito */
+/* ===== VALUES SECTION ===== */
 .values-section {
     width: 100%;
     padding: 50px 20px;
@@ -391,7 +404,22 @@
     font-size: 1.6rem;
 }
 
-/* Responsive */
+/* ===== ANIMATIONS ===== */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ===== RESPONSIVE BREAKPOINTS ===== */
+
+/* 1024px */
 @media (max-width: 1024px) {
     .hero-title {
         font-size: 2.5rem;
@@ -403,6 +431,27 @@
     }
 }
 
+/* 800px */
+@media (max-width: 800px) {
+
+    .purpose-grid,
+    .values-grid {
+        flex-direction: column;
+    }
+
+    .purpose-card,
+    .value-card {
+        flex: none !important;
+        width: 100%;
+    }
+
+    .purpose-section .section-header h2,
+    .values-section .section-header h2 {
+        font-size: 2rem;
+    }
+}
+
+/* 768px */
 @media (max-width: 768px) {
     .hero-section {
         padding: 4rem 5%;
@@ -433,25 +482,7 @@
     }
 }
 
-@media (max-width: 800px) {
-
-    .purpose-grid,
-    .values-grid {
-        flex-direction: column;
-    }
-
-    .purpose-card,
-    .value-card {
-        flex: none !important;
-        width: 100%;
-    }
-
-    .purpose-section .section-header h2,
-    .values-section .section-header h2 {
-        font-size: 2rem;
-    }
-}
-
+/* 480px */
 @media (max-width: 480px) {
     .hero-title {
         font-size: 1.9rem;
@@ -478,17 +509,5 @@
     .purpose-section .section-header h2,
     .values-section .section-header h2 {
         font-size: 1.8rem;
-    }
-}
-
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
     }
 }

@@ -182,31 +182,258 @@ h1 {
 }
 
 /* ==========================================================================
-   6. Responsive
+   6. Responsive - CORREGIDO: Cuadrado centrado en móviles
    ========================================================================== */
+
+/* Tablets (hasta 1024px) */
+@media (max-width: 1024px) {
+    .slide-content {
+        width: 45%;
+        left: 27.5%;
+        /* Centrado: (100% - 45%) / 2 = 27.5% */
+        padding: 2rem;
+    }
+}
+
+/* Tablets pequeñas (hasta 900px) */
+@media (max-width: 900px) {
+    .info-grid {
+        flex-direction: column;
+    }
+
+    .info-card {
+        flex: none !important;
+        width: 100%;
+    }
+
+    .info-grid:hover .info-card {
+        opacity: 1;
+    }
+}
+
+/* Tablets pequeñas (hasta 768px) */
 @media (max-width: 768px) {
     app-breadcrumbs {
         margin-top: 60px;
-        /* Header más pequeño en móvil */
     }
 
     .gallery-wrapper {
         height: calc(100vh - 120px);
     }
 
+    /* CORREGIDO: Cuadrado centrado en tablets */
     .slide-content {
-        width: 85%;
-        left: 7.5%;
-        top: 50%;
-        padding: 1.5rem;
-        border-radius: 12px;
+        width: 80%;
+        left: 10%;
+        /* Centrado: (100% - 80%) / 2 = 10% */
+        top: 15%;
+        padding: 1.8rem;
+        border-radius: 16px;
     }
 
     h1 {
         font-size: 2.2rem;
+        margin-bottom: 1rem;
+    }
+
+    .nav-dots {
+        bottom: 30px;
+    }
+
+    .dot {
+        width: 12px;
+        height: 12px;
+    }
+
+    .marquee-footer {
+        height: 60px;
+    }
+
+    .marquee-item {
+        font-size: 1.3rem;
+        padding: 0 30px;
     }
 }
 
+/* Móviles grandes (hasta 600px) */
+@media (max-width: 600px) {
+
+    /* CORREGIDO: Cuadrado centrado en móviles grandes */
+    .slide-content {
+        width: 85%;
+        left: 7.5%;
+        /* Centrado: (100% - 85%) / 2 = 7.5% */
+        top: 12%;
+        padding: 1.5rem;
+    }
+
+    h1 {
+        font-size: 1.9rem;
+    }
+
+    .description {
+        font-size: 0.95rem;
+    }
+}
+
+/* Móviles pequeños (hasta 480px) */
+@media (max-width: 480px) {
+    .hero-section {
+        padding: 4rem 4%;
+    }
+
+    .hero-title {
+        font-size: 2rem;
+    }
+
+    .hero-description {
+        font-size: 1rem;
+    }
+
+    /* CORREGIDO: Cuadrado centrado en móviles pequeños */
+    .slide-content {
+        width: 90%;
+        left: 5%;
+        /* Centrado: (100% - 90%) / 2 = 5% */
+        top: 10%;
+        padding: 1.2rem;
+        border-radius: 12px;
+    }
+
+    h1 {
+        font-size: 1.7rem;
+    }
+
+    .catalogue-number {
+        font-size: 0.6rem;
+        letter-spacing: 2px;
+    }
+
+    .description {
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+
+    .nav-dots {
+        bottom: 20px;
+        gap: 10px;
+    }
+
+    .dot {
+        width: 10px;
+        height: 10px;
+    }
+
+    .info-section {
+        padding: 1.5rem 4%;
+    }
+
+    .main-wrapper {
+        padding: 30px 15px;
+        border-radius: 20px;
+    }
+
+    .card-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+    }
+
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    .card-body h3 {
+        font-size: 1.2rem;
+    }
+
+    .card-body p {
+        font-size: 0.85rem;
+    }
+
+    h2 {
+        font-size: 2rem;
+    }
+
+    .accordion-section {
+        padding: 3rem 4%;
+    }
+
+    .accordion-header {
+        padding: 0.8rem 1.2rem;
+    }
+
+    .accordion-icon-box {
+        min-width: 40px;
+        width: 40px;
+        height: 40px;
+        font-size: 1.1rem;
+        margin-right: 1rem;
+    }
+
+    .accordion-title {
+        font-size: 0.95rem;
+    }
+
+    .arrow-indicator {
+        font-size: 1.3rem;
+    }
+
+    .accordion-content p {
+        padding: 0.8rem 0 1.5rem 3.5rem;
+        font-size: 0.9rem;
+    }
+}
+
+/* Móviles muy pequeños (hasta 360px) */
+@media (max-width: 360px) {
+    .hero-title {
+        font-size: 1.8rem;
+    }
+
+    /* CORREGIDO: Cuadrado centrado en móviles muy pequeños */
+    .slide-content {
+        width: 92%;
+        left: 4%;
+        /* Centrado: (100% - 92%) / 2 = 4% */
+        top: 8%;
+        padding: 1rem;
+    }
+
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    .catalogue-number {
+        font-size: 0.55rem;
+        letter-spacing: 1px;
+    }
+
+    .description {
+        font-size: 0.8rem;
+    }
+
+    .card-body h3 {
+        font-size: 1.1rem;
+    }
+
+    .card-body p {
+        font-size: 0.8rem;
+    }
+
+    .accordion-title {
+        font-size: 0.85rem;
+    }
+
+    .accordion-content p {
+        font-size: 0.8rem;
+        padding-left: 3rem;
+    }
+}
+
+/* ==========================================================================
+   7. Marquee Footer
+   ========================================================================== */
 .marquee-footer {
     background-color: #b0001e;
     /* El color rojo que pediste */
@@ -278,20 +505,8 @@ h1 {
     }
 }
 
-/* Ajuste para que no se rompa en pantallas pequeñas */
-@media (max-width: 768px) {
-    .marquee-footer {
-        height: 60px;
-    }
-
-    .marquee-item {
-        font-size: 1.3rem;
-        padding: 0 30px;
-    }
-}
-
 /* ==========================================================================
-   Nuevos Estilos para las Info Cards
+   8. Info Cards
    ========================================================================== */
 
 .info-section {
@@ -377,24 +592,8 @@ h1 {
     font-size: 0.95rem;
 }
 
-/* Responsive para las Cards */
-@media (max-width: 900px) {
-    .info-grid {
-        flex-direction: column;
-    }
-
-    .info-card {
-        flex: none !important;
-        width: 100%;
-    }
-
-    .info-grid:hover .info-card {
-        opacity: 1;
-    }
-}
-
 /* ==========================================================================
-   Sección de Acordeones (Estilo Cards)
+   9. Sección de Acordeones (Estilo Cards)
    ========================================================================== */
 h2 {
     font-size: 2.4rem;
@@ -509,4 +708,39 @@ h2 {
 
 .accordion-item.active .accordion-icon-box {
     background: #8b0018;
+}
+
+/* ==========================================================================
+   10. Navegación por Puntos
+   ========================================================================== */
+.nav-dots {
+    position: absolute;
+    bottom: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 15px;
+    z-index: 20;
+    pointer-events: auto;
+    /* Permite clics sobre la capa invisible */
+}
+
+.dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.1);
+    border: 2px solid #b0001e;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.dot.active {
+    background: #b0001e;
+    transform: scale(1.4);
+    box-shadow: 0 0 15px rgba(176, 0, 30, 0.4);
+}
+
+.dot:hover {
+    background: rgba(176, 0, 30, 0.5);
 }
