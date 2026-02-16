@@ -154,7 +154,7 @@ export class Recursos implements AfterViewInit, OnDestroy {
     const frameGeo = new THREE.BoxGeometry(this.CONFIG.pWidth + 0.8, this.CONFIG.pHeight + 0.8, 0.5);
     const frameMat = new THREE.MeshBasicMaterial({ color: this.CONFIG.frameColor });
 
-    const images = ['assets/pulsera.png', 'assets/pulsera.png', 'assets/pulsera.png'];
+    const images = ['assets/pulserahtas.png', 'assets/celhtas.png', 'assets/laptophtas.png'];
 
     for (let i = 0; i < this.CONFIG.slideCount; i++) {
       const group = new THREE.Group();

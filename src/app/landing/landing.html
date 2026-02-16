@@ -17,15 +17,35 @@
       <div class="content-text" #animateUp>
         <h2 #animateUp>Tu aliado diario en el control tensional.</h2>
         <p #animateUp>Nuestra aplicación facilita el autocontrol de tu condición de manera organizada y sencilla.
-          Registra sistemáticamente tus mediciones de presión arterial y frecuencia cardiaca,
-          manteniendo un historial preciso que te ayuda a entender mejor tu salud.</p>
+          Registra sistemáticamente tus mediciones de presión arterial y frecuencia cardiaca.</p>
         <p #animateUp>Más que un registro, es un asistente personal: incorpora recordatorios inteligentes para tu
-          medicación y citas médicas, asegurando que nunca pierdas un paso en tu tratamiento y
-          reduciendo el riesgo de complicaciones a largo plazo.</p>
+          medicación y citas médicas.</p>
       </div>
-      <div class="content-image" #animateUp>
-        <div class="image-placeholder" #animateUp>
-          <img src="assets/pulsera.png" alt="Monitoreo de salud" class="img-fluid">
+
+      <div class="phone-container">
+        <div class="phone">
+          <div class="phone-body">
+            <div class="button"></div>
+            <div class="button volume"></div>
+
+            <div class="screen">
+              <div class="notch"></div>
+              <div class="screen-content">
+                <div class="heart-icon">❤️</div>
+                <h2 class="phone-header">HTAS</h2>
+                <div class="pulse-container">
+                  <div class="pulse-bar"></div>
+                  <div class="pulse-bar delay-1"></div>
+                  <div class="pulse-bar delay-2"></div>
+                </div>
+                <p class="phone-phrase">
+                  Cuidando tu corazón<br>
+                  <span>en todo momento.</span>
+                </p>
+                <div class="system-badge">● SISTEMA ACTIVO</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -156,19 +176,19 @@
 
         <div class="slide" [class.active]="activeGalleryTab === 1" (click)="setActiveGalleryTab(1)">
           <div class="image-card">
-            <img src="assets/pulsera.png" alt="Monitoreo App" class="gallery-img">
+            <img src="assets/celhtas2.png" alt="Monitoreo App" class="gallery-img">
           </div>
         </div>
 
         <div class="slide" [class.active]="activeGalleryTab === 2" (click)="setActiveGalleryTab(2)">
           <div class="image-card">
-            <img src="assets/fondo.jpg" alt="Detalle Pulsera" class="gallery-img">
+            <img src="assets/pulserahtas2.png" alt="Detalle Pulsera" class="gallery-img">
           </div>
         </div>
 
         <div class="slide" [class.active]="activeGalleryTab === 3" (click)="setActiveGalleryTab(3)">
           <div class="image-card">
-            <img src="assets/fondo.jpg" alt="Plataforma Web" class="gallery-img">
+            <img src="assets/pchtas.png" alt="Plataforma Web" class="gallery-img">
           </div>
         </div>
 
