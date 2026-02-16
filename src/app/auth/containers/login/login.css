@@ -13,7 +13,6 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #F0F4F3;
   padding-top: 0px;
   /* Reduced from 70px as breadcrumbs clear the header */
   padding-bottom: 20px;
@@ -281,4 +280,171 @@
     width: 100%;
     /* Full width button on mobile */
   }
+}
+
+/* --- ESTILOS DEL MODAL --- */
+
+/* Fondo oscurecido con desenfoque para dar enfoque al modal */
+.custom-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  /* Por encima de todo */
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Caja del Modal */
+.custom-modal {
+  background: white;
+  width: 90%;
+  max-width: 400px;
+  padding: 30px;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+  animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Iconos dinámicos */
+.modal-icon {
+  font-size: 70px;
+  margin-bottom: 15px;
+  display: inline-block;
+}
+
+/* Estilo según el tipo (Éxito o Error) */
+.custom-modal.success .modal-icon {
+  color: #b0001e;
+  /* Verde Ionic */
+}
+
+.custom-modal.error .modal-icon {
+  color: #b0001e;
+  /* Tu rojo institucional */
+}
+
+.custom-modal.info .modal-icon {
+  color: #3880ff;
+}
+
+/* Textos dentro del modal */
+.custom-modal h3 {
+  font-size: 22px;
+  margin-bottom: 10px;
+  color: #333;
+  font-weight: 700;
+}
+
+.custom-modal p {
+  font-size: 15px;
+  color: #666;
+  line-height: 1.5;
+  margin-bottom: 25px;
+}
+
+/* Botón del Modal (Sincronizado con tus estilos) */
+.modal-button {
+  width: 100%;
+  /* Botón ancho para móvil/escritorio */
+  max-width: 200px;
+  height: 45px;
+  background-color: #b0001e;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+.modal-button:hover {
+  background-color: #8a0017;
+  transform: scale(1.03);
+}
+
+.modal-button:active {
+  transform: scale(0.98);
+}
+
+/* --- ANIMACIONES --- */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Ajuste específico para móvil */
+@media (max-width: 768px) {
+  .custom-modal {
+    width: 85%;
+    padding: 25px 20px;
+  }
+
+  .modal-icon {
+    font-size: 60px;
+  }
+
+  .custom-modal h3 {
+    font-size: 20px;
+  }
+}
+
+.error {
+  position: absolute;
+  bottom: -18px;
+  /* Lo coloca justo debajo del input gris */
+  left: 10px;
+  color: #b0001e;
+  font-size: 11px;
+  font-weight: 600;
+  animation: fadeInError 0.3s ease-in-out;
+}
+
+/* Animación sutil para que el error aparezca suavemente */
+@keyframes fadeInError {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Cambiar el borde del input cuando hay un error (opcional pero recomendado) */
+.container-input:has(input.ng-invalid.ng-touched) {
+  border: 1px solid rgba(176, 0, 30, 0.3);
+}
+
+/* Estilo para que el icono del input también cambie a rojo si hay error */
+.container-input:has(input.ng-invalid.ng-touched) i {
+  color: #b0001e;
 }

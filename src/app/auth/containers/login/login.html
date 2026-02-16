@@ -3,54 +3,81 @@
 
 <div class="login-container">
   <div class="container" [class.toggle]="isToggled">
+
     <div class="container-form">
-      <form class="sign-in" (submit)="onSubmitSignIn($event)">
+      <form class="sign-in" [formGroup]="loginForm" (ngSubmit)="onSubmitSignIn()">
         <h2>Iniciar Sesión</h2>
         <span>Use su Correo y Contraseña</span>
 
         <div class="container-input">
-          <ion-icon name="mail-outline"></ion-icon>
-          <input type="email" placeholder="Correo Electrónico" required>
+          <i class="bi bi-envelope-at"></i>
+          <input type="email" formControlName="Correo" placeholder="Correo Electrónico" maxlength="60">
+          <div *ngIf="loginForm.get('Correo')?.invalid && loginForm.get('Correo')?.touched" class="error">
+            {{ loginForm.get('Correo')?.errors?.['required'] ? 'Correo requerido' : 'Correo inválido' }}
+          </div>
         </div>
 
         <div class="container-input">
-          <ion-icon name="lock-closed-outline"></ion-icon>
-          <input type="password" placeholder="Contraseña" required>
+          <i class="bi bi-lock"></i>
+          <input type="password" formControlName="Contrasenia" placeholder="Contraseña" maxlength="255">
+          <div *ngIf="loginForm.get('Contrasenia')?.invalid && loginForm.get('Contrasenia')?.touched" class="error">
+            {{ loginForm.get('Contrasenia')?.errors?.['required'] ? 'Contraseña requerida' : 'Contraseña inválida' }}
+          </div>
         </div>
 
-        <a href="#" class="forgot-password">¿Olvidaste tu contraseña?</a>
-        <button type="submit" class="button">Iniciar Sesión</button>
+        <button type="submit" class="button" [disabled]="loginForm.invalid || loading">
+          {{ loading ? 'Validando...' : 'Iniciar Sesión' }}
+        </button>
 
         <p class="mobile-toggle">¿No tienes cuenta? <a (click)="toggleToSignUp()">Regístrate</a></p>
       </form>
     </div>
 
     <div class="container-form">
-      <form class="sign-up" (submit)="onSubmitSignUp($event)">
+      <form class="sign-up" [formGroup]="registerForm" (ngSubmit)="onSubmitSignUp()">
         <h2>Registrarse</h2>
-        <span>Use su Correo Electrónico para Registrarse</span>
+        <span>Crea tu cuenta personal</span>
 
         <div class="container-input">
-          <ion-icon name="person-outline"></ion-icon>
-          <input type="text" placeholder="Nombre" required>
+          <i class="bi bi-person"></i>
+          <input type="text" formControlName="NombreCompleto" placeholder="Nombre Completo"
+            (keypress)="onKeyPress($event)" maxlength="60">
+          <div *ngIf="registerForm.get('NombreCompleto')?.invalid && registerForm.get('NombreCompleto')?.touched"
+            class="error">
+            Nombre requerido
+          </div>
         </div>
 
         <div class="container-input">
-          <ion-icon name="mail-outline"></ion-icon>
-          <input type="email" placeholder="Correo Electrónico" required>
+          <i class="bi bi-telephone"></i>
+          <input type="text" formControlName="Telefono" placeholder="Teléfono (10 dígitos)"
+            (keypress)="soloNumeros($event)" (input)="limitarLongitud($event, 10)">
+          <div *ngIf="registerForm.get('Telefono')?.invalid && registerForm.get('Telefono')?.touched" class="error">
+            {{ registerForm.get('Telefono')?.errors?.['required'] ? 'Teléfono requerido' : '10 dígitos requeridos' }}
+          </div>
         </div>
 
         <div class="container-input">
-          <ion-icon name="lock-closed-outline"></ion-icon>
-          <input type="password" placeholder="Contraseña" required>
+          <i class="bi bi-envelope-at"></i>
+          <input type="email" formControlName="Correo" placeholder="Correo Electrónico" maxlength="60">
+          <div *ngIf="registerForm.get('Correo')?.invalid && registerForm.get('Correo')?.touched" class="error">
+            {{ registerForm.get('Correo')?.errors?.['required'] ? 'Correo requerido' : 'Correo inválido' }}
+          </div>
         </div>
 
         <div class="container-input">
-          <ion-icon name="lock-closed-outline"></ion-icon>
-          <input type="password" placeholder="Confirmar Contraseña" required>
+          <i class="bi bi-lock"></i>
+          <input type="password" formControlName="Contrasenia" placeholder="Contraseña (mín. 6 caracteres)"
+            maxlength="255">
+          <div *ngIf="registerForm.get('Contrasenia')?.invalid && registerForm.get('Contrasenia')?.touched"
+            class="error">
+            {{ registerForm.get('Contrasenia')?.errors?.['required'] ? 'Contraseña requerida' : 'Mínimo 8 caracteres' }}
+          </div>
         </div>
 
-        <button type="submit" class="button">Registrarse</button>
+        <button type="submit" class="button" [disabled]="registerForm.invalid || loading">
+          {{ loading ? 'Creando cuenta...' : 'Registrarse' }}
+        </button>
 
         <p class="mobile-toggle">¿Ya tienes cuenta? <a (click)="toggleToSignIn()">Inicia Sesión</a></p>
       </form>
@@ -59,16 +86,28 @@
     <div class="container-welcome">
       <div class="welcome-sign-up welcome">
         <h3>¡Bienvenido!</h3>
-        <p>Ingrese sus datos personales para usar todas las funciones del sitio</p>
+        <p>Ingrese sus datos para usar todas las funciones</p>
         <button class="button" (click)="toggleToSignUp()">Registrarse</button>
       </div>
 
       <div class="welcome-sign-in welcome">
-        <h3>¡Hola!</h3>
-        <p>Regístrese con sus datos personales para usar todas las funciones del sitio</p>
+        <h3>¡Hola de nuevo!</h3>
+        <p>Inicie sesión con su cuenta para continuar</p>
         <button class="button" (click)="toggleToSignIn()">Iniciar Sesión</button>
       </div>
     </div>
+
+  </div>
+</div>
+
+<div class="custom-modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="custom-modal" (click)="$event.stopPropagation()" [ngClass]="modalType">
+    <div class="modal-icon">
+      <i [ngClass]="modalIcon"></i>
+    </div>
+    <h3>{{ modalTitle }}</h3>
+    <p>{{ modalMessage }}</p>
+    <button class="modal-button" (click)="closeModal()">Aceptar</button>
   </div>
 </div>
 
