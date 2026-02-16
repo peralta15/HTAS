@@ -1,5 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
 
+:host {
+  display: block;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -289,15 +293,15 @@
   position: fixed;
   top: 0;
   left: 0;
+  right: 0;
+  bottom: 0;
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(4px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 10000;
-  /* Por encima de todo */
+  z-index: 100000;
+  display: block;
+  /* No flex/grid here to avoid host conflicts */
   animation: fadeIn 0.3s ease-out;
 }
 
@@ -310,7 +314,11 @@
   border-radius: 20px;
   text-align: center;
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-  animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  margin: auto;
+  /* Fallback centering */
+  position: relative;
+  z-index: 100001;
+  animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
 /* Iconos dinámicos */
@@ -447,4 +455,69 @@
 /* Estilo para que el icono del input también cambie a rojo si hay error */
 .container-input:has(input.ng-invalid.ng-touched) i {
   color: #b0001e;
+}
+
+/* Estilos para el nuevo botón de Google */
+.social-networks {
+  width: 300px;
+  margin: 15px 0 25px;
+  display: flex;
+  justify-content: center;
+}
+
+.google-btn {
+  width: 100%;
+  height: 48px;
+  /* Un poco más alto para que respire mejor */
+  display: flex;
+  align-items: center;
+  /* Centrado vertical */
+  justify-content: center;
+  /* Centrado horizontal */
+  gap: 12px;
+  background-color: #EEEEEE;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #444;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 0;
+  /* Evita paddings internos que muevan el contenido */
+}
+
+.google-btn i {
+  color: #b0001e;
+  font-size: 20px;
+  display: flex;
+  /* Ayuda a que el icono no tenga espacio extra abajo */
+  align-items: center;
+}
+
+.google-btn span {
+  display: inline-block;
+  line-height: normal;
+  /* Fuerza al texto a usar su altura natural */
+  margin: 0;
+  padding: 0;
+}
+
+.google-btn:hover {
+  background-color: #f5f5f5;
+  border-color: #b0001e;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+.google-btn:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+  .social-networks {
+    width: 100%;
+    padding: 0 1.5rem;
+    /* Para que no pegue a los bordes en móvil */
+  }
 }

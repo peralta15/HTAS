@@ -25,6 +25,13 @@
           </div>
         </div>
 
+        <div class="social-networks">
+          <button type="button" class="google-btn" (click)="onLoginWithGoogle()">
+            <i class="bi bi-google"></i>
+            <span>Continuar con Google</span>
+          </button>
+        </div>
+
         <button type="submit" class="button" [disabled]="loginForm.invalid || loading">
           {{ loading ? 'Validando...' : 'Iniciar Sesión' }}
         </button>

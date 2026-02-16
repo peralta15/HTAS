@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { soloLetrasValidator, soloLetras, soloNumerosValidator } from '../../../validations/validators';
 import { AuthService } from '../../services/auth';
+import { Google } from '../../services/google';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Headermenu } from "../../../template/headermenu/headermenu";
@@ -22,6 +23,9 @@ import { Footer } from "../../../template/footer/footer";
   styleUrl: './login.css',
 })
 export class Login implements OnInit {
+
+  loginService = inject(Google);
+  Router = inject(Router);
   isToggled = false;
   loginForm: FormGroup;
   registerForm: FormGroup;
@@ -36,7 +40,8 @@ export class Login implements OnInit {
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {
     this.loginForm = this.fb.group({
       Correo: ['', [Validators.required, Validators.email, Validators.maxLength(60)]],
@@ -104,6 +109,7 @@ export class Login implements OnInit {
         next: (res) => {
           console.log('Login exitoso', res);
           this.loading = false;
+          this.cdr.detectChanges();
           this.router.navigate(['/recursos']);
         },
         error: (err) => {
@@ -113,6 +119,7 @@ export class Login implements OnInit {
             err.error?.message || 'Correo o contraseña incorrectos. Por favor, intente de nuevo.',
             'error'
           );
+          this.cdr.detectChanges();
         }
       });
     }
@@ -129,6 +136,7 @@ export class Login implements OnInit {
       this.authService.register(datosRegistro).subscribe({
         next: () => {
           this.loading = false;
+          this.cdr.detectChanges();
           this.openModal(
             '¡Registro Exitoso!',
             'Tu cuenta ha sido creada correctamente. Ya puedes iniciar sesión.',
@@ -139,6 +147,7 @@ export class Login implements OnInit {
         },
         error: (err) => {
           this.loading = false;
+          this.cdr.detectChanges();
           this.openModal(
             'Error al Registrar',
             err.error?.message || 'El correo o teléfono ya están en uso. Intente con otros datos.',
@@ -147,5 +156,30 @@ export class Login implements OnInit {
         }
       });
     }
+  }
+
+  onLoginWithGoogle() {
+    this.loading = true;
+
+    this.loginService.logInGoogle()
+      .then((res) => {
+        this.loading = false;
+        this.router.navigate(['/recursos']);
+      })
+      .catch((err) => {
+        this.loading = false;
+
+        if (err.code === 'auth/popup-closed-by-user') {
+          console.warn('El usuario cerró la ventana de Google antes de terminar.');
+        } else if (err.code === 'auth/cancelled-popup-request') {
+          console.warn('Se canceló la solicitud del popup (posible doble clic).');
+        } else {
+          this.openModal(
+            'Error de Conexión',
+            'Hubo un problema al conectar con Google. Inténtalo de nuevo.',
+            'error'
+          );
+        }
+      });
   }
 }
