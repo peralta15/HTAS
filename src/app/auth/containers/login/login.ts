@@ -1,8 +1,7 @@
-import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, ChangeDetectorRef, NgZone } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { soloLetrasValidator, soloLetras, soloNumerosValidator } from '../../../validations/validators';
-import { AuthService } from '../../services/auth';
-import { Google } from '../../services/google';
+import { soloLetrasValidator, soloLetras } from '../../../validations/validators';
+import { GoogleService } from '../../services/google';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Headermenu } from "../../../template/headermenu/headermenu";
@@ -22,164 +21,112 @@ import { Footer } from "../../../template/footer/footer";
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
-export class Login implements OnInit {
+export class Login {
+  private googleService = inject(GoogleService);
+  private router = inject(Router);
+  private fb = inject(FormBuilder);
+  private cdr = inject(ChangeDetectorRef);
+  private ngZone = inject(NgZone);
 
-  loginService = inject(Google);
-  Router = inject(Router);
   isToggled = false;
-  loginForm: FormGroup;
   registerForm: FormGroup;
   loading = false;
 
+  // Propiedades para el modal de avisos
   showModal = false;
   modalTitle = '';
   modalMessage = '';
   modalIcon = '';
-  modalType: 'success' | 'error' | 'info' = 'success';
+  modalType: 'modal-success' | 'modal-error' = 'modal-success';
 
-  constructor(
-    private fb: FormBuilder,
-    private authService: AuthService,
-    private router: Router,
-    private cdr: ChangeDetectorRef
-  ) {
-    this.loginForm = this.fb.group({
-      Correo: ['', [Validators.required, Validators.email, Validators.maxLength(60)]],
-      Contrasenia: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(255)]]
-    });
-
+  constructor() {
+    // Formulario de registro (SIN correo ni contraseña, Google los dará)
     this.registerForm = this.fb.group({
       NombreCompleto: ['', [Validators.required, Validators.maxLength(100), soloLetrasValidator()]],
-      Telefono: ['', [Validators.required, Validators.pattern('^[0-9]{10}$'), soloNumerosValidator(10)]],
-      Correo: ['', [Validators.required, Validators.email, Validators.maxLength(60)]],
-      Contrasenia: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(255)]],
-      Rol: ['Paciente'],
+      Telefono: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
+      Rol: ['', [Validators.required]],
       Activo: [true]
     });
   }
 
-  onKeyPress(event: KeyboardEvent): boolean {
-    return soloLetras(event);
+  // Alternar entre vistas
+  toggleToSignUp() { this.isToggled = true; }
+  toggleToSignIn() { this.isToggled = false; }
+
+  // Lógica de REGISTRO
+  async onSubmitSignUp() {
+    if (this.registerForm.valid) {
+      this.loading = true;
+      this.cdr.detectChanges();
+
+      try {
+        await this.googleService.registerWithGoogle(this.registerForm.value);
+        this.ngZone.run(() => {
+          this.loading = false;
+          this.router.navigate(['/recursos']);
+          this.cdr.detectChanges();
+        });
+      } catch (error: any) {
+        // Force the execution to be handled by Angular instantly
+        setTimeout(() => {
+          this.ngZone.run(() => {
+            this.loading = false;
+            this.openModal(
+              'Error al Registrar',
+              error.message || 'Hubo un problema al vincular tu cuenta de Google.',
+              'modal-error'
+            );
+            this.cdr.detectChanges();
+          });
+        }, 0);
+      }
+    }
   }
+
+  // Lógica de LOGIN
+  async onLoginWithGoogle() {
+    this.loading = true;
+    this.cdr.detectChanges();
+
+    try {
+      await this.googleService.loginWithGoogle();
+      this.ngZone.run(() => {
+        this.loading = false;
+        this.router.navigate(['/recursos']);
+        this.cdr.detectChanges();
+      });
+    } catch (error: any) {
+      // Definitive fix for async rendering delay
+      setTimeout(() => {
+        this.ngZone.run(() => {
+          this.loading = false;
+          this.openModal(
+            'Acceso Denegado',
+            error.message || 'Cuenta no registrada.',
+            'modal-error'
+          );
+          this.cdr.detectChanges();
+        });
+      }, 0);
+    }
+  }
+
+  // Utilidades para el formulario
+  onKeyPress(event: KeyboardEvent): boolean { return soloLetras(event); }
 
   soloNumeros(event: KeyboardEvent): boolean {
     const charCode = event.key.charCodeAt(0);
     return (charCode >= 48 && charCode <= 57);
   }
 
-  limitarLongitud(event: Event, maxLength: number): void {
-    const input = event.target as HTMLInputElement;
-    if (input.value.length > maxLength) {
-      input.value = input.value.slice(0, maxLength);
-      this.registerForm.get(input.name)?.setValue(input.value);
-    }
-  }
-
-  ngOnInit() { }
-
-  toggleToSignUp() { this.isToggled = true; }
-  toggleToSignIn() { this.isToggled = false; }
-
-  private openModal(title: string, message: string, type: 'success' | 'error' | 'info') {
+  private openModal(title: string, message: string, type: 'modal-success' | 'modal-error') {
     this.modalTitle = title;
     this.modalMessage = message;
     this.modalType = type;
-
-    if (type === 'success') {
-      this.modalIcon = 'bi bi-check-circle-fill';
-    } else if (type === 'error') {
-      this.modalIcon = 'bi bi-exclamation-triangle-fill';
-    } else {
-      this.modalIcon = 'bi bi-info-circle-fill';
-    }
-
+    this.modalIcon = type === 'modal-success' ? 'bi bi-check-circle-fill' : 'bi bi-exclamation-triangle-fill';
     this.showModal = true;
+    this.cdr.detectChanges(); // Force UI update instantly
   }
 
-  closeModal() {
-    this.showModal = false;
-  }
-
-  onSubmitSignIn() {
-    if (this.loginForm.valid) {
-      this.loading = true;
-      const { Correo, Contrasenia } = this.loginForm.value;
-
-      this.authService.login(Correo, Contrasenia).subscribe({
-        next: (res) => {
-          console.log('Login exitoso', res);
-          this.loading = false;
-          this.cdr.detectChanges();
-          this.router.navigate(['/recursos']);
-        },
-        error: (err) => {
-          this.loading = false;
-          this.openModal(
-            'Acceso Denegado',
-            err.error?.message || 'Correo o contraseña incorrectos. Por favor, intente de nuevo.',
-            'error'
-          );
-          this.cdr.detectChanges();
-        }
-      });
-    }
-  }
-
-  onSubmitSignUp() {
-    if (this.registerForm.valid) {
-      this.loading = true;
-      const datosRegistro = {
-        ...this.registerForm.value,
-        Telefono: Number(this.registerForm.value.Telefono)
-      };
-
-      this.authService.register(datosRegistro).subscribe({
-        next: () => {
-          this.loading = false;
-          this.cdr.detectChanges();
-          this.openModal(
-            '¡Registro Exitoso!',
-            'Tu cuenta ha sido creada correctamente. Ya puedes iniciar sesión.',
-            'success'
-          );
-          this.toggleToSignIn();
-          this.registerForm.reset({ Rol: 'Paciente', Activo: true });
-        },
-        error: (err) => {
-          this.loading = false;
-          this.cdr.detectChanges();
-          this.openModal(
-            'Error al Registrar',
-            err.error?.message || 'El correo o teléfono ya están en uso. Intente con otros datos.',
-            'error'
-          );
-        }
-      });
-    }
-  }
-
-  onLoginWithGoogle() {
-    this.loading = true;
-
-    this.loginService.logInGoogle()
-      .then((res) => {
-        this.loading = false;
-        this.router.navigate(['/recursos']);
-      })
-      .catch((err) => {
-        this.loading = false;
-
-        if (err.code === 'auth/popup-closed-by-user') {
-          console.warn('El usuario cerró la ventana de Google antes de terminar.');
-        } else if (err.code === 'auth/cancelled-popup-request') {
-          console.warn('Se canceló la solicitud del popup (posible doble clic).');
-        } else {
-          this.openModal(
-            'Error de Conexión',
-            'Hubo un problema al conectar con Google. Inténtalo de nuevo.',
-            'error'
-          );
-        }
-      });
-  }
+  closeModal() { this.showModal = false; }
 }

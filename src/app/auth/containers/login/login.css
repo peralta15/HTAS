@@ -38,13 +38,69 @@
   overflow: hidden;
 }
 
-.container-form form {
+.container-form form,
+.sign-in {
   height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   transition: transform 0.5s ease-in;
+  position: relative;
+  overflow: hidden;
+}
+
+.decor-icon {
+  position: absolute;
+  top: -20px;
+  right: -20px;
+  font-size: 150px;
+  color: rgba(176, 0, 29, 0.103);
+  /* Muy sutil */
+  transform: rotate(15deg);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.decor-icon-2 {
+  position: absolute;
+  bottom: -40px;
+  left: -20px;
+  font-size: 140px;
+  color: rgba(176, 0, 29, 0.103);
+  transform: rotate(-15deg);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.security-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 25px;
+  padding: 10px 18px;
+  background-color: rgba(0, 0, 0, 0.03);
+  border-radius: 50px;
+  font-size: 11px;
+  color: #777;
+  font-weight: 600;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.security-badge i {
+  color: #b0001e;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+}
+
+.security-badge span {
+  margin: 0 !important;
+  /* Forces vertical centering by removing inherited margin-bottom */
+  line-height: normal;
+  display: flex;
+  align-items: center;
 }
 
 .container-form h2 {
@@ -280,75 +336,59 @@
     text-align: center;
   }
 
-  .button {
+  .google-btn {
     width: 100%;
-    /* Full width button on mobile */
   }
 }
 
-/* --- ESTILOS DEL MODAL --- */
-
-/* Fondo oscurecido con desenfoque para dar enfoque al modal */
+/* --- ESTILOS DEL MODAL (SIMPLIFICADOS PARA CARGA INSTANTÁNEA) --- */
 .custom-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(4px);
-  z-index: 100000;
-  display: block;
-  /* No flex/grid here to avoid host conflicts */
-  animation: fadeIn 0.3s ease-out;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 10000000;
+  display: none;
+  /* Oculto por defecto */
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
 }
 
-/* Caja del Modal */
+/* Clase para mostrar al instante */
+.custom-modal-overlay.show {
+  display: flex !important;
+}
+
 .custom-modal {
   background: white;
-  width: 90%;
+  width: 100%;
   max-width: 400px;
-  padding: 30px;
+  padding: 35px;
   border-radius: 20px;
   text-align: center;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-  margin: auto;
-  /* Fallback centering */
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
   position: relative;
-  z-index: 100001;
-  animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
-/* Iconos dinámicos */
+.custom-modal.modal-error {
+  border: 2px solid #b0001e;
+}
+
 .modal-icon {
-  font-size: 70px;
+  font-size: 60px;
   margin-bottom: 15px;
-  display: inline-block;
-}
-
-/* Estilo según el tipo (Éxito o Error) */
-.custom-modal.success .modal-icon {
   color: #b0001e;
-  /* Verde Ionic */
 }
 
-.custom-modal.error .modal-icon {
-  color: #b0001e;
-  /* Tu rojo institucional */
-}
-
-.custom-modal.info .modal-icon {
-  color: #3880ff;
-}
-
-/* Textos dentro del modal */
 .custom-modal h3 {
   font-size: 22px;
   margin-bottom: 10px;
   color: #333;
   font-weight: 700;
+  /* Eliminado uppercase para un look más limpio */
 }
 
 .custom-modal p {
@@ -358,29 +398,22 @@
   margin-bottom: 25px;
 }
 
-/* Botón del Modal (Sincronizado con tus estilos) */
 .modal-button {
   width: 100%;
-  /* Botón ancho para móvil/escritorio */
-  max-width: 200px;
+  max-width: 180px;
   height: 45px;
   background-color: #b0001e;
   color: white;
   border: none;
-  border-radius: 10px;
+  border-radius: 8px;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.2s, background-color 0.2s;
+  transition: background-color 0.2s;
 }
 
 .modal-button:hover {
   background-color: #8a0017;
-  transform: scale(1.03);
-}
-
-.modal-button:active {
-  transform: scale(0.98);
 }
 
 /* --- ANIMACIONES --- */
@@ -423,22 +456,39 @@
   }
 }
 
-.error {
-  position: absolute;
-  bottom: -18px;
-  /* Lo coloca justo debajo del input gris */
-  left: 10px;
-  color: #b0001e;
-  font-size: 11px;
-  font-weight: 600;
-  animation: fadeInError 0.3s ease-in-out;
+/* Asegura que el contenedor sea la referencia para el error */
+.container-input {
+  position: relative;
+  margin-bottom: 20px;
+  /* Aumentamos un poco el margen para que el error tenga aire */
+  overflow: visible;
+  /* IMPORTANTE: permitimos que el error se vea fuera del borde gris */
 }
 
-/* Animación sutil para que el error aparezca suavemente */
+.error {
+  position: absolute;
+  /* Lo alineamos justo debajo del borde gris, pero sin ocupar espacio físico */
+  bottom: -16px;
+  left: 5px;
+  color: #b0001e;
+  font-size: 10px;
+  /* Un poco más pequeño para que sea elegante */
+  font-weight: 700;
+  text-transform: uppercase;
+  /* Opcional: le da un look más de "alerta" */
+  letter-spacing: 0.5px;
+  pointer-events: none;
+  /* Para que no interfiera con los clics */
+  animation: fadeInError 0.2s ease-out;
+  white-space: nowrap;
+  /* Evita que el texto salte de línea */
+}
+
+/* Animación de entrada más profesional */
 @keyframes fadeInError {
   from {
     opacity: 0;
-    transform: translateY(-5px);
+    transform: translateY(-3px);
   }
 
   to {
@@ -447,14 +497,16 @@
   }
 }
 
-/* Cambiar el borde del input cuando hay un error (opcional pero recomendado) */
-.container-input:has(input.ng-invalid.ng-touched) {
-  border: 1px solid rgba(176, 0, 30, 0.3);
+/* Feedback visual en el input cuando hay error */
+.container-input:has(.error) {
+  border: 1.5px solid rgba(176, 0, 30, 0.4);
+  background-color: #fff5f5;
+  /* Un tono rosado muy suave */
 }
 
-/* Estilo para que el icono del input también cambie a rojo si hay error */
-.container-input:has(input.ng-invalid.ng-touched) i {
+.container-input:has(.error) i {
   color: #b0001e;
+  /* Iconos en rojo si hay error */
 }
 
 /* Estilos para el nuevo botón de Google */
@@ -462,11 +514,20 @@
   width: 300px;
   margin: 15px 0 25px;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.social-networks p {
+  font-size: 13px;
+  color: #666;
+  text-align: center;
+  margin-bottom: 5px;
 }
 
 .google-btn {
-  width: 100%;
+  width: 300px;
   height: 48px;
   /* Un poco más alto para que respire mejor */
   display: flex;
@@ -476,15 +537,17 @@
   /* Centrado horizontal */
   gap: 12px;
   background-color: #EEEEEE;
-  border: 1px solid #ddd;
-  border-radius: 10px;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   color: #444;
   font-weight: 600;
   font-size: 14px;
   padding: 0;
   /* Evita paddings internos que muevan el contenido */
+  margin: 0 auto;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .google-btn i {
@@ -514,10 +577,121 @@
   transform: translateY(0);
 }
 
+.info-text {
+  font-size: 13px;
+  color: #666;
+  text-align: center;
+  margin: 10px 0 20px;
+  max-width: 300px;
+  line-height: 1.5;
+}
+
+.button.google-style {
+  width: 300px;
+  height: 48px;
+  background-color: #EEEEEE;
+  color: #444;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  margin-top: 5px;
+  padding: 0;
+}
+
+.button.google-style i {
+  color: #b0001e;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  margin: 0;
+}
+
+.button.google-style span {
+  display: inline-block;
+  line-height: normal;
+  margin: 0;
+  padding: 0;
+}
+
+.button.google-style:hover {
+  background-color: #f5f5f5;
+  border-color: #b0001e;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+/* Estilo para el contenedor cuando tiene un select */
+.container-input {
+  position: relative;
+  /* Necesario para posicionar la flecha y el error */
+  display: flex;
+  align-items: center;
+}
+
+/* Reset completo del select */
+.select-custom {
+  border: none;
+  outline: none;
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
+  font-family: "Montserrat", sans-serif;
+  font-size: 14px;
+  color: #555;
+  cursor: pointer;
+  appearance: none;
+  /* Quita la flecha nativa de Windows/Mac */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 30px;
+  /* Espacio para que el texto no tape la flecha */
+}
+
+/* Estilo para las opciones (el menú desplegable) */
+.select-custom option {
+  background-color: white;
+  color: #333;
+  padding: 10px;
+}
+
+/* Flecha personalizada usando Bootstrap Icons */
+.arrow-select {
+  position: absolute;
+  right: 15px;
+  font-size: 12px;
+  color: #888;
+  pointer-events: none;
+  /* Para que al hacer clic en la flecha se abra el select */
+  transition: color 0.3s ease;
+}
+
+/* Efecto visual al interactuar */
+.container-input:focus-within .arrow-select {
+  color: #b0001e;
+  /* Cambia al color de tu marca al seleccionar */
+}
+
+/* Ajuste para que el icono de la izquierda (bi-person-badge) mantenga el estilo */
+.container-input i:first-child {
+  color: #666;
+  font-size: 18px;
+}
+
 @media (max-width: 768px) {
   .social-networks {
     width: 100%;
     padding: 0 1.5rem;
     /* Para que no pegue a los bordes en móvil */
+  }
+
+  .info-text {
+    max-width: 100%;
+    padding: 0 1.5rem;
   }
 }
