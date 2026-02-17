@@ -6,17 +6,13 @@
 
     <div class="container-form">
       <div class="sign-in">
-        <div class="decor-icon">
-          <i class="bi bi-shield-lock"></i>
-        </div>
-        <div class="decor-icon-2">
-          <i class="bi bi-shield-check"></i>
-        </div>
+        <div class="decor-icon"><i class="bi bi-shield-lock"></i></div>
+        <div class="decor-icon-2"><i class="bi bi-shield-check"></i></div>
 
-        <h2>Iniciar Sesión</h2>
-        <span>Accede de forma segura con tu cuenta</span>
+        <h2>{{ esperandoPin ? 'Verificar Identidad' : 'Iniciar Sesión' }}</h2>
+        <span>{{ esperandoPin ? 'Ingresa el PIN de tu correo' : 'Accede de forma segura con tu cuenta' }}</span>
 
-        <div class="social-networks">
+        <div *ngIf="!esperandoPin" class="social-networks">
           <p>Para ingresar, utiliza el botón de abajo:</p>
           <button type="button" class="google-btn" (click)="onLoginWithGoogle()" [disabled]="loading">
             <i class="bi bi-google"></i>
@@ -24,24 +20,32 @@
           </button>
         </div>
 
-        <div class="security-badge">
+        <div *ngIf="esperandoPin" class="pin-verification-container">
+          <div class="container-input">
+            <i class="bi bi-key-fill"></i>
+            <input type="text" [(ngModel)]="pinIngresado" placeholder="Introduce tu PIN de 6 dígitos" maxlength="6"
+              (keypress)="soloNumeros($event)">
+          </div>
+          <button type="button" class="button google-style" (click)="verificarPin()">
+            <i class="bi bi-shield-check"></i> Verificar y Entrar
+          </button>
+          <p class="mobile-toggle"><a (click)="esperandoPin = false">Intentar con otra cuenta</a></p>
+        </div>
+
+        <div *ngIf="!esperandoPin" class="security-badge">
           <i class="bi bi-patch-check-fill"></i>
           <span>Protección de datos</span>
         </div>
 
-        <p class="mobile-toggle">¿No tienes cuenta? <a (click)="toggleToSignUp()">Regístrate aquí</a></p>
+        <p *ngIf="!esperandoPin" class="mobile-toggle">¿No tienes cuenta? <a (click)="toggleToSignUp()">Regístrate
+            aquí</a></p>
       </div>
     </div>
 
     <div class="container-form">
       <form class="sign-up" [formGroup]="registerForm" (ngSubmit)="onSubmitSignUp()">
-        <div class="decor-icon">
-          <i class="bi bi-person-badge"></i>
-        </div>
-        <div class="decor-icon-2">
-          <i class="bi bi-person-fill-add"></i>
-        </div>
-
+        <div class="decor-icon"><i class="bi bi-person-badge"></i></div>
+        <div class="decor-icon-2"><i class="bi bi-person-fill-add"></i></div>
         <h2>Registrarse</h2>
         <span>Completa tus datos personales</span>
 
@@ -49,19 +53,12 @@
           <i class="bi bi-person"></i>
           <input type="text" formControlName="NombreCompleto" placeholder="Nombre Completo"
             (keypress)="onKeyPress($event)" maxlength="60">
-          <div *ngIf="registerForm.get('NombreCompleto')?.invalid && registerForm.get('NombreCompleto')?.touched"
-            class="error">
-            Nombre requerido
-          </div>
         </div>
 
         <div class="container-input">
           <i class="bi bi-telephone"></i>
-          <input type="text" formControlName="Telefono" placeholder="Teléfono (10 dígitos)"
-            (keypress)="soloNumeros($event)" maxlength="10">
-          <div *ngIf="registerForm.get('Telefono')?.invalid && registerForm.get('Telefono')?.touched" class="error">
-            {{ registerForm.get('Telefono')?.errors?.['required'] ? 'Teléfono requerido' : '10 dígitos requeridos' }}
-          </div>
+          <input type="text" formControlName="Telefono" placeholder="Teléfono" (keypress)="soloNumeros($event)"
+            maxlength="10">
         </div>
 
         <div class="container-input">
@@ -74,13 +71,7 @@
             <option value="Acompañante">Acompañante</option>
           </select>
           <i class="bi bi-chevron-down arrow-select"></i>
-
-          <div *ngIf="registerForm.get('Rol')?.invalid && registerForm.get('Rol')?.touched" class="error">
-            Selecciona un rol
-          </div>
         </div>
-
-        <p class="info-text">El correo se vinculará automáticamente con tu cuenta de Google.</p>
 
         <button type="submit" class="button google-style" [disabled]="registerForm.invalid || loading">
           <i class="bi bi-google"></i>
@@ -97,7 +88,6 @@
         <p>Crea tu cuenta vinculada a Google para guardar tus datos</p>
         <button class="button" (click)="toggleToSignUp()">Registrarse</button>
       </div>
-
       <div class="welcome-sign-in welcome">
         <h3>¡Hola de nuevo!</h3>
         <p>Inicia sesión rápidamente con tu cuenta de Google</p>
@@ -110,9 +100,7 @@
 
 <div class="custom-modal-overlay" [class.show]="showModal" (click)="closeModal()">
   <div class="custom-modal" (click)="$event.stopPropagation()" [ngClass]="modalType">
-    <div class="modal-icon">
-      <i [ngClass]="modalIcon"></i>
-    </div>
+    <div class="modal-icon"><i [ngClass]="modalIcon"></i></div>
     <h3>{{ modalTitle }}</h3>
     <p>{{ modalMessage }}</p>
     <button class="modal-button" (click)="closeModal()">Aceptar</button>

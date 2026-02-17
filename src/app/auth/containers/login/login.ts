@@ -1,5 +1,5 @@
 import { Component, inject, ChangeDetectorRef, NgZone } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { soloLetrasValidator, soloLetras } from '../../../validations/validators';
 import { GoogleService } from '../../services/google';
 import { Router } from '@angular/router';
@@ -14,6 +14,7 @@ import { Footer } from "../../../template/footer/footer";
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    FormsModule,
     Headermenu,
     Breadcrumbs,
     Footer
@@ -32,7 +33,11 @@ export class Login {
   registerForm: FormGroup;
   loading = false;
 
-  // Propiedades para el modal de avisos
+  esperandoPin = false;
+  pinIngresado = '';
+  pinCorrectoBD = '';
+  usuarioUidTemporal = ''; // Para saber a quién actualizar el pinVerificado
+
   showModal = false;
   modalTitle = '';
   modalMessage = '';
@@ -40,7 +45,6 @@ export class Login {
   modalType: 'modal-success' | 'modal-error' = 'modal-success';
 
   constructor() {
-    // Formulario de registro (SIN correo ni contraseña, Google los dará)
     this.registerForm = this.fb.group({
       NombreCompleto: ['', [Validators.required, Validators.maxLength(100), soloLetrasValidator()]],
       Telefono: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
@@ -49,71 +53,79 @@ export class Login {
     });
   }
 
-  // Alternar entre vistas
   toggleToSignUp() { this.isToggled = true; }
-  toggleToSignIn() { this.isToggled = false; }
+  toggleToSignIn() { this.isToggled = false; this.esperandoPin = false; }
 
-  // Lógica de REGISTRO
   async onSubmitSignUp() {
     if (this.registerForm.valid) {
       this.loading = true;
       this.cdr.detectChanges();
+      const generadoPin = Math.floor(100000 + Math.random() * 900000).toString();
 
       try {
-        await this.googleService.registerWithGoogle(this.registerForm.value);
+        await this.googleService.registerWithGoogle({ ...this.registerForm.value, pin: generadoPin });
         this.ngZone.run(() => {
           this.loading = false;
-          this.router.navigate(['/recursos']);
+          this.openModal('¡Registro Exitoso!', `Cuenta creada. Revisa tu correo para obtener tu PIN de acceso único.`, 'modal-success');
           this.cdr.detectChanges();
         });
       } catch (error: any) {
-        // Force the execution to be handled by Angular instantly
-        setTimeout(() => {
-          this.ngZone.run(() => {
-            this.loading = false;
-            this.openModal(
-              'Error al Registrar',
-              error.message || 'Hubo un problema al vincular tu cuenta de Google.',
-              'modal-error'
-            );
-            this.cdr.detectChanges();
-          });
-        }, 0);
+        this.ngZone.run(() => {
+          this.loading = false;
+          this.openModal('Error al Registrar', error.message, 'modal-error');
+        });
       }
     }
   }
 
-  // Lógica de LOGIN
   async onLoginWithGoogle() {
     this.loading = true;
     this.cdr.detectChanges();
 
     try {
-      await this.googleService.loginWithGoogle();
+      const datosUsuario = await this.googleService.loginWithGoogle();
       this.ngZone.run(() => {
         this.loading = false;
-        this.router.navigate(['/recursos']);
-        this.cdr.detectChanges();
+
+        // REVISIÓN DE SEGURIDAD: ¿Ya verificó el PIN antes?
+        if (datosUsuario['pinVerificado'] === true) {
+          // Si ya lo hizo, entra directo
+          this.router.navigate(['/recursos']);
+        } else {
+          // Si es su primer login tras el registro, pide el PIN
+          this.usuarioUidTemporal = datosUsuario['uid'];
+          this.pinCorrectoBD = datosUsuario['pin'];
+          this.esperandoPin = true;
+          this.cdr.detectChanges();
+        }
       });
     } catch (error: any) {
-      // Definitive fix for async rendering delay
-      setTimeout(() => {
-        this.ngZone.run(() => {
-          this.loading = false;
-          this.openModal(
-            'Acceso Denegado',
-            error.message || 'Cuenta no registrada.',
-            'modal-error'
-          );
-          this.cdr.detectChanges();
-        });
-      }, 0);
+      this.ngZone.run(() => {
+        this.loading = false;
+        this.openModal('Acceso Denegado', error.message, 'modal-error');
+      });
     }
   }
 
-  // Utilidades para el formulario
-  onKeyPress(event: KeyboardEvent): boolean { return soloLetras(event); }
+  async verificarPin() {
+    if (this.pinIngresado === this.pinCorrectoBD) {
+      try {
+        // Marcamos en la BD que ya no se le pida más el PIN
+        await this.googleService.marcarPinComoVerificado(this.usuarioUidTemporal);
 
+        this.openModal('Verificado', 'Identidad confirmada. Bienvenido a HTAS.', 'modal-success');
+        setTimeout(() => {
+          this.ngZone.run(() => this.router.navigate(['/recursos']));
+        }, 1500);
+      } catch (e) {
+        this.openModal('Error', 'No se pudo actualizar el estado de verificación.', 'modal-error');
+      }
+    } else {
+      this.openModal('PIN Incorrecto', 'El código no coincide con el enviado a tu correo.', 'modal-error');
+    }
+  }
+
+  onKeyPress(event: KeyboardEvent): boolean { return soloLetras(event); }
   soloNumeros(event: KeyboardEvent): boolean {
     const charCode = event.key.charCodeAt(0);
     return (charCode >= 48 && charCode <= 57);
@@ -125,7 +137,7 @@ export class Login {
     this.modalType = type;
     this.modalIcon = type === 'modal-success' ? 'bi bi-check-circle-fill' : 'bi bi-exclamation-triangle-fill';
     this.showModal = true;
-    this.cdr.detectChanges(); // Force UI update instantly
+    this.cdr.detectChanges();
   }
 
   closeModal() { this.showModal = false; }

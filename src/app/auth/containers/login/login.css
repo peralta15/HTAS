@@ -695,3 +695,113 @@
     padding: 0 1.5rem;
   }
 }
+
+/* Contenedor principal de la verificación */
+.pin-verification-container {
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 20px 0;
+  animation: fadeInPin 0.4s ease-out;
+  margin: 0 auto;
+}
+
+/* Texto de instrucción */
+.pin-verification-container span {
+  font-size: 13px;
+  color: #777;
+  text-align: center;
+  margin-bottom: 5px;
+  line-height: 1.5;
+}
+
+/* Estilo específico para el input del PIN */
+.pin-verification-container .container-input {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.pin-verification-container .container-input input {
+  letter-spacing: 0.8rem;
+  /* More elegant spacing */
+  font-weight: 800;
+  text-align: center;
+  font-size: 1.4rem;
+  color: #b0001e;
+  /* Using brand red for the input text */
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  background-color: #fcfcfc;
+  transition: all 0.3s ease;
+  padding-left: 0.8rem;
+  /* Offset for letter-spacing offset */
+}
+
+.pin-verification-container .container-input input:focus {
+  border-color: #b0001e;
+  background-color: #fff;
+  box-shadow: 0 0 0 4px rgba(176, 0, 30, 0.05);
+}
+
+/* Botón de verificar adaptado al estilo Google del resto de la app */
+.pin-verification-container .button.google-style {
+  width: 100%;
+  height: 48px;
+  background-color: #EEEEEE;
+  color: #444;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.pin-verification-container .button.google-style i {
+  color: #b0001e;
+  font-size: 18px;
+}
+
+.pin-verification-container .button.google-style:hover {
+  background-color: #f5f5f5;
+  border-color: #b0001e;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(176, 0, 30, 0.1);
+}
+
+/* Enlace para regresar corregido */
+.pin-verification-container .mobile-toggle {
+  margin-top: 5px;
+}
+
+.pin-verification-container .mobile-toggle a {
+  color: #888;
+  font-weight: 600;
+  font-size: 13px;
+  transition: color 0.2s;
+}
+
+.pin-verification-container .mobile-toggle a:hover {
+  color: #b0001e;
+}
+
+/* Animación sutil de aparición */
+@keyframes fadeInPin {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
