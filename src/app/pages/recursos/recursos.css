@@ -444,7 +444,7 @@ h1 {
     position: relative;
     display: flex;
     align-items: center;
-    z-index: 1000;
+    z-index: 990;
     border-top: 2px solid rgba(255, 255, 255, 0.2);
     border-bottom: 2px solid rgba(255, 255, 255, 0.2);
 }
