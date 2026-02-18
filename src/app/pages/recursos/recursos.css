@@ -199,11 +199,14 @@ h1 {
 @media (max-width: 900px) {
     .info-grid {
         flex-direction: column;
+        align-items: center;
     }
 
     .info-card {
         flex: none !important;
         width: 100%;
+        max-width: 500px;
+        margin: 0 auto;
     }
 
     .info-grid:hover .info-card {
@@ -510,20 +513,28 @@ h1 {
    ========================================================================== */
 
 .info-section {
-    width: 100%;
-    padding: 2rem 5%;
+    padding: 4rem 5% 0.5rem;
+    margin-bottom: 0;
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
+    opacity: 1;
 }
 
 .main-wrapper {
-    background-color: #f8f9fa;
-    padding: 60px 20px;
-    border-radius: 30px;
+    background-color: #f4f4f4;
+    padding: 50px 20px;
+    border-radius: 20px;
+    display: flex;
+    justify-content: center;
+    margin: 2rem 0;
 }
 
 .info-grid {
     display: flex;
-    gap: 20px;
-    max-width: 1200px;
+    gap: 15px;
+    width: 100%;
+    max-width: 1100px;
     margin: 0 auto;
 }
 
@@ -544,15 +555,15 @@ h1 {
 
 /* Efecto Hover Expansión */
 .info-grid:hover .info-card {
-    flex: 0.8;
-    opacity: 0.6
+    flex: 0.9;
+    opacity: 0.7;
 }
 
 .info-grid .info-card:hover {
-    flex: 1.4;
+    flex: 1.2;
     opacity: 1;
-    transform: translateY(-10px);
-    box-shadow: 0 15px 30px rgba(176, 0, 30, 0.15);
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(176, 0, 30, 0.18);
 }
 
 /* Icono con diseño de esquina */
@@ -576,7 +587,10 @@ h1 {
 
 /* Contenido de la Card */
 .card-body {
-    padding: 2rem;
+    padding: 1.8rem 1.5rem 1.5rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
 }
 
 .card-body h3 {
@@ -607,7 +621,7 @@ h2 {
 }
 
 .accordion-section {
-    padding: 4rem 5%;
+    padding: 1rem 5% 4rem;
     max-width: 1200px;
     margin: 0 auto;
 }

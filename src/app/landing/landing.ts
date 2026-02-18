@@ -109,7 +109,6 @@ export class Landing implements AfterViewInit {
     return `translateX(-${desplazamiento}%)`;
   }
 
-  // En tu clase Landing
   modalData = [
     {
       title: 'Tu Salud en tus Manos',

@@ -290,7 +290,39 @@
     max-width: 1400px;
     margin-left: auto;
     margin-right: auto;
+
+    /* ESTAS DOS LÍNEAS SON LA CLAVE */
+    position: relative;
+    /* Define el límite para los iconos absolutos */
+    overflow: hidden;
+    /* Corta cualquier cosa que salga del borde redondeado */
+
     opacity: 1;
+    z-index: 1;
+}
+
+.decor-section-icon {
+    position: absolute;
+    font-size: 500px;
+    /* Ajustado ligeramente para mejor balance */
+    color: rgba(176, 0, 29, 0.151);
+    /* Bajé la opacidad a 0.05 para que sea más elegante */
+    pointer-events: none;
+    z-index: -1;
+    /* Asegura que esté DETRÁS del texto y botones */
+    line-height: 1;
+}
+
+.icon-bg-left {
+    top: -50px;
+    left: -100px;
+    transform: rotate(-15deg);
+}
+
+.icon-bg-right {
+    bottom: -100px;
+    right: -100px;
+    transform: rotate(15deg);
 }
 
 .section-header {
@@ -328,7 +360,7 @@
 }
 
 .interactive-item {
-    background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), transparent);
     border-radius: 12px;
     padding: 2.5rem 2rem;
     cursor: pointer;
@@ -353,7 +385,8 @@
 
 .interactive-item:hover {
     transform: translateY(-8px);
-    border-color: #b0001e;
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(176, 0, 30, 0.2);
     box-shadow: 0 12px 30px rgba(213, 0, 50, 0.15);
 }
 
@@ -378,7 +411,7 @@
 .item-text {
     font-size: 1.5rem;
     font-weight: 600;
-    color: #333;
+    color: #b0001dcc;
     transition: color 0.3s ease;
 }
 
@@ -389,8 +422,14 @@
 .arrow-icon {
     font-size: 2.2rem;
     font-weight: 700;
-    color: #999;
+    color: #b0001dcc;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.section-header,
+.interactive-container {
+    position: relative;
+    z-index: 2;
 }
 
 /* ===== GALLERY SECTION ===== */

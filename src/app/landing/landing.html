@@ -12,7 +12,7 @@
   <br>
   <br>
 
-  <div class="content-section" #animateUp>
+  <div id="appmovil" class="content-section" #animateUp>
     <div class="content-block" #animateUp>
       <div class="content-text" #animateUp>
         <h2 #animateUp>Tu aliado diario en el control tensional.</h2>
@@ -96,6 +96,8 @@
   </section>
 
   <div class="interactive-section" #animateUp>
+    <div class="decor-section-icon icon-bg-left"><i class="bi bi-heart-pulse"></i></div>
+    <div class="decor-section-icon icon-bg-right"><i class="bi bi-clipboard2-pulse"></i></div>
     <div class="section-header" #animateUp>
       <h2 #animateUp>Control Integral de tu Bienestar</h2>
     </div>
@@ -176,9 +178,9 @@
   <br>
   <br>
 
-  <div class="gallery-section" #animateUp>
+  <div id="diseño" class="gallery-section" #animateUp>
     <div class="section-header" #animateUp>
-      <h2 #animateUp>Nuestra Tecnología en Detalle</h2>
+      <h2 #animateUp>Nuestra Tecnología</h2>
     </div>
 
     <div class="filter-pills" #animateUp>
@@ -268,28 +270,30 @@
     <div class="modal-content" (click)="$event.stopPropagation()" *ngIf="selectedModal">
       <button class="modal-close" (click)="closeModal()">×</button>
 
-      <div class="modal-header">
-        <h2>{{ selectedModal.title }}</h2>
-      </div>
-
-      <div class="modal-body">
-        <p class="main-description">{{ selectedModal.description }}</p>
-
-        <div class="modal-details">
-          <h3>{{ selectedModal.additionalTitle }}</h3>
-
-          <p>{{ selectedModal.additionalText }}</p>
-
-          <ul>
-            <li *ngFor="let feature of selectedModal.features">
-              {{ feature }}
-            </li>
-          </ul>
+      <div class="modal-scrollable">
+        <div class="modal-header">
+          <h2>{{ selectedModal.title }}</h2>
         </div>
-      </div>
 
-      <div class="modal-footer">
-        <button class="btn btn-primary" (click)="closeModal()">Cerrar</button>
+        <div class="modal-body">
+          <p class="main-description">{{ selectedModal.description }}</p>
+
+          <div class="modal-details">
+            <h3>{{ selectedModal.additionalTitle }}</h3>
+
+            <p>{{ selectedModal.additionalText }}</p>
+
+            <ul>
+              <li *ngFor="let feature of selectedModal.features">
+                {{ feature }}
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-primary" (click)="closeModal()">Cerrar</button>
+        </div>
       </div>
     </div>
   </div>
