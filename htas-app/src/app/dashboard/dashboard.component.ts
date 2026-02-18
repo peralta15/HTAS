@@ -12,8 +12,9 @@ import { QuickActions } from '../components/quick-actions/quick-actions';
   selector: 'app-dashboard',
   standalone: true,
   imports: [CommonModule, Charts, AlertsList, QuickActions],
-  templateUrl: './dashboard.html',
-  styleUrls: ['./dashboard.scss'],
+ templateUrl: './dashboard.component.html',
+styleUrls: ['./dashboard.component.scss']
+
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   loading = true;

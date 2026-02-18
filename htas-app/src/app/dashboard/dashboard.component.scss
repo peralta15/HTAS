@@ -1,0 +1,258 @@
+/* ================== PALETA BASE (MISMA) ================== */
+$blue: #2563EB;
+$grey: #6B7280;
+$red: #DC2626;
+$green: #10B981;
+$yellow: #F59E0B;
+$bg: #FFFFFF;
+
+$space-1: 8px;
+$space-2: 16px;
+$space-3: 24px;
+$space-4: 32px;
+$space-5: 48px;
+
+$radius-sm: 12px;
+$radius-lg: 24px;
+
+$transition: 300ms cubic-bezier(.4,0,.2,1);
+
+/* ================== GLOBAL ================== */
+:root {
+  font-family: 'Inter', system-ui;
+}
+
+.htas-dashboard {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, rgba(37,99,235,0.08), transparent 40%),
+    radial-gradient(circle at bottom right, rgba(16,185,129,0.06), transparent 45%),
+    linear-gradient(180deg, #f9fafb, #eef2ff);
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+  overflow-x: hidden;
+
+  /* ================= HEADER ================= */
+  .dashboard-header {
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(14px);
+    padding: $space-3 $space-5;
+    border-bottom: 1px solid rgba(107,114,128,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    animation: slideDown .6s ease;
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: $space-2;
+
+      .logo {
+        height: 44px;
+        filter: drop-shadow(0 6px 14px rgba(37,99,235,.35));
+        animation: float 5s ease-in-out infinite;
+      }
+
+      .title {
+        font-size: 24px;
+        font-weight: 800;
+        letter-spacing: -.02em;
+        background: linear-gradient(135deg, $blue, #60a5fa);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+    }
+
+    .session {
+      display: flex;
+      align-items: center;
+      gap: $space-3;
+
+      .caregiver {
+        text-align: right;
+
+        .name {
+          font-weight: 700;
+          color: $grey;
+        }
+
+        .status {
+          font-size: .85rem;
+          color: $green;
+        }
+      }
+
+      .logout {
+        background: linear-gradient(135deg, $red, #ef4444);
+        border: none;
+        border-radius: 999px;
+        height: 46px;
+        padding: 0 $space-3;
+        color: white;
+        font-weight: 700;
+        cursor: pointer;
+        box-shadow: 0 12px 30px rgba(220,38,38,.4);
+        transition: all $transition;
+
+        &:hover {
+          transform: translateY(-3px) scale(1.05);
+          box-shadow: 0 18px 40px rgba(220,38,38,.55);
+        }
+      }
+    }
+  }
+
+  /* ================= MAIN ================= */
+  .dashboard-main {
+    padding: 0 $space-5 $space-5;
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: $space-5;
+    animation: fadeUp .7s ease both;
+  }
+
+  /* ================= SUMMARY ================= */
+  .summary-cards {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+    gap: $space-4;
+  }
+
+  .card {
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.9), rgba(255,255,255,.75));
+    border-radius: $radius-lg;
+    padding: $space-4;
+    position: relative;
+    overflow: hidden;
+    box-shadow:
+      0 20px 45px rgba(37,99,235,0.15),
+      inset 0 1px 0 rgba(255,255,255,.6);
+    transition: all $transition;
+    animation: popIn .6s ease both;
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at top right, rgba(37,99,235,.18), transparent 40%);
+      opacity: .6;
+      pointer-events: none;
+    }
+
+    &:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow:
+        0 30px 70px rgba(37,99,235,.28);
+    }
+
+    h3 {
+      font-size: 15px;
+      color: $grey;
+      margin-bottom: $space-2;
+    }
+
+    .value {
+      font-size: 28px;
+      font-weight: 900;
+      color: $blue;
+    }
+
+    .meta {
+      font-size: .85rem;
+      color: $grey;
+    }
+  }
+
+  /* ================= CHARTS ================= */
+  .charts-grid {
+    display: grid;
+    gap: $space-4;
+  }
+
+  .chart {
+    background: rgba(255,255,255,.9);
+    border-radius: $radius-lg;
+    padding: $space-4;
+    box-shadow: 0 18px 45px rgba(107,114,128,.15);
+    animation: fadeUp .8s ease both;
+  }
+
+  /* ================= ALERTS ================= */
+  .alerts {
+    background: rgba(255,255,255,.75);
+    border-radius: $radius-lg;
+    padding: $space-4;
+    box-shadow: 0 18px 45px rgba(220,38,38,.12);
+  }
+
+  /* ================= QUICK ACTIONS ================= */
+  .quick-actions-region {
+    background: rgba(255,255,255,.85);
+    border-radius: $radius-lg;
+    padding: $space-4;
+    box-shadow: 0 20px 55px rgba(16,185,129,.18);
+    position: sticky;
+    top: 120px;
+    animation: slideLeft .8s ease both;
+  }
+
+  /* ================= FOOTER ================= */
+  .dashboard-footer {
+    text-align: center;
+    padding: $space-3;
+    font-size: .8rem;
+    color: $grey;
+    opacity: .8;
+  }
+
+  /* ================= ANIMATIONS ================= */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  @keyframes slideLeft {
+    from { opacity: 0; transform: translateX(30px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(.92); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  @keyframes float {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  /* ================= RESPONSIVE ================= */
+  @media (max-width: 1024px) {
+    .dashboard-main { grid-template-columns: 1fr; }
+    .quick-actions-region { position: static; }
+  }
+
+  @media (max-width: 600px) {
+    .dashboard-header {
+      flex-direction: column;
+      gap: $space-2;
+    }
+
+    .summary-cards {
+      grid-template-columns: 1fr;
+    }
+  }
+}
