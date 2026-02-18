@@ -1,0 +1,20 @@
+<div class="alerts-list">
+	<h2>Alertas recientes</h2>
+	<div *ngIf="alerts && alerts.length; else none">
+		<ul role="list" aria-live="polite">
+			<li *ngFor="let a of (alerts | slice:0:10)" [attr.data-status]="a.status" [ngClass]="a.severity || ''">
+				<div class="row">
+					<div class="title">
+						<strong>{{ a.title || a.type }}</strong>
+					</div>
+					<div class="meta">{{ a.timestamp || a.createdAt }}</div>
+				</div>
+				<div class="message">{{ a.message || a.summary }}</div>
+				<div class="status-label">Estado: {{ a.status || 'desconocido' }}</div>
+			</li>
+		</ul>
+	</div>
+	<ng-template #none>
+		<p>No hay alertas recientes.</p>
+	</ng-template>
+</div>

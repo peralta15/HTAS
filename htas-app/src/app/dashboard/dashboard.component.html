@@ -1,0 +1,93 @@
+<section class="htas-dashboard" *ngIf="!loading; else loadingTpl">
+  <header class="dashboard-header" role="banner" aria-label="Cabecera del dashboard">
+    <div class="brand">
+      <img alt="HTAS" src="/assets/htas-logo.svg" class="logo" />
+      <h1 class="title">HTAS — Dashboard del cuidador</h1>
+    </div>
+
+    <div class="session" role="region" aria-label="Información de sesión">
+      <div class="caregiver" aria-live="polite">
+        <span class="name" *ngIf="dashboard?.caregiverName">{{ dashboard?.caregiverName }}</span>
+        <span class="status active" aria-hidden="false" aria-label="Sesión activa">Sesión activa</span>
+      </div>
+      <button class="logout" (click)="logout()" aria-label="Cerrar sesión">Cerrar sesión</button>
+    </div>
+  </header>
+
+  <main class="dashboard-main" role="main">
+    <!-- Summary cards grid -->
+    <section class="summary-cards" aria-labelledby="summary-heading">
+      <h2 id="summary-heading" class="visually-hidden">Resumen general</h2>
+
+      <article class="card" role="region" aria-labelledby="bp-heading">
+        <h3 id="bp-heading">Última presión arterial</h3>
+        <p class="value">
+          <span *ngIf="dashboard?.vitals?.bloodPressure?.last">
+            {{ dashboard?.vitals?.bloodPressure?.last?.systolic }} / {{ dashboard?.vitals?.bloodPressure?.last?.diastolic }}
+          </span>
+          <span *ngIf="!dashboard?.vitals?.bloodPressure?.last">Sin datos</span>
+        </p>
+        <p class="meta">{{ dashboard?.vitals?.bloodPressure?.last?.timestamp || 'Sin marca temporal' }}</p>
+      </article>
+
+      <article class="card" role="region" aria-labelledby="adh-heading">
+        <h3 id="adh-heading">Adherencia (últimos 7 días)</h3>
+          <p class="value">{{ adherenceDisplay }}</p>
+      </article>
+
+      <article class="card" role="region" aria-labelledby="alerts-heading">
+        <h3 id="alerts-heading">Alertas activas</h3>
+        <p class="value">{{ activeAlertsCount }}</p>
+      </article>
+
+      <article class="card" role="region" aria-labelledby="appt-heading">
+        <h3 id="appt-heading">Próxima cita médica</h3>
+        <p class="value">{{ dashboard?.summary?.nextAppointment || 'Sin cita programada' }}</p>
+      </article>
+    </section>
+
+    <!-- Charts grid -->
+    <section class="charts-grid" aria-labelledby="charts-heading">
+      <h2 id="charts-heading" class="visually-hidden">Gráficas clínicas</h2>
+
+      <figure class="chart" role="region" aria-labelledby="chart-bp">
+        <figcaption id="chart-bp">Tendencia de presión arterial (30 días)</figcaption>
+        <app-charts [vitals]="dashboard?.vitals"></app-charts>
+      </figure>
+
+      <figure class="chart" role="region" aria-labelledby="chart-adh">
+        <figcaption id="chart-adh">Adherencia a medicación</figcaption>
+        <app-charts [vitals]="dashboard?.vitals"></app-charts>
+      </figure>
+
+      <figure class="chart" role="region" aria-labelledby="chart-freq">
+        <figcaption id="chart-freq">Frecuencia de mediciones</figcaption>
+        <app-charts [vitals]="dashboard?.vitals"></app-charts>
+      </figure>
+    </section>
+
+    <!-- Alerts list -->
+    <section class="alerts" aria-labelledby="alerts-list-heading">
+      <h2 id="alerts-list-heading">Alertas recientes</h2>
+      <app-alerts-list [alerts]="dashboard?.alerts"></app-alerts-list>
+    </section>
+
+    <!-- Quick actions -->
+    <aside class="quick-actions-region" role="complementary" aria-labelledby="qa-heading">
+      <h2 id="qa-heading" class="visually-hidden">Acciones rápidas</h2>
+      <app-quick-actions (action)="onQuickAction($event)"></app-quick-actions>
+    </aside>
+  </main>
+
+  <footer class="dashboard-footer">
+    <small>Información clínica sensible — manejo conforme a políticas de privacidad.</small>
+  </footer>
+</section>
+
+<ng-template #loadingTpl>
+  <div class="loading" role="status" aria-live="polite">Cargando información del paciente…</div>
+</ng-template>
+
+<ng-template #errorTpl>
+  <div class="error" role="alert">{{ error }}</div>
+</ng-template>
