@@ -116,12 +116,24 @@ ul {
     transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
-.main-nav a:hover {
-    color: #f0f2f5;
+.main-nav a:hover,
+.main-nav a.active {
+    color: #ffffff;
+    font-weight: 700;
 }
 
-.main-nav a:hover::after {
+.main-nav a.active {
+    background-color: rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+}
+
+.main-nav a:hover::after,
+.main-nav a.active::after {
     transform: scaleX(1);
+}
+
+.main-nav a.active::after {
+    height: 3px;
 }
 
 /* Media queries para responsive */
@@ -181,8 +193,14 @@ ul {
         font-size: 1rem;
     }
 
-    .main-nav a:hover {
-        background-color: rgba(255, 255, 255, 0.1);
+    .main-nav a:hover,
+    .main-nav a.active {
+        background-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .main-nav a.active {
+        border-left: 5px solid #ffffff;
+        font-weight: 700;
     }
 
     .logo a {

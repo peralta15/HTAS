@@ -3,11 +3,11 @@ import { Headermenu } from "../../template/headermenu/headermenu";
 import { Footer } from "../../template/footer/footer";
 
 @Component({
-  selector: 'app-contacto',
+  selector: 'app-pagos',
   imports: [Headermenu, Footer],
-  templateUrl: './contacto.html',
-  styleUrl: './contacto.css',
+  templateUrl: './pagos.html',
+  styleUrl: './pagos.css',
 })
-export class Contacto {
+export class Pagos {
 
 }

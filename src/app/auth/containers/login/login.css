@@ -18,8 +18,8 @@
   justify-content: center;
   align-items: center;
   padding-top: 0px;
-  /* Reduced from 70px as breadcrumbs clear the header */
   padding-bottom: 20px;
+  margin-top: 85px;
 }
 
 .container {

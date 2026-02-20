@@ -1,7 +1,5 @@
 <app-headermenu></app-headermenu>
 
-<app-breadcrumbs></app-breadcrumbs>
-
 <div id="appweb" class="hero-section" #animateUp>
     <h1 class="hero-title" #animateUp>Recursos Tecnológicos</h1>
     <p class="hero-description" #animateUp>
@@ -77,37 +75,41 @@
 <section class="info-section" #animateUp>
     <div class="main-wrapper" #animateUp>
         <div class="info-grid" #animateUp>
-
-            <div class="info-card" #animateUp>
-                <div class="card-icon"><i class="bi bi-watch"></i></div>
+            <div class="info-card" #infoCard>
+                <div class="card-image-container">
+                    <img src="assets/pulsera.png" alt="Monitoreo Wearable">
+                </div>
                 <div class="card-body">
-                    <h3 #animateUp>Dispositivo Wearable</h3>
-                    <p #animateUp>Sensor de grado clínico diseñado para la captura continua de presión arterial
-                        sistólica y
-                        diastólica, con tecnología de oximetría avanzada y alertas preventivas ante arritmias.</p>
+                    <h3>Dispositivo Wearable</h3>
+                    <p>Sensor de grado clínico diseñado para la captura continua de presión arterial sistólica y
+                        diastólica.</p>
+                    <button class="btn-action">Leer más</button>
                 </div>
             </div>
 
-            <div class="info-card" #animateUp>
-                <div class="card-icon"><i class="bi bi-phone"></i></div>
+            <div class="info-card" #infoCard>
+                <div class="card-image-container">
+                    <img src="assets/celhtas.png" alt="Ecosistema Móvil">
+                </div>
                 <div class="card-body">
-                    <h3 #animateUp>Gestión Personal</h3>
-                    <p #animateUp>Centro de control del paciente donde se visualizan tendencias diarias, se gestiona la
-                        adherencia
-                        al tratamiento farmacológico y se activan protocolos de emergencia geolocalizados.</p>
+                    <h3>Gestión Personal</h3>
+                    <p>Centro de control del paciente donde se visualizan tendencias diarias y se gestiona el
+                        tratamiento.</p>
+                    <button class="btn-action">Leer más</button>
                 </div>
             </div>
 
-            <div class="info-card" #animateUp>
-                <div class="card-icon"><i class="bi bi-laptop"></i></div>
+            <div class="info-card" #infoCard>
+                <div class="card-image-container">
+                    <img src="assets/laptophtas.png" alt="Plataforma Web">
+                </div>
                 <div class="card-body">
-                    <h3 #animateUp>Portal Especialista</h3>
-                    <p #animateUp>Plataforma de telemonitorización para médicos que utiliza analítica avanzada para
-                        predecir crisis
-                        hipertensivas y generar informes de riesgo cardiovascular automatizados.</p>
+                    <h3>Portal Especialista</h3>
+                    <p>Plataforma de telemonitorización para médicos que utiliza analítica avanzada para predecir
+                        crisis.</p>
+                    <button class="btn-action">Leer más</button>
                 </div>
             </div>
-
         </div>
     </div>
 </section>

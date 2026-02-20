@@ -2,21 +2,17 @@ import { Component, ElementRef, ViewChild, ViewChildren, QueryList, AfterViewIni
 import { isPlatformBrowser, CommonModule } from '@angular/common';
 import { Headermenu } from "../../template/headermenu/headermenu";
 import { Footer } from "../../template/footer/footer";
-import { Breadcrumbs } from "../breadcrumbs/breadcrumbs";
 import * as THREE from 'three';
 
 @Component({
   selector: 'app-recursos',
   standalone: true,
-  imports: [Headermenu, Footer, CommonModule, Breadcrumbs],
+  imports: [Headermenu, Footer, CommonModule],
   templateUrl: './recursos.html',
   styleUrl: './recursos.css',
 })
 export class Recursos implements AfterViewInit, OnDestroy {
-  // Referencias para Three.js
   @ViewChild('canvasContainer') canvasContainer!: ElementRef;
-
-  // Referencias para animaciones de Scroll (estilo Nosotros)
   @ViewChildren('animateUp') elementsToAnimate!: QueryList<ElementRef>;
   @ViewChildren('infoCard') infoCards!: QueryList<ElementRef>;
 
@@ -24,24 +20,23 @@ export class Recursos implements AfterViewInit, OnDestroy {
     {
       num: '01',
       title: 'Monitoreo <br>Wearable',
-      description: 'Dispositivo biomédico de pulso diseñado para la captura de constantes hemodinámicas. Utiliza sensores PPG de alta resolución para el seguimiento continuo de la presión arterial sistólica y diastólica.'
+      description: 'Dispositivo biomédico de pulso diseñado para la captura de constantes hemodinámicas. Utiliza sensores PPG de alta resolución.'
     },
     {
       num: '02',
       title: 'Ecosistema <br>Móvil',
-      description: 'Interfaz de gestión para el paciente que centraliza el registro de presiones. Actúa como el puente de comunicación mediante Bluetooth BLE, procesando datos para alertas preventivas.'
+      description: 'Interfaz de gestión para el paciente que centraliza el registro de presiones. Actúa como el puente de comunicación mediante Bluetooth BLE.'
     },
     {
       num: '03',
       title: 'Plataforma <br>Web',
-      description: 'Panel web de alta fidelidad diseñado para especialistas en cardiología. Integra herramientas de Big Data para visualizar tendencias históricas y reportes detallados.'
+      description: 'Panel web de alta fidelidad diseñado para especialistas en cardiología. Integra herramientas de Big Data.'
     }
   ];
 
   currentSlideIndex = 0;
   isBrowser: boolean;
 
-  // Propiedades de Three.js
   private scene!: THREE.Scene;
   private camera!: THREE.PerspectiveCamera;
   private renderer!: THREE.WebGLRenderer;
@@ -60,9 +55,9 @@ export class Recursos implements AfterViewInit, OnDestroy {
     pHeight: 20,
     camZ: 35,
     wallAngleY: -0.25,
-    snapDelay: 200,
-    lerpSpeed: 0.06,
-    frameColor: 0xE8E8E8
+    snapDelay: 400,
+    lerpSpeed: 0.04, // Velocidad suave solicitada
+    fadeRange: 15
   };
 
   private totalWidth = 3 * 45;
@@ -73,21 +68,17 @@ export class Recursos implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit() {
     if (this.isBrowser) {
-      // Iniciamos ambos sistemas: Three.js y Observadores de Scroll
       setTimeout(() => {
         this.initThree();
         this.animate();
         this.onResize();
-        this.initScrollAnimations(); // <-- Implementación de Nosotros
-        this.initCard3DAnimations();   // <-- Implementación de Nosotros
+        this.initScrollAnimations();
+        this.initCard3DAnimations();
       }, 100);
     }
   }
 
-  /* ==========================================================================
-     1. LÓGICA DE ANIMACIONES DE SCROLL (HEREDADA DE NOSOTROS)
-     ========================================================================== */
-
+  /* --- ANIMACIONES DE SCROLL (DOM) --- */
   private initScrollAnimations() {
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
@@ -95,15 +86,10 @@ export class Recursos implements AfterViewInit, OnDestroy {
           entry.target.animate([
             { opacity: 0, transform: 'translateY(60px)' },
             { opacity: 1, transform: 'translateY(0)' }
-          ], {
-            duration: 800,
-            easing: 'ease-out',
-            fill: 'forwards'
-          });
+          ], { duration: 800, easing: 'ease-out', fill: 'forwards' });
         }
       });
     }, { threshold: 0.1 });
-
     this.elementsToAnimate.forEach(el => observer.observe(el.nativeElement));
   }
 
@@ -114,22 +100,14 @@ export class Recursos implements AfterViewInit, OnDestroy {
           entry.target.animate([
             { transform: 'perspective(1000px) rotateX(25deg) scale(0.9)', opacity: 0 },
             { transform: 'perspective(1000px) rotateX(0deg) scale(1)', opacity: 1 }
-          ], {
-            duration: 900,
-            easing: 'ease-out',
-            fill: 'forwards'
-          });
+          ], { duration: 900, easing: 'ease-out', fill: 'forwards' });
         }
       });
     }, { threshold: 0.1 });
-
     this.infoCards.forEach(card => observer.observe(card.nativeElement));
   }
 
-  /* ==========================================================================
-     2. LÓGICA DE THREE.JS (GALLERY)
-     ========================================================================== */
-
+  /* --- LÓGICA THREE.JS (SIN CUADROS) --- */
   private initThree() {
     if (!this.canvasContainer) return;
     this.scene = new THREE.Scene();
@@ -146,15 +124,13 @@ export class Recursos implements AfterViewInit, OnDestroy {
     this.canvasContainer.nativeElement.innerHTML = '';
     this.canvasContainer.nativeElement.appendChild(this.renderer.domElement);
 
-    this.scene.add(new THREE.AmbientLight(0xffffff, 1.2));
+    this.scene.add(new THREE.AmbientLight(0xffffff, 1.5)); // Subimos luz para compensar falta de marco
     this.scene.add(this.galleryGroup);
 
     const textureLoader = new THREE.TextureLoader();
     const planeGeo = new THREE.PlaneGeometry(this.CONFIG.pWidth, this.CONFIG.pHeight);
-    const frameGeo = new THREE.BoxGeometry(this.CONFIG.pWidth + 0.8, this.CONFIG.pHeight + 0.8, 0.5);
-    const frameMat = new THREE.MeshBasicMaterial({ color: this.CONFIG.frameColor });
 
-    const images = ['assets/pulserahtas.png', 'assets/celhtas.png', 'assets/laptophtas.png'];
+    const images = ['assets/pulsera.png', 'assets/celhtas.png', 'assets/laptophtas.png'];
 
     for (let i = 0; i < this.CONFIG.slideCount; i++) {
       const group = new THREE.Group();
@@ -163,51 +139,28 @@ export class Recursos implements AfterViewInit, OnDestroy {
       const texture = textureLoader.load(images[i]);
       texture.colorSpace = THREE.SRGBColorSpace;
 
-      const mat = new THREE.MeshBasicMaterial({ map: texture, transparent: true, side: THREE.DoubleSide });
+      // Solo la imagen con transparencia
+      const mat = new THREE.MeshBasicMaterial({
+        map: texture,
+        transparent: true,
+        side: THREE.DoubleSide
+      });
+
       const mesh = new THREE.Mesh(planeGeo, mat);
-      mesh.position.z = 0.31;
 
-      const frame = new THREE.Mesh(frameGeo, frameMat);
-      const shadowGeo = new THREE.PlaneGeometry(this.CONFIG.pWidth + 1, this.CONFIG.pHeight + 1);
-      const shadowMat = new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.12 });
+      // Sombra opcional (la mantengo ligera para dar profundidad)
+      const shadowGeo = new THREE.PlaneGeometry(this.CONFIG.pWidth, this.CONFIG.pHeight);
+      const shadowMat = new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.1 });
       const shadow = new THREE.Mesh(shadowGeo, shadowMat);
-      shadow.position.set(0.8, -0.8, -0.6);
+      shadow.position.set(1, -1, -0.2);
 
-      group.add(frame, mesh, shadow);
+      group.add(mesh, shadow); // Ya no agregamos el 'frame'
       this.galleryGroup.add(group);
       this.paintingGroups.push(group);
     }
 
     this.galleryGroup.rotation.y = this.CONFIG.wallAngleY;
     this.galleryGroup.position.x = 8;
-  }
-
-  goToSlide(index: number) {
-    if (!this.isBrowser) return;
-    const diff = index - this.currentSlideIndex;
-    this.targetScroll += diff * this.CONFIG.spacingX;
-  }
-
-  @HostListener('window:wheel', ['$event'])
-  onWheel(e: WheelEvent) {
-    if (!this.isBrowser) return;
-    // Detenemos el scroll si estamos dentro del área del canvas para controlar la galería
-    // Opcional: e.preventDefault();
-    this.targetScroll += e.deltaY * 0.1;
-    if (this.snapTimer) clearTimeout(this.snapTimer);
-    this.snapTimer = setTimeout(() => this.snapToNearest(), this.CONFIG.snapDelay);
-  }
-
-  @HostListener('window:mousemove', ['$event'])
-  onMouseMove(e: MouseEvent) {
-    if (!this.isBrowser) return;
-    this.mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-    this.mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
-  }
-
-  private snapToNearest() {
-    const index = Math.round(this.targetScroll / this.CONFIG.spacingX);
-    this.targetScroll = index * this.CONFIG.spacingX;
   }
 
   private animate = () => {
@@ -224,7 +177,23 @@ export class Recursos implements AfterViewInit, OnDestroy {
       const originalX = i * this.CONFIG.spacingX;
       const distFromCam = this.currentScroll - originalX;
       const shift = Math.round(distFromCam / this.totalWidth) * this.totalWidth;
-      group.position.x = originalX + shift;
+      const finalX = originalX + shift;
+      group.position.x = finalX;
+
+      // Opacidad según distancia
+      const distance = Math.abs(this.currentScroll - finalX);
+      let opacity = 1 - (distance / this.CONFIG.fadeRange);
+      opacity = Math.max(0, Math.min(1, opacity));
+
+      group.children.forEach((child) => {
+        const mesh = child as THREE.Mesh;
+        if (mesh.material) {
+          const material = mesh.material as THREE.MeshBasicMaterial;
+          // Si es el hijo 0 (la imagen) usa opacity full, si es el 1 (sombra) usa 0.1
+          material.opacity = (child === group.children[1]) ? opacity * 0.1 : opacity;
+          child.visible = opacity > 0.001;
+        }
+      });
     });
 
     this.camera.rotation.x = this.mouse.y * 0.05;
@@ -234,6 +203,34 @@ export class Recursos implements AfterViewInit, OnDestroy {
     this.currentSlideIndex = ((rawIndex % this.CONFIG.slideCount) + this.CONFIG.slideCount) % this.CONFIG.slideCount;
 
     this.renderer.render(this.scene, this.camera);
+  }
+
+  /* --- EVENTOS --- */
+  goToSlide(index: number) {
+    if (!this.isBrowser) return;
+    const diff = index - this.currentSlideIndex;
+    this.targetScroll += diff * this.CONFIG.spacingX;
+  }
+
+  @HostListener('window:wheel', ['$event'])
+  onWheel(e: WheelEvent) {
+    if (!this.isBrowser) return;
+    // Multiplicador bajo (0.05) para evitar que pase muy rápido
+    this.targetScroll += e.deltaY * 0.05;
+    if (this.snapTimer) clearTimeout(this.snapTimer);
+    this.snapTimer = setTimeout(() => this.snapToNearest(), this.CONFIG.snapDelay);
+  }
+
+  @HostListener('window:mousemove', ['$event'])
+  onMouseMove(e: MouseEvent) {
+    if (!this.isBrowser) return;
+    this.mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+    this.mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+  }
+
+  private snapToNearest() {
+    const index = Math.round(this.targetScroll / this.CONFIG.spacingX);
+    this.targetScroll = index * this.CONFIG.spacingX;
   }
 
   @HostListener('window:resize')
