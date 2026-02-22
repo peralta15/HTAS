@@ -14,10 +14,8 @@ export class Landing implements AfterViewInit {
   @ViewChildren('animateUp') elementsToAnimate!: QueryList<ElementRef>;
   @ViewChildren('infoCard') infoCards!: QueryList<ElementRef>;
 
-  isModalOpen = false;
-  modalTitle = '';
-  modalDescription = '';
   activeGalleryTab = 1;
+  activeFeatureIndex = 0; // Controla qué característica se muestra en el showcase
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object) { }
 
@@ -139,31 +137,8 @@ export class Landing implements AfterViewInit {
     }
   ];
 
-  // Variable para manejar el modal actual de forma completa
-  selectedModal: any = null;
-
-  openModal(index: number) {
-    const dataIndex = index - 1;
-    if (this.modalData[dataIndex]) {
-      this.selectedModal = this.modalData[dataIndex]; // Guardamos todo el objeto
-      this.isModalOpen = true;
-      if (isPlatformBrowser(this.platformId)) {
-        document.body.style.overflow = 'hidden';
-      }
-    }
-  }
-
-  closeModal() {
-    this.isModalOpen = false;
-    if (isPlatformBrowser(this.platformId)) {
-      document.body.style.overflow = 'auto';
-    }
-  }
-
-  @HostListener('document:keydown', ['$event'])
-  handleKeyboardEvent(event: KeyboardEvent) {
-    if (event.key === 'Escape' && this.isModalOpen) {
-      this.closeModal();
-    }
+  // --- Lógica del Showcase Interactivo ---
+  setActiveFeature(index: number) {
+    this.activeFeatureIndex = index;
   }
 }

@@ -351,85 +351,218 @@
     border-radius: 2px;
 }
 
-.interactive-container {
+.dashboard-wrapper {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 2rem;
-    max-width: 900px;
+    grid-template-columns: 350px 1fr;
+    gap: 30px;
+    max-width: 1200px;
     margin: 0 auto;
+    min-height: 550px;
 }
 
-.interactive-item {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), transparent);
-    border-radius: 12px;
-    padding: 2.5rem 2rem;
+/* Navegación Lateral */
+.dashboard-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.nav-item {
+    background: rgba(248, 249, 250, 0.5);
+    /* Semi-transparente */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 1.5rem 2rem;
+    border-radius: 15px;
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 1px solid #eaeaea;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    /* Borde claro para resaltar brillo */
+    position: relative;
+    overflow: hidden;
+    color: #444;
+}
+
+.nav-indicator {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 6px;
+    height: 100%;
+    background: #b0001e;
+    transform: scaleY(0);
+    transition: transform 0.4s ease;
+}
+
+.nav-item.active {
+    background: rgba(255, 255, 255, 0.8);
+    border-color: rgba(176, 0, 30, 0.3);
+    color: #b0001e;
+    box-shadow: 0 10px 25px rgba(176, 0, 30, 0.1);
+    transform: translateX(10px);
+}
+
+.nav-item.active .nav-indicator {
+    transform: scaleY(1);
+}
+
+.nav-text {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.nav-arrow {
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: all 0.3s ease;
+}
+
+.nav-item.active .nav-arrow {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Pantalla de Visualización (Glassmorphism) */
+.dashboard-display {
+    background: rgba(255, 255, 255, 0.4);
+    /* Transparencia equilibrada */
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 30px;
+    padding: 3.5rem;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.6);
     position: relative;
     overflow: hidden;
 }
 
-.interactive-item::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(45deg, rgba(213, 0, 50, 0.08), rgba(176, 0, 30, 0.08));
-    opacity: 1;
-    transition: opacity 0.3s ease;
+.display-content {
+    animation: slideInContent 0.5s ease-out forwards;
 }
 
-.interactive-item:hover {
-    transform: translateY(-8px);
-    background: rgba(255, 255, 255, 0.25);
-    border-color: rgba(176, 0, 30, 0.2);
-    box-shadow: 0 12px 30px rgba(213, 0, 50, 0.15);
+@keyframes slideInContent {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
-.interactive-item:hover::before {
-    opacity: 1;
-}
-
-.interactive-item:hover .arrow-icon {
-    transform: translateX(8px);
+.category-badge {
     color: #b0001e;
+    font-weight: 800;
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+    display: block;
+    margin-bottom: 0.8rem;
 }
 
-.item-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: relative;
-    z-index: 1;
-    width: 100%;
+.display-header h2 {
+    font-size: 2.4rem;
+    color: #333;
+    margin-bottom: 1.5rem;
+    font-weight: 800;
 }
 
-.item-text {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #b0001dcc;
-    transition: color 0.3s ease;
+.main-text {
+    font-size: 1.2rem;
+    line-height: 1.8;
+    color: #666;
+    margin-bottom: 2.5rem;
 }
 
-.interactive-item:hover .item-text {
-    color: #b0001e;
+.features-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
 }
 
-.arrow-icon {
-    font-size: 2.2rem;
+.highlight-box {
+    background: rgba(176, 0, 30, 0.05);
+    backdrop-filter: blur(5px);
+    padding: 1.8rem;
+    border-radius: 20px;
+    border-left: 4px solid #b0001e;
+}
+
+.highlight-box h4 {
+    color: #333;
+    margin-bottom: 0.8rem;
+    font-size: 1.1rem;
     font-weight: 700;
-    color: #b0001dcc;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.section-header,
-.interactive-container {
-    position: relative;
-    z-index: 2;
+.highlight-box p {
+    font-size: 0.95rem;
+    color: #555;
+    line-height: 1.6;
+}
+
+.benefit-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.benefit-list li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #444;
+    font-weight: 500;
+}
+
+.benefit-list li i {
+    color: #b0001e;
+    font-size: 1.2rem;
+}
+
+/* Ajuste Responsivo */
+@media (max-width: 900px) {
+    .dashboard-wrapper {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-nav {
+        flex-direction: row;
+        overflow-x: auto;
+        padding-bottom: 10px;
+    }
+
+    .nav-item {
+        min-width: 250px;
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+    }
+
+    .nav-indicator {
+        width: 100%;
+        height: 4px;
+        top: auto;
+        bottom: 0;
+        transform: scaleX(0);
+    }
+
+    .nav-item.active {
+        transform: translateY(-5px);
+    }
+
+    .nav-item.active .nav-indicator {
+        transform: scaleX(1);
+    }
+
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* ===== GALLERY SECTION ===== */
@@ -718,58 +851,104 @@
 }
 
 .feature-mini-box {
+    width: 240px;
+    height: auto;
+    position: relative;
+    cursor: pointer;
+    animation-duration: 12s;
+    background: transparent;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+    z-index: 10;
+}
+
+.feature-card {
     background: rgba(255, 255, 255, 0.9);
     backdrop-filter: blur(8px);
     padding: 20px;
     border-radius: 15px;
-    width: 240px;
+    width: 100%;
     border: 1px solid rgba(0, 0, 0, 0.05);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
     position: relative;
-    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    cursor: pointer;
     animation-duration: 12s;
-    /* Sincronizado con el orbe */
     animation-iteration-count: infinite;
     animation-timing-function: linear;
 }
 
-/* Sincronización Milimétrica (Calculada por vectores de órbita) */
-.right .feature-mini-box:nth-child(1) {
-    animation-name: syncBoxHighlightRight;
+.feature-content-wrapper {
+    padding: 20px;
+    width: 100%;
+    height: 100%;
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Aplicar animaciones de visuales (brillo) al hijo */
+.right .feature-mini-box:nth-child(1) .feature-card {
+    animation-name: syncVisualsRight;
     animation-delay: 11.4s;
 }
 
-/* Top Right - Sincronizado al inicio */
-.right .feature-mini-box:nth-child(2) {
-    animation-name: syncBoxHighlightRight;
+.right .feature-mini-box:nth-child(2) .feature-card {
+    animation-name: syncVisualsRight;
     animation-delay: 1.4s;
 }
 
-/* Bottom Right */
-.left .feature-mini-box:nth-child(2) {
-    animation-name: syncBoxHighlightLeft;
+.left .feature-mini-box:nth-child(2) .feature-card {
+    animation-name: syncVisualsLeft;
     animation-delay: 5.4s;
 }
 
-/* Bottom Left */
-.left .feature-mini-box:nth-child(1) {
-    animation-name: syncBoxHighlightLeft;
+.left .feature-mini-box:nth-child(1) .feature-card {
+    animation-name: syncVisualsLeft;
     animation-delay: 7.4s;
 }
 
-/* Top Left */
-
-
-.left .feature-mini-box:hover {
-    transform: translateX(-15px) scale(1.05);
-    animation: none;
-    /* Pausa la sincronización al interactuar */
+/* El padre sigue encargándose del movimiento de órbita */
+.right .feature-mini-box:nth-child(1) {
+    animation-name: syncTransformRight;
+    animation-delay: 11.4s;
 }
 
-.right .feature-mini-box:hover {
-    transform: translateX(15px) scale(1.05);
-    animation: none;
+.right .feature-mini-box:nth-child(2) {
+    animation-name: syncTransformRight;
+    animation-delay: 1.4s;
+}
+
+.left .feature-mini-box:nth-child(2) {
+    animation-name: syncTransformLeft;
+    animation-delay: 5.4s;
+}
+
+.left .feature-mini-box:nth-child(1) {
+    animation-name: syncTransformLeft;
+    animation-delay: 7.4s;
+}
+
+
+.left .feature-mini-box:hover .feature-card {
+    transform: translateX(-10px) scale(1.05);
+    /* Elevación estática elegante */
+}
+
+.right .feature-mini-box:hover .feature-card {
+    transform: translateX(10px) scale(1.05);
+}
+
+.left .feature-mini-box:hover .feature-card {
+    transform: translateX(-15px) scale(1.08);
+}
+
+.right .feature-mini-box:hover .feature-card {
+    transform: translateX(15px) scale(1.08);
+}
+
+.feature-mini-box:hover .feature-card {
+    border-color: rgba(176, 0, 30, 0.4);
+    box-shadow: 0 25px 50px rgba(176, 0, 30, 0.2);
+    background: #ffffff;
+    z-index: 100;
 }
 
 .feature-mini-box h3 {
@@ -793,6 +972,30 @@
     top: 50%;
     z-index: -1;
     transition: all 0.5s ease;
+    animation-duration: 12s;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+}
+
+/* Sincronización de Líneas con el Orbe */
+.left .feature-mini-box:nth-child(1) .pointer-line {
+    animation-name: syncLineHighlightLeft;
+    animation-delay: 7.4s;
+}
+
+.left .feature-mini-box:nth-child(2) .pointer-line {
+    animation-name: syncLineHighlightLeft;
+    animation-delay: 5.4s;
+}
+
+.right .feature-mini-box:nth-child(1) .pointer-line {
+    animation-name: syncLineHighlightRight;
+    animation-delay: 11.4s;
+}
+
+.right .feature-mini-box:nth-child(2) .pointer-line {
+    animation-name: syncLineHighlightRight;
+    animation-delay: 1.4s;
 }
 
 .pointer-line::after {
@@ -822,56 +1025,151 @@
     left: 0;
 }
 
-.left .feature-mini-box:hover .pointer-line {
-    width: 120px;
-    right: -120px;
-    background: #b0001e;
+.feature-card:hover .pointer-line {
+    width: 120px !important;
+    background: #b0001e !important;
 }
 
-.right .feature-mini-box:hover .pointer-line {
-    width: 120px;
-    left: -120px;
-    background: #b0001e;
+.left .feature-card .pointer-line {
+    right: -100px;
 }
 
-/* Keyframes Milimétricos (Efecto de impacto inmediato) */
-@keyframes syncBoxHighlightLeft {
+.left .feature-card:hover .pointer-line {
+    right: -120px !important;
+}
+
+.right .feature-card .pointer-line {
+    left: -100px;
+}
+
+.right .feature-card:hover .pointer-line {
+    left: -120px !important;
+}
+
+/* Keyframes de Movimiento (Solo transform) */
+@keyframes syncTransformLeft {
 
     0%,
     15%,
     100% {
-        transform: translateX(0) scale(1);
+        transform: translateX(0);
+    }
+
+    10% {
+        transform: translateX(-15px);
+    }
+}
+
+@keyframes syncTransformRight {
+
+    0%,
+    15%,
+    100% {
+        transform: translateX(0);
+    }
+
+    10% {
+        transform: translateX(15px);
+    }
+}
+
+/* Keyframes Visuales (Solo Brillo y Escala) */
+@keyframes syncVisualsLeft {
+
+    0%,
+    15%,
+    100% {
+        scale: 1;
         border-color: rgba(0, 0, 0, 0.05);
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
     }
 
     10% {
+        scale: 1.1;
+        border-color: rgba(176, 0, 30, 0.5);
+        box-shadow: 0 25px 50px rgba(176, 0, 30, 0.25);
+        background: #ffffff;
+    }
+}
+
+@keyframes syncVisualsRight {
+
+    0%,
+    15%,
+    100% {
+        scale: 1;
+        border-color: rgba(0, 0, 0, 0.05);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    }
+
+    10% {
+        scale: 1.1;
+        border-color: rgba(176, 0, 30, 0.5);
+        box-shadow: 0 25px 50px rgba(176, 0, 30, 0.25);
+        background: #ffffff;
+    }
+}
+
+/* Keyframes para Líneas Conectoras */
+@keyframes syncLineHighlightLeft {
+
+    0%,
+    15%,
+    100% {
+        width: 100px;
+        background: rgba(180, 180, 180, 0.4);
+        right: -100px;
+    }
+
+    10% {
+        width: 120px;
+        background: #b0001e;
+        right: -120px;
+    }
+}
+
+@keyframes syncLineHighlightRight {
+
+    0%,
+    15%,
+    100% {
+        width: 100px;
+        background: rgba(180, 180, 180, 0.4);
+        left: -100px;
+    }
+
+    10% {
+        width: 120px;
+        background: #b0001e;
+        left: -120px;
+    }
+}
+
+/* Keyframes para Hover Dinámico (Sincronizados con el Orbe) */
+@keyframes hoverPulseLeft {
+
+    0%,
+    100% {
+        transform: translateX(0) scale(1);
+    }
+
+    50% {
         transform: translateX(-15px) scale(1.1);
-        border-color: rgba(176, 0, 30, 0.5);
-        box-shadow: 0 25px 50px rgba(176, 0, 30, 0.25);
-        background: #ffffff;
     }
 }
 
-@keyframes syncBoxHighlightRight {
+@keyframes hoverPulseRight {
 
     0%,
-    15%,
     100% {
         transform: translateX(0) scale(1);
-        border-color: rgba(0, 0, 0, 0.05);
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
     }
 
-    10% {
+    50% {
         transform: translateX(15px) scale(1.1);
-        border-color: rgba(176, 0, 30, 0.5);
-        box-shadow: 0 25px 50px rgba(176, 0, 30, 0.25);
-        background: #ffffff;
     }
 }
 
-/* ===== INFO SECTION ===== */
 .info-section {
     padding: 4rem 5% 5rem;
     margin-bottom: 2rem;

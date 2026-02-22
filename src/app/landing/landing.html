@@ -63,14 +63,18 @@
     <div class="schematic-container" #animateUp>
       <div class="feature-column left" #animateUp>
         <div class="feature-mini-box">
-          <div class="pointer-line"></div>
-          <h3 #animateUp>Presión Arterial</h3>
-          <p #animateUp>Monitoreo sistólico y diastólico en tiempo real.</p>
+          <div class="feature-card">
+            <div class="pointer-line"></div>
+            <h3 #animateUp>Presión Arterial</h3>
+            <p #animateUp>Monitoreo sistólico y diastólico en tiempo real.</p>
+          </div>
         </div>
         <div class="feature-mini-box">
-          <div class="pointer-line"></div>
-          <h3 #animateUp>Bio-Sensores</h3>
-          <p #animateUp>Detección de arritmias y frecuencia cardíaca.</p>
+          <div class="feature-card">
+            <div class="pointer-line"></div>
+            <h3 #animateUp>Bio-Sensores</h3>
+            <p #animateUp>Detección de arritmias y frecuencia cardíaca.</p>
+          </div>
         </div>
       </div>
 
@@ -81,14 +85,18 @@
 
       <div class="feature-column right" #animateUp>
         <div class="feature-mini-box">
-          <div class="pointer-line"></div>
-          <h3 #animateUp>Sincronización</h3>
-          <p #animateUp>Reportes automáticos directos a la App Móvil.</p>
+          <div class="feature-card">
+            <div class="pointer-line"></div>
+            <h3 #animateUp>Nivel de Oxígeno</h3>
+            <p #animateUp>Saturación de SpO2 constante para tu seguridad.</p>
+          </div>
         </div>
         <div class="feature-mini-box">
-          <div class="pointer-line"></div>
-          <h3 #animateUp>Autonomía</h3>
-          <p #animateUp>Batería de larga duración para monitoreo 24/7.</p>
+          <div class="feature-card">
+            <div class="pointer-line"></div>
+            <h3 #animateUp>Actividad Diaria</h3>
+            <p #animateUp>Seguimiento de pasos, calorías y calidad del sueño.</p>
+          </div>
         </div>
       </div>
     </div>
@@ -101,33 +109,49 @@
       <h2 #animateUp>Control Integral de tu Bienestar</h2>
     </div>
 
-    <div class="interactive-container" #animateUp>
-      <div class="interactive-item" (click)="openModal(1)" #animateUp>
-        <div class="item-content" #animateUp>
-          <span class="item-text">Tu Salud en tus Manos</span>
-          <span class="arrow-icon" #animateUp><i class="bi bi-chevron-right"></i></span>
+    <div class="dashboard-wrapper" #animateUp>
+      <!-- Menú Lateral de Selectores -->
+      <div class="dashboard-nav" #animateUp>
+        @for (item of modalData; track $index) {
+        <div class="nav-item" [class.active]="activeFeatureIndex === $index" (click)="setActiveFeature($index)"
+          #animateUp>
+          <div class="nav-indicator"></div>
+          <span class="nav-text">{{ item.title }}</span>
+          <i class="bi bi-chevron-right nav-arrow"></i>
         </div>
+        }
       </div>
 
-      <div class="interactive-item" (click)="openModal(2)" #animateUp>
-        <div class="item-content" #animateUp>
-          <span class="item-text">Gestión Inteligente</span>
-          <span class="arrow-icon" #animateUp><i class="bi bi-chevron-right"></i></span>
-        </div>
-      </div>
+      <!-- Panel de Visualización (Showcase) -->
+      <div class="dashboard-display" #animateUp>
+        @if (modalData[activeFeatureIndex]; as selected) {
+        <div class="display-content">
+          <div class="display-header">
+            <span class="category-badge">BIENESTAR HTAS</span>
+            <h2>{{ selected.title }}</h2>
+          </div>
 
-      <div class="interactive-item" (click)="openModal(3)" #animateUp>
-        <div class="item-content" #animateUp>
-          <span class="item-text">Control Tensional</span>
-          <span class="arrow-icon" #animateUp><i class="bi bi-chevron-right"></i></span>
-        </div>
-      </div>
+          <div class="display-body">
+            <p class="main-text">{{ selected.description }}</p>
 
-      <div class="interactive-item" (click)="openModal(4)" #animateUp>
-        <div class="item-content" #animateUp>
-          <span class="item-text">Vivir con Tranquilidad</span>
-          <span class="arrow-icon" #animateUp><i class="bi bi-chevron-right"></i></span>
+            <div class="features-grid">
+              <div class="highlight-box">
+                <h4>{{ selected.additionalTitle }}</h4>
+                <p>{{ selected.additionalText }}</p>
+              </div>
+
+              <ul class="benefit-list">
+                @for (feature of selected.features; track feature) {
+                <li>
+                  <i class="bi bi-check-circle-fill"></i>
+                  <span>{{ feature }}</span>
+                </li>
+                }
+              </ul>
+            </div>
+          </div>
         </div>
+        }
       </div>
     </div>
   </div>
@@ -265,36 +289,5 @@
     </div>
   </div>
 
-  <div class="modal-overlay" [class.active]="isModalOpen" (click)="closeModal()">
-    <div class="modal-content" (click)="$event.stopPropagation()" *ngIf="selectedModal">
-      <button class="modal-close" (click)="closeModal()">×</button>
-
-      <div class="modal-scrollable">
-        <div class="modal-header">
-          <h2>{{ selectedModal.title }}</h2>
-        </div>
-
-        <div class="modal-body">
-          <p class="main-description">{{ selectedModal.description }}</p>
-
-          <div class="modal-details">
-            <h3>{{ selectedModal.additionalTitle }}</h3>
-
-            <p>{{ selectedModal.additionalText }}</p>
-
-            <ul>
-              <li *ngFor="let feature of selectedModal.features">
-                {{ feature }}
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        <div class="modal-footer">
-          <button class="btn btn-primary" (click)="closeModal()">Cerrar</button>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <app-footer></app-footer>
