@@ -5,7 +5,6 @@ import { GoogleService } from '../../services/google';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Headermenu } from "../../../template/headermenu/headermenu";
-import { Breadcrumbs } from "../../../pages/breadcrumbs/breadcrumbs";
 import { Footer } from "../../../template/footer/footer";
 
 @Component({
@@ -16,7 +15,6 @@ import { Footer } from "../../../template/footer/footer";
     ReactiveFormsModule,
     FormsModule,
     Headermenu,
-    Breadcrumbs,
     Footer
   ],
   templateUrl: './login.html',

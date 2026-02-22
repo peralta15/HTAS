@@ -72,44 +72,31 @@
 </div>
 <br>
 
-<section class="info-section" #animateUp>
+<section class="info-section" #animateUp [class.section-expanded]="expandedCardIndex !== null">
     <div class="main-wrapper" #animateUp>
         <div class="info-grid" #animateUp>
-            <div class="info-card" #infoCard>
+            @for (card of infoCardsContent; track $index) {
+            <div class="info-card" #infoCard [class.expanded]="expandedCardIndex === $index">
                 <div class="card-image-container">
-                    <img src="assets/pulsera.png" alt="Monitoreo Wearable">
+                    <img [src]="card.image" [alt]="card.title">
                 </div>
                 <div class="card-body">
-                    <h3>Dispositivo Wearable</h3>
-                    <p>Sensor de grado clínico diseñado para la captura continua de presión arterial sistólica y
-                        diastólica.</p>
-                    <button class="btn-action">Leer más</button>
-                </div>
-            </div>
+                    <h3>{{card.title}}</h3>
+                    <p>{{card.shortDesc}}</p>
 
-            <div class="info-card" #infoCard>
-                <div class="card-image-container">
-                    <img src="assets/celhtas.png" alt="Ecosistema Móvil">
-                </div>
-                <div class="card-body">
-                    <h3>Gestión Personal</h3>
-                    <p>Centro de control del paciente donde se visualizan tendencias diarias y se gestiona el
-                        tratamiento.</p>
-                    <button class="btn-action">Leer más</button>
-                </div>
-            </div>
+                    <div class="extra-info">
+                        <p class="detail-text">{{card.extraInfo}}</p>
+                        <button class="btn-action close-btn" (click)="toggleCard($index)">
+                            Cerrar
+                        </button>
+                    </div>
 
-            <div class="info-card" #infoCard>
-                <div class="card-image-container">
-                    <img src="assets/laptophtas.png" alt="Plataforma Web">
-                </div>
-                <div class="card-body">
-                    <h3>Portal Especialista</h3>
-                    <p>Plataforma de telemonitorización para médicos que utiliza analítica avanzada para predecir
-                        crisis.</p>
-                    <button class="btn-action">Leer más</button>
+                    <button *ngIf="expandedCardIndex !== $index" class="btn-action" (click)="toggleCard($index)">
+                        Leer más
+                    </button>
                 </div>
             </div>
+            }
         </div>
     </div>
 </section>
@@ -128,7 +115,7 @@
                 <span class="accordion-title">¿Qué es la Hipertensión Arterial Sistémica (HTAS)?</span>
                 <span class="arrow-indicator">+</span>
             </div>
-            <div class="accordion-content" #animateUp>
+            <div class="accordion-content">
                 <p>La HTAS es una enfermedad crónica donde la fuerza de la sangre contra las paredes de las
                     arterias es
                     demasiado alta de forma sostenida. Nuestra plataforma ayuda a monitorear este "asesino silencioso",
@@ -145,7 +132,7 @@
                 <span class="accordion-title">¿Cómo integra el ecosistema mis niveles de salud?</span>
                 <span class="arrow-indicator">+</span>
             </div>
-            <div class="accordion-content" #animateUp>
+            <div class="accordion-content">
                 <p>El ecosistema vincula el hardware de medición con nuestra arquitectura en la nube mediante
                     tecnología
                     BLE. Esto permite que cada toma de presión se analice instantáneamente, comparándola con tus rangos
@@ -161,7 +148,7 @@
                 <span class="accordion-title">¿Cómo protegen mis registros clínicos?</span>
                 <span class="arrow-indicator">+</span>
             </div>
-            <div class="accordion-content" #animateUp>
+            <div class="accordion-content">
                 <p>Utilizamos estándares de encriptación AES-256 para asegurar que tu historial de presión arterial y
                     datos biométricos sean privados. Cumplimos con las normativas internacionales de protección de datos
                     de salud, garantizando que tú tienes el control total sobre quién accede a tu información.</p>

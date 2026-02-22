@@ -2,12 +2,11 @@ import { Component, HostListener, AfterViewInit, ElementRef, QueryList, ViewChil
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Headermenu } from "../template/headermenu/headermenu";
 import { Footer } from "../template/footer/footer";
-import { Breadcrumbs } from "../pages/breadcrumbs/breadcrumbs";
 
 @Component({
   selector: 'app-landing',
   standalone: true,
-  imports: [CommonModule, Headermenu, Footer, Breadcrumbs],
+  imports: [CommonModule, Headermenu, Footer],
   templateUrl: './landing.html',
   styleUrl: './landing.css',
 })
