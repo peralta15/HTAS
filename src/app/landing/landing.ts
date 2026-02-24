@@ -15,7 +15,7 @@ export class Landing implements AfterViewInit {
   @ViewChildren('infoCard') infoCards!: QueryList<ElementRef>;
 
   activeGalleryTab = 1;
-  activeFeatureIndex = 0; // Controla qué característica se muestra en el showcase
+  activeFeatureIndex = 0;
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object) { }
 

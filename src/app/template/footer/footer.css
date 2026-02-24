@@ -9,8 +9,8 @@
   max-width: 1300px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: 1fr 0.8fr 1.2fr 1fr;
-  gap: 40px;
+  grid-template-columns: 1.1fr 1fr 0.9fr 1.2fr;
+  gap: 30px;
   padding-bottom: 60px;
 }
 
@@ -257,99 +257,6 @@
   font-size: 0.85rem;
   margin-top: 2px;
   line-height: 1.2;
-}
-
-/* Creadores y GitHub */
-.creators-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 30px;
-}
-
-.creator-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  text-decoration: none;
-  color: white;
-  background: rgba(0, 0, 0, 0.1);
-  padding: 10px;
-  border-radius: 5px;
-  transition: 0.3s;
-}
-
-.creator-item:hover {
-  background: white;
-  color: #b0001e;
-}
-
-.github-icon {
-  font-weight: 900;
-  border: 1px solid currentColor;
-  padding: 2px 5px;
-  font-size: 0.7rem;
-  border-radius: 4px;
-}
-
-.creator-name {
-  font-weight: 700;
-  font-size: 0.9rem;
-  display: block;
-}
-
-.creator-role {
-  font-size: 0.7rem;
-  opacity: 0.8;
-}
-
-/* Contenedor de los botones */
-.partners-section {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 15px;
-}
-
-/* El botón (enlace) */
-.partner-badge {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  /* Espacio entre el icono de GitHub y el texto */
-
-  background-color: #ffffff;
-  color: #b0001e !important;
-  /* Forzamos el color rojo para el texto del enlace */
-
-  width: 160px;
-  padding: 10px 15px;
-  border-radius: 6px;
-
-  font-weight: 800;
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  text-decoration: none;
-  /* Quita la línea azul de debajo */
-
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  cursor: pointer;
-}
-
-/* Efecto al pasar el mouse */
-.partner-badge:hover {
-  background-color: #24292e;
-  /* Color oficial de GitHub */
-  color: #ffffff !important;
-  transform: translateY(-3px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-}
-
-/* Ajuste para el icono si usas Bootstrap Icons */
-.partner-badge i {
-  font-size: 1.1rem;
 }
 
 /* Bottom */
