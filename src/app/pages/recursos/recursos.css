@@ -592,7 +592,7 @@ h1 {
     line-height: 1.6;
     margin-bottom: 1.5rem;
     flex-grow: 1;
-    /* Empuja el botón hacia abajo si el texto es corto */
+    text-align: center;
 }
 
 /* --- BOTÓN ACCIÓN --- */
@@ -617,52 +617,40 @@ h1 {
     box-shadow: 0 8px 25px rgba(176, 0, 30, 0.4);
 }
 
-/* --- ESTILOS DE EXPANSIÓN (OVERLAY PREMIUM) --- */
+/* --- ESTILOS DE EXPANSIÓN (INTEGRACIÓN FLUIDA) --- */
 .extra-info {
-    position: absolute;
-    top: calc(100% - 1px);
-    /* Unión perfecta con el borde inferior */
-    left: -1px;
-    /* Alineación milimétrica para cubrir bordes */
-    width: calc(100% + 2px);
-    background: #ffffff;
-    border-radius: 0 0 30px 30px;
-    padding: 0 30px 40px;
+    position: relative;
+    width: 100%;
+    background: transparent;
+    /* Hereda del padre */
+    padding: 0;
     max-height: 0;
     overflow: hidden;
     opacity: 0;
     z-index: 100;
-    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.15);
     transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1);
-    transform: translateY(0);
+    transform: translateY(10px);
     pointer-events: none;
-    border: 1px solid rgba(176, 0, 30, 0.3);
-    border-top: none;
 }
 
 .detail-text {
-    padding-top: 0;
-    /* Eliminado para subir el texto al máximo */
-    border-top: none;
-    /* Eliminado el borde para unión limpia */
-    color: #444 !important;
-    font-style: normal;
-    font-size: 0.95rem !important;
-    line-height: 1.8 !important;
-    text-align: justify;
-    font-weight: 500;
+    padding-top: 5px;
+    color: #555555;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    text-align: center;
+    font-weight: 400;
 }
 
 .info-card.expanded {
     z-index: 200;
-    border-radius: 30px 30px 0 0;
-    /* Bordes rectos abajo para unir con la caja */
-    border-color: rgba(176, 0, 30, 0.3);
-    box-shadow: 0 15px 40px rgba(176, 0, 30, 0.08);
-    border-bottom: 1px solid transparent;
+    border-radius: 24px;
+    /* Mantiene el radio original */
+    border-color: rgba(176, 0, 30, 0.2);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
     background: #ffffff;
-    padding-bottom: 15px;
-    /* Reducido para compactar */
+    padding-bottom: 35px;
+    /* Restaurado para balancear el cierre */
 }
 
 .info-card.expanded .card-body p {
@@ -675,6 +663,8 @@ h1 {
     opacity: 1;
     transform: translateY(0) scale(1);
     pointer-events: auto;
+    overflow: visible;
+    /* Permite que la sombra y el escalado del botón no se corten */
 }
 
 .info-card.expanded .card-image-container img {
@@ -686,7 +676,8 @@ h1 {
 .info-card.expanded .btn-action {
     background-color: #b0001e;
     margin-top: 1.5rem;
-    /* Espacio para el botón de cierre */
+    margin-bottom: 10px;
+    /* Espacio extra para que no se corte al hacer hover */
     display: table;
     margin-left: auto;
     margin-right: auto;
