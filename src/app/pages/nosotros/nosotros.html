@@ -183,42 +183,51 @@
         </div>
     </div>
 
-    <!-- Nuestros Valores (mismos estilos que propósito) -->
+    <!-- Nuestros Valores con Carrusel 3D -->
     <div class="values-section" #animateUp>
         <div class="section-header" #animateUp>
             <h2 #animateUp>Nuestros Valores</h2>
         </div>
-        <div class="values-grid" #animateUp>
-            <div class="value-card">
-                <div class="value-icon">
-                    <i class="bi bi-shield-check"></i>
-                </div>
-                <div class="value-content">
-                    <h3>Precisión Médica</h3>
-                    <p>Nos basamos en estándares clínicos internacionales para garantizar la fiabilidad de la
-                        información.</p>
-                </div>
-            </div>
-            <div class="value-card">
-                <div class="value-icon">
-                    <i class="bi bi-people-fill"></i>
-                </div>
-                <div class="value-content">
-                    <h3>Empatía con el Paciente</h3>
-                    <p>Diseñamos pensando en la facilidad de uso para personas de todas las edades.</p>
-                </div>
-            </div>
-            <div class="value-card">
-                <div class="value-icon">
-                    <i class="bi bi-incognito"></i>
-                </div>
-                <div class="value-content">
-                    <h3>Seguridad de Datos</h3>
-                    <p>Protegemos la información de salud de nuestros usuarios con los más altos niveles de
-                        encriptación.</p>
-                </div>
-            </div>
-        </div>
+
+        <section class="cont-carrusel">
+            <input type="radio" name="posicion" id="pos1" checked />
+            <input type="radio" name="posicion" id="pos2" />
+            <input type="radio" name="posicion" id="pos3" />
+
+            <main id="items-carrusel">
+                <label class="value-card item" for="pos1">
+                    <div class="value-icon">
+                        <i class="bi bi-shield-check"></i>
+                    </div>
+                    <div class="value-content">
+                        <h3>Precisión Médica</h3>
+                        <p>Nos basamos en estándares clínicos internacionales para garantizar la fiabilidad de la
+                            información.</p>
+                    </div>
+                </label>
+
+                <label class="value-card item" for="pos2">
+                    <div class="value-icon">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                    <div class="value-content">
+                        <h3>Empatía con el Paciente</h3>
+                        <p>Diseñamos pensando en la facilidad de uso para personas de todas las edades.</p>
+                    </div>
+                </label>
+
+                <label class="value-card item" for="pos3">
+                    <div class="value-icon">
+                        <i class="bi bi-incognito"></i>
+                    </div>
+                    <div class="value-content">
+                        <h3>Seguridad de Datos</h3>
+                        <p>Protegemos la información de salud de nuestros usuarios con los más altos niveles de
+                            encriptación.</p>
+                    </div>
+                </label>
+            </main>
+        </section>
     </div>
 </div>
 
