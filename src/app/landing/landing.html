@@ -1,4 +1,5 @@
 <app-headermenu></app-headermenu>
+
 <div class="landing-container">
   <div class="hero-section" #animateUp>
     <h1 class="hero-title" #animateUp>Toma el control de tu salud cardiovascular.</h1>
@@ -203,45 +204,56 @@
     </div>
   </div>
 
-  <div class="info-section" #animateUp>
-    <div class="section-header" #animateUp>
-      <h2 #animateUp>Ecosistema de Cuidado Integral</h2>
+  <div class="ecosystem-container">
+    <div class="section-header">
+      <h2>Ecosistema de Cuidado Integral</h2>
+      <div class="underline"></div>
     </div>
-    <div class="main-wrapper" #animateUp>
-      <div class="info-grid" #animateUp>
-        <div class="info-card design" #animateUp>
-          <div class="card-icon" #animateUp>
-          </div>
-          <div class="card-body" #animateUp>
-            <h3 #animateUp>MONITOREO</h3>
-            <p #animateUp>Captura constante de presión arterial y frecuencia cardíaca mediante nuestra pulsera
-              inteligente de alta precisión.</p>
-          </div>
-        </div>
 
-        <div class="info-card development" #animateUp>
-          <div class="card-icon" #animateUp>
-          </div>
-          <div class="card-body" #animateUp>
-            <h3 #animateUp>ANÁLISIS</h3>
-            <p #animateUp>Procesamiento inteligente de datos para generar reportes detallados que facilitan la labor del
-              profesional sanitario.
-            </p>
-          </div>
+    <div class="cards-wrapper">
+      <div class="eco-card">
+        <div class="card-number">01</div>
+        <div class="icon-circle">
+          <i class="bi bi-activity"></i>
         </div>
+        <div class="card-content">
+          <h3>MONITOREO</h3>
+          <p>Implementamos un sistema de captura constante que registra tu presión arterial y frecuencia cardíaca en
+            tiempo real. Gracias a nuestra pulsera inteligente de alta precisión, los datos se sincronizan
+            automáticamente, permitiendo detectar irregularidades antes de que se conviertan en problemas mayores.</p>
+        </div>
+        <div class="card-footer-line"></div>
+      </div>
 
-        <div class="info-card launch" #animateUp>
-          <div class="card-icon" #animateUp>
-          </div>
-          <div class="card-body" #animateUp>
-            <h3 #animateUp>BIENESTAR</h3>
-            <p #animateUp>Adherencia al tratamiento y educación en hábitos saludables para reducir riesgos
-              cardiovasculares a largo plazo.</p>
-          </div>
+      <div class="eco-card">
+        <div class="card-number">02</div>
+        <div class="icon-circle">
+          <i class="bi bi-bar-chart-line"></i>
         </div>
+        <div class="card-content">
+          <h3>ANÁLISIS</h3>
+          <p>Nuestros algoritmos de inteligencia artificial procesan grandes volúmenes de datos para generar reportes
+            clínicos detallados. Esta herramienta facilita la labor del profesional sanitario, ofreciendo diagnósticos
+            más precisos y una visión clara de la evolución del paciente mediante gráficas intuitivas y alertas
+            preventivas.</p>
+        </div>
+        <div class="card-footer-line"></div>
+      </div>
+
+      <div class="eco-card">
+        <div class="card-number">03</div>
+        <div class="icon-circle">
+          <i class="bi bi-heart-pulse"></i>
+        </div>
+        <div class="card-content">
+          <h3>BIENESTAR</h3>
+          <p>No solo medimos, también educamos. Fomentamos la adherencia al tratamiento médico y promovemos hábitos
+            saludables personalizados. Nuestro enfoque integral busca reducir los riesgos cardiovasculares a largo
+            plazo, empoderando al usuario con conocimientos clave para una vida plena y equilibrada.</p>
+        </div>
+        <div class="card-footer-line"></div>
       </div>
     </div>
   </div>
-
 
   <app-footer></app-footer>

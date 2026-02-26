@@ -1,3 +1,4 @@
+/* MANTENEMOS TODO TU CÓDIGO ORIGINAL IGUAL */
 .hero-section {
     background: linear-gradient(135deg, #b0001e 0%, #7a0015 100%);
     color: #ffffff;
@@ -28,7 +29,6 @@
     justify-content: center;
     align-items: center;
     padding: 80px 20px 100px;
-    /* Space between hero and footer */
 }
 
 .container {
@@ -40,7 +40,6 @@
     display: flex;
     border-radius: 12px;
     transform: translateX(40px);
-    /* Balancing the -80px left shift of .info */
 }
 
 h2 {
@@ -48,13 +47,11 @@ h2 {
     font-weight: 600;
 }
 
-/* INFO */
 .info {
     background: #b0001e;
     position: absolute;
     top: 40px;
     left: -80px;
-    /* Shifting to the left */
     width: 350px;
     height: calc(100% - 80px);
     padding: 40px;
@@ -114,7 +111,6 @@ h2 {
     font-size: 30px;
 }
 
-/* SOCIALES */
 .sociales {
     width: 80%;
     display: flex;
@@ -130,14 +126,12 @@ h2 {
     transition: all .5s;
 }
 
-/* Form */
 .form {
     position: relative;
     width: 100%;
     min-height: 100%;
     background: #fff;
     padding: 50px 50px 60px 300px;
-    /* Increased padding to clear info box */
     box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
     border-radius: 12px;
 }
@@ -230,12 +224,20 @@ h2 {
     background: #7a0015;
 }
 
+/* =========================================
+   ADAPTACIÓN SOLO PARA PANTALLAS PEQUEÑAS
+   ========================================= */
 @media (max-width: 991px) {
+    .hero-title {
+        font-size: 2.2rem;
+        /* Reducimos título para que no se corte */
+    }
+
     .container {
         flex-direction: column;
         height: auto;
         transform: translateX(0);
-        /* Resetting center compensation for mobile */
+        /* Quitamos el desplazamiento lateral */
     }
 
     .info {
@@ -243,18 +245,52 @@ h2 {
         width: 100%;
         top: 0;
         left: 0;
-        /* Resetting shifted position for mobile */
+        /* Alineamos al centro */
         height: auto;
-        padding: 40px;
+        padding: 30px;
+        border-radius: 12px 12px 0 0;
+        /* Redondeado solo arriba */
+    }
+
+    .info-text {
+        gap: 20px;
+        /* Evitamos que el texto se encime */
+        margin: 20px 0;
+    }
+
+    .sociales {
+        width: 100%;
+        justify-content: space-evenly;
     }
 
     .form {
-        padding: 40px;
-        margin-left: 0;
         width: 100%;
+        padding: 40px 30px;
+        /* Quitamos el padding lateral de 300px */
+        margin-left: 0;
+        border-radius: 0 0 12px 12px;
+        /* Redondeado solo abajo */
     }
 
     .input-box.w50 {
         width: 100%;
+        /* Inputs a ancho completo */
+    }
+
+    .input-box input[type='submit'] {
+        width: 100%;
+        /* Botón más fácil de tocar en móvil */
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-section {
+        padding: 4rem 5% 6rem;
+        clip-path: polygon(0 0, 100% 0, 100% 90%, 50% 100%, 0 90%);
+        /* Ajuste de pico */
+    }
+
+    .hero-title {
+        font-size: 1.8rem;
     }
 }

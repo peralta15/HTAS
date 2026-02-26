@@ -8,21 +8,24 @@
 .landing-container {
     width: 100%;
     min-height: 100vh;
-    padding-top: 90px;
+    padding-top: 0px;
 }
 
 /* ===== HERO SECTION ===== */
 .hero-section {
     background: linear-gradient(135deg, #b0001e 0%, #7a0015 100%);
     color: #ffffff;
-    padding: 5rem 5% 8rem;
+    padding: 5rem 5%;
     text-align: center;
     filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.2));
     margin-bottom: 0;
+    margin-top: 90px;
     clip-path: polygon(0 0, 100% 0, 100% 85%, 50% 100%, 0 85%);
     position: relative;
     z-index: 10;
 }
+
+
 
 .hero-title {
     font-size: 2.8rem;
@@ -34,6 +37,8 @@
     margin-left: auto;
     margin-right: auto;
 }
+
+
 
 .hero-description {
     font-size: 1.3rem;
@@ -1202,157 +1207,126 @@
     }
 }
 
-.info-section {
-    padding: 4rem 5% 5rem;
-    margin-bottom: 2rem;
-    max-width: 1400px;
-    margin-left: auto;
-    margin-right: auto;
-    opacity: 1;
+/* Contenedor Principal */
+.ecosystem-container {
+    padding: 70px 20px;
+    text-align: center;
 }
 
-.main-wrapper {
-    background-color: #f4f4f4;
-    padding: 50px 20px;
-    border-radius: 20px;
+/* Wrapper de las Tarjetas */
+.cards-wrapper {
     display: flex;
     justify-content: center;
-    margin: 2rem 0;
-}
-
-.info-grid {
-    display: flex;
-    gap: 15px;
-    width: 100%;
-    max-width: 1100px;
+    gap: 30px;
+    max-width: 1300px;
     margin: 0 auto;
+    flex-wrap: wrap;
 }
 
-.info-card {
-    position: relative;
+/* La Tarjeta Individual */
+.eco-card {
+    background: #ffffff;
     flex: 1;
-    background: white;
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    border-radius: 25px;
-    transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
-    cursor: pointer;
+    min-width: 320px;
+    max-width: 400px;
+    padding: 50px 35px;
+    border-radius: 30px;
+    position: relative;
+    transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
+    /* Alineación a la izquierda para mejor lectura de texto largo */
+    text-align: left;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.04);
     overflow: hidden;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-    animation: fadeInUp 0.6s ease forwards;
-    opacity: 0;
 }
 
-.info-card:nth-child(1) {
-    animation-delay: 0.1s;
+.eco-card:hover {
+    transform: translateY(-15px);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.08);
+    border-color: rgba(176, 0, 30, 0.2);
 }
 
-.info-card:nth-child(2) {
-    animation-delay: 0.3s;
-}
-
-.info-card:nth-child(3) {
-    animation-delay: 0.5s;
-}
-
-.info-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: 25px;
-    padding: 2px;
-    background: linear-gradient(90deg, #b0001e, #ff6b6b);
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    pointer-events: none;
-}
-
-.info-card:hover::before {
-    opacity: 1;
-}
-
-.info-grid:hover .info-card {
-    flex: 0.7;
-    opacity: 0.7;
-    filter: blur(0.5px);
-}
-
-.info-grid .info-card:hover {
-    flex: 1.2;
-    opacity: 1;
-    filter: blur(0);
-    transform: translateY(-5px);
-    box-shadow: 0 20px 30px rgba(176, 0, 30, 0.2);
-}
-
-.card-icon {
-    background-color: #b0001e;
-    min-width: 70px;
+/* Icono de Bootstrap */
+.icon-circle {
     width: 70px;
     height: 70px;
+    background: #b0001e;
+    border-radius: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.8rem;
-    border-radius: 0 0 25px 0;
-    color: #fff;
+    font-size: 2rem;
+    color: white;
+    margin-bottom: 30px;
     transition: all 0.4s ease;
-    box-shadow: 0 4px 10px rgba(176, 0, 30, 0.2);
+    z-index: 2;
+    box-shadow: 0 10px 20px rgba(176, 0, 30, 0.2);
 }
 
-.card-body {
-    padding: 1.8rem 1.5rem 1.5rem 1.5rem;
-    display: flex;
-    flex-direction: column;
-    flex: 1;
+.eco-card:hover .icon-circle {
+    transform: scale(1.1) rotate(-5deg);
+    background: #d40024;
 }
 
-.card-body h3 {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 800;
-    font-size: 1.4rem;
+/* Contenido de Texto */
+.card-content h3 {
     color: #b0001e;
-    margin-bottom: 1rem;
-    position: relative;
-    display: inline-block;
-    padding-bottom: 8px;
+    font-size: 1.4rem;
+    font-weight: 800;
+    margin-bottom: 20px;
+    letter-spacing: 0.5px;
 }
 
-.card-body h3::after {
-    content: '';
+.card-content p {
+    color: #4a4a4a;
+    line-height: 1.8;
+    font-size: 1rem;
+    margin: 0;
+}
+
+/* Número Decorativo */
+.card-number {
+    position: absolute;
+    top: 20px;
+    right: 35px;
+    font-size: 5rem;
+    font-weight: 900;
+    color: #b0001e;
+    line-height: 1;
+    z-index: 1;
+    transition: 0.4s ease;
+}
+
+.eco-card:hover .card-number {
+    color: #b0001e;
+    transform: scale(1.1);
+}
+
+/* Línea Inferior */
+.card-footer-line {
     position: absolute;
     bottom: 0;
     left: 0;
-    width: 40px;
-    height: 3px;
-    background: linear-gradient(90deg, #b0001e, #ff6b6b);
-    border-radius: 2px;
-    transition: width 0.3s ease;
+    width: 100%;
+    height: 8px;
+    background: linear-gradient(90deg, #b0001e, #ff4d6d);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.5s ease;
 }
 
-.info-card:hover .card-body h3::after {
-    width: 60px;
+.eco-card:hover .card-footer-line {
+    transform: scaleX(1);
 }
 
-.card-body p {
-    color: #555;
-    line-height: 1.6;
-    font-size: 1rem;
-    margin: 0;
-    flex: 1;
-}
-
-.info-card:hover .card-icon {
-    width: 85px;
-    height: 85px;
-    font-size: 2.2rem;
-    background-color: #8b0018;
-    box-shadow: 0 6px 15px rgba(176, 0, 30, 0.3);
+/* Responsivo */
+@media (max-width: 992px) {
+    .eco-card {
+        max-width: 90%;
+    }
 }
 
 /* Modal Scrollbar */
@@ -1655,39 +1629,6 @@
     .image-card {
         height: 300px;
     }
-
-    .modal-content {
-        width: 95%;
-        padding: 2rem;
-        max-height: 90vh;
-    }
-
-    .modal-header h2 {
-        font-size: 1.9rem;
-    }
-
-    .modal-icon {
-        font-size: 3.5rem;
-    }
-
-    .modal-footer {
-        flex-direction: column;
-        gap: 1rem;
-    }
-
-    .modal-footer .btn {
-        width: 100%;
-        margin: 0;
-    }
-
-    .marquee-footer {
-        height: 60px;
-    }
-
-    .marquee-item {
-        font-size: 1.3rem;
-        padding: 0 30px;
-    }
 }
 
 /* 480px */
@@ -1738,23 +1679,6 @@
 
     .arrow-icon {
         font-size: 1.7rem;
-    }
-
-    .modal-content {
-        padding: 1.8rem;
-        border-radius: 15px;
-    }
-
-    .modal-header h2 {
-        font-size: 1.7rem;
-    }
-
-    .modal-body>p {
-        font-size: 1.1rem;
-    }
-
-    .modal-details {
-        padding: 1.5rem;
     }
 
     .main-wrapper {
