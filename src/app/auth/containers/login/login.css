@@ -17,9 +17,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding-top: 0px;
-  padding-bottom: 20px;
-  margin-top: 85px;
+  padding: 20px;
 }
 
 .container {
@@ -804,4 +802,43 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* --- VISTA COMPACTA PARA DOCTOR (Para que todo quepa en 500px) --- */
+.sign-up.doctor-active h2 {
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+.sign-up.doctor-active span {
+  display: inline-block;
+  line-height: normal;
+  margin: 0;
+  padding: 0;
+}
+
+.sign-up.doctor-active .container-input {
+  height: 36px;
+  margin-bottom: 8px;
+  padding: 0 15px;
+}
+
+.sign-up.doctor-active .container-input i {
+  font-size: 16px;
+}
+
+.sign-up.doctor-active .container-input input,
+.sign-up.doctor-active .container-input .select-custom {
+  font-size: 14px;
+}
+
+.sign-up.doctor-active .button.google-style {
+  height: 44px;
+  margin-top: 12px;
+  font-size: 14px;
+}
+
+.sign-up.doctor-active .mobile-toggle {
+  margin-top: 15px;
+  font-size: 13px;
 }

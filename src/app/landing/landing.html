@@ -1,50 +1,69 @@
 <app-headermenu></app-headermenu>
 
 <div class="landing-container">
-  <div class="hero-section" #animateUp>
-    <h1 class="hero-title" #animateUp>Toma el control de tu salud cardiovascular.</h1>
-    <p class="hero-description" #animateUp>
-      La herramienta integral diseñada para el manejo inteligente de la hipertensión arterial.
-      Empodérate, monitorea tus signos vitales y vive con tranquilidad.
-    </p>
+  <div class="hero-wrapper">
+    <div class="hero-section" #animateUp>
+      <h1 class="hero-title" #animateUp>Toma el control de tu salud cardiovascular.</h1>
+      <p class="hero-description" #animateUp>
+        La herramienta integral diseñada para el manejo inteligente de la hipertensión arterial.
+        Empodérate, monitorea tus signos vitales y vive con tranquilidad.
+      </p>
+    </div>
+    <div class="hero-layer hero-layer--1"></div>
+    <div class="hero-layer hero-layer--2"></div>
   </div>
 
-  <br>
-  <br>
+  <div id="appmovil" class="app-promo-section" #animateUp>
+    <!-- Background Decor -->
+    <div class="promo-decor decor-top-right"><i class="bi bi-qr-code-scan"></i></div>
+    <div class="promo-decor decor-bottom-left"><i class="bi bi-shield-lock-fill"></i></div>
 
-  <div id="appmovil" class="content-section" #animateUp>
     <div class="content-block" #animateUp>
       <div class="content-text" #animateUp>
+        <span class="promo-badge">DISPONIBLE AHORA</span>
         <h2 #animateUp>Tu aliado diario en el control tensional.</h2>
         <p #animateUp>Nuestra aplicación facilita el autocontrol de tu condición de manera organizada y sencilla.
           Registra sistemáticamente tus mediciones de presión arterial y frecuencia cardiaca.</p>
         <p #animateUp>Más que un registro, es un asistente personal: incorpora recordatorios inteligentes para tu
           medicación y citas médicas.</p>
+
+        <div class="promo-actions">
+          <div class="download-btn">
+            <i class="bi bi-download"></i>
+            <span>Descargar la aplicación ahora</span>
+          </div>
+        </div>
       </div>
 
-      <div class="phone-container">
-        <div class="phone">
-          <div class="phone-body">
-            <div class="button"></div>
-            <div class="button volume"></div>
+      <div class="phone-mockup-wrapper" #animateUp>
+        <!-- Dynamic Feature Boxes -->
+        @for (feature of appScreens[activeScreenIndex].features; track feature.title) {
+        <div class="feature-label-box" [ngClass]="feature.position" #animateUp>
+          <div class="label-icon"><i class="bi" [ngClass]="feature.icon"></i></div>
+          <div class="label-content">
+            <h4>{{ feature.title }}</h4>
+            <p>{{ feature.desc }}</p>
+          </div>
+        </div>
+        }
 
-            <div class="screen">
-              <div class="notch"></div>
-              <div class="screen-content">
-                <div class="heart-icon">❤️</div>
-                <h2 class="phone-header">HTAS</h2>
-                <div class="pulse-container">
-                  <div class="pulse-bar"></div>
-                  <div class="pulse-bar delay-1"></div>
-                  <div class="pulse-bar delay-2"></div>
-                </div>
-                <p class="phone-phrase">
-                  Cuidando tu corazón<br>
-                  <span>en todo momento.</span>
-                </p>
-                <div class="system-badge">● SISTEMA ACTIVO</div>
+        <div class="phone-mockup">
+          <div class="phone-bezel">
+            <div class="phone-screen">
+              <div class="screen-track" [style.transform]="screenTransform">
+                <img src="assets/Imagen1.png" alt="App Screen 1" class="app-screen">
+                <img src="assets/Imagen2.png" alt="App Screen 2" class="app-screen">
+                <img src="assets/Imagen4.png" alt="App Screen 3" class="app-screen">
               </div>
             </div>
+          </div>
+          <div class="phone-reflections"></div>
+
+          <!-- Interactive Controls -->
+          <div class="mockup-controls">
+            <button class="mockup-dot" [class.active]="activeScreenIndex === 0" (click)="setScreenIndex(0)"></button>
+            <button class="mockup-dot" [class.active]="activeScreenIndex === 1" (click)="setScreenIndex(1)"></button>
+            <button class="mockup-dot" [class.active]="activeScreenIndex === 2" (click)="setScreenIndex(2)"></button>
           </div>
         </div>
       </div>
@@ -212,7 +231,6 @@
 
     <div class="cards-wrapper">
       <div class="eco-card">
-        <div class="card-number">01</div>
         <div class="icon-circle">
           <i class="bi bi-activity"></i>
         </div>
@@ -226,7 +244,6 @@
       </div>
 
       <div class="eco-card">
-        <div class="card-number">02</div>
         <div class="icon-circle">
           <i class="bi bi-bar-chart-line"></i>
         </div>
@@ -241,7 +258,6 @@
       </div>
 
       <div class="eco-card">
-        <div class="card-number">03</div>
         <div class="icon-circle">
           <i class="bi bi-heart-pulse"></i>
         </div>

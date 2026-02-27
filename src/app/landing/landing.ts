@@ -138,7 +138,44 @@ export class Landing implements AfterViewInit {
   ];
 
   // --- Lógica del Showcase Interactivo ---
+  activeScreenIndex = 0;
+
+  appScreens = [
+    {
+      id: 0,
+      title: 'Monitoreo en Tiempo Real',
+      features: [
+        { title: 'Presión Arterial', desc: 'Control preciso de sístole y diástole.', position: 'top-left', icon: 'bi-heart-pulse-fill' },
+        { title: 'Nivel de Riesgo', desc: 'Interpretación instantánea de tus valores.', position: 'bottom-right', icon: 'bi-exclamation-triangle-fill' }
+      ]
+    },
+    {
+      id: 1,
+      title: 'Gestión de Tratamiento',
+      features: [
+        { title: 'Adherencia Diaria', desc: 'Progreso real de tu tratamiento médico.', position: 'top-right', icon: 'bi-calendar-check-fill' },
+        { title: 'Alertas Inteligentes', desc: 'Recordatorios para toma de medicación.', position: 'bottom-left', icon: 'bi-bell-fill' }
+      ]
+    },
+    {
+      id: 2,
+      title: 'Perfil y Configuración',
+      features: [
+        { title: 'Historial Clínico', desc: 'Más de 150 mediciones almacenadas.', position: 'top-left', icon: 'bi-file-earmark-medical-fill' },
+        { title: 'Umbral de Alerta', desc: 'Personalización de límites de seguridad.', position: 'bottom-right', icon: 'bi-gear-wide-connected' }
+      ]
+    }
+  ];
+
   setActiveFeature(index: number) {
     this.activeFeatureIndex = index;
+  }
+
+  setScreenIndex(index: number) {
+    this.activeScreenIndex = index;
+  }
+
+  get screenTransform() {
+    return `translateY(-${this.activeScreenIndex * 33.333}%)`;
   }
 }

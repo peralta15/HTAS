@@ -7,15 +7,46 @@
 }
 
 /* ===== HERO SECTION ===== */
+.hero-wrapper {
+    position: relative;
+    margin-top: 90px;
+    margin-bottom: 0px;
+    /* Reduced to join with next section */
+    z-index: 10;
+    overflow: visible;
+}
+
 .hero-section {
     background: linear-gradient(135deg, #b0001e 0%, #7a0015 100%);
     color: #ffffff;
-    padding: 5rem 5%;
+    padding: 7rem 5% 9rem;
     text-align: center;
-    filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.2));
-    margin-bottom: 0;
-    margin-top: 90px;
-    clip-path: polygon(0 0, 100% 0, 100% 85%, 50% 100%, 0 85%);
+    clip-path: polygon(0 0, 100% 0, 100% 75%, 50% 100%, 0 75%);
+    position: relative;
+    z-index: 3;
+}
+
+.hero-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.hero-layer--1 {
+    background: rgba(176, 0, 30, 0.4);
+    z-index: 2;
+    clip-path: polygon(0 0, 100% 0, 100% 75%, 50% 100%, 0 75%);
+    transform: translateY(25px);
+}
+
+.hero-layer--2 {
+    background: rgba(176, 0, 30, 0.15);
+    z-index: 1;
+    clip-path: polygon(0 0, 100% 0, 100% 75%, 50% 100%, 0 75%);
+    transform: translateY(50px);
 }
 
 .hero-title {
@@ -38,18 +69,20 @@
     font-weight: 400;
 }
 
-
-
 /* ===== CONTENT SECTION ===== */
 .content-section {
-    padding: 4rem 5% 5rem;
+    padding: 12rem 5% 5rem;
     background-color: #ffffff;
+    margin-top: -100px;
+    /* Pulls content under the hero peaks */
     margin-bottom: 2rem;
-    border-radius: 10px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    border-radius: 0;
+    box-shadow: none;
     max-width: 1400px;
     margin-left: auto;
     margin-right: auto;
+    position: relative;
+    z-index: 0;
 }
 
 .content-block {

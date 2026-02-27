@@ -4,8 +4,6 @@ import { soloLetrasValidator, soloLetras } from '../../../validations/validators
 import { GoogleService } from '../../services/google';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { Headermenu } from "../../../template/headermenu/headermenu";
-import { Footer } from "../../../template/footer/footer";
 
 @Component({
   selector: 'app-login',
@@ -13,9 +11,7 @@ import { Footer } from "../../../template/footer/footer";
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    FormsModule,
-    Headermenu,
-    Footer
+    FormsModule
   ],
   templateUrl: './login.html',
   styleUrl: './login.css',
@@ -47,7 +43,30 @@ export class Login {
       NombreCompleto: ['', [Validators.required, Validators.maxLength(100), soloLetrasValidator()]],
       Telefono: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
       Rol: ['', [Validators.required]],
+      Cedula: [''],
+      Especialidad: [''],
+      DireccionClinica: [''],
       Activo: [true]
+    });
+
+    // Escuchar cambios en el Rol para ajustar validaciones
+    this.registerForm.get('Rol')?.valueChanges.subscribe(rol => {
+      this.actualizarValidacionesDoctor(rol);
+    });
+  }
+
+  private actualizarValidacionesDoctor(rol: string) {
+    const doctorFields = ['Cedula', 'Especialidad', 'DireccionClinica'];
+
+    doctorFields.forEach(fieldName => {
+      const control = this.registerForm.get(fieldName);
+      if (rol === 'Doctor') {
+        control?.setValidators([Validators.required]);
+      } else {
+        control?.clearValidators();
+        control?.setValue(''); // Limpiar si cambia a otro rol
+      }
+      control?.updateValueAndValidity();
     });
   }
 

@@ -1,5 +1,3 @@
-<app-headermenu></app-headermenu>
-
 <div class="login-container">
   <div class="container" [class.toggle]="isToggled">
 
@@ -42,7 +40,8 @@
     </div>
 
     <div class="container-form">
-      <form class="sign-up" [formGroup]="registerForm" (ngSubmit)="onSubmitSignUp()">
+      <form class="sign-up" [formGroup]="registerForm" (ngSubmit)="onSubmitSignUp()"
+        [class.doctor-active]="registerForm.get('Rol')?.value === 'Doctor'">
         <div class="decor-icon"><i class="bi bi-person-badge"></i></div>
         <div class="decor-icon-2"><i class="bi bi-person-fill-add"></i></div>
         <h2>Registrarse</h2>
@@ -70,6 +69,26 @@
           </select>
           <i class="bi bi-chevron-down arrow-select"></i>
         </div>
+
+        <!-- Campos adicionales para Doctor -->
+        <ng-container *ngIf="registerForm.get('Rol')?.value === 'Doctor'">
+          <div class="container-input">
+            <i class="bi bi-card-text"></i>
+            <input type="text" formControlName="Cedula" placeholder="Cédula Profesional"
+              (keypress)="soloNumeros($event)" maxlength="15">
+          </div>
+
+          <div class="container-input">
+            <i class="bi bi-clipboard-data"></i>
+            <input type="text" formControlName="Especialidad" placeholder="Especialidad" (keypress)="onKeyPress($event)"
+              maxlength="60">
+          </div>
+
+          <div class="container-input">
+            <i class="bi bi-geo-alt"></i>
+            <input type="text" formControlName="DireccionClinica" placeholder="Dirección Clínica" maxlength="100">
+          </div>
+        </ng-container>
 
         <button type="submit" class="button google-style" [disabled]="registerForm.invalid || loading">
           <i class="bi bi-google"></i>
@@ -104,5 +123,3 @@
     <button class="modal-button" (click)="closeModal()">Aceptar</button>
   </div>
 </div>
-
-<app-footer></app-footer>

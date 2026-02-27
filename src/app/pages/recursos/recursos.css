@@ -39,15 +39,46 @@ body {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
 
+.hero-wrapper {
+    position: relative;
+    margin-top: 90px;
+    margin-bottom: 10px;
+    /* Space for the sharper peaks to overflow */
+    z-index: 10;
+    overflow: visible;
+}
+
 .hero-section {
     background: linear-gradient(135deg, #b0001e 0%, #7a0015 100%);
     color: #ffffff;
-    padding: 5rem 10%;
+    padding: 7rem 5% 9rem;
     text-align: center;
-    filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.2));
-    margin-bottom: 0;
-    margin-top: 90px;
-    clip-path: polygon(0 0, 100% 0, 100% 85%, 50% 100%, 0 85%);
+    clip-path: polygon(0 0, 100% 0, 100% 75%, 50% 100%, 0 75%);
+    position: relative;
+    z-index: 3;
+}
+
+.hero-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.hero-layer--1 {
+    background: rgba(176, 0, 30, 0.4);
+    z-index: 2;
+    clip-path: polygon(0 0, 100% 0, 100% 75%, 50% 100%, 0 75%);
+    transform: translateY(25px);
+}
+
+.hero-layer--2 {
+    background: rgba(176, 0, 30, 0.15);
+    z-index: 1;
+    clip-path: polygon(0 0, 100% 0, 100% 75%, 50% 100%, 0 75%);
+    transform: translateY(50px);
 }
 
 .hero-title {
