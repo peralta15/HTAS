@@ -325,3 +325,9 @@ h2 {
         font-size: 1.8rem;
     }
 }
+
+/* Estilos para soportar la animación staggered on-load */
+.animate-entrance {
+    opacity: 0;
+    transform: translateY(40px);
+}

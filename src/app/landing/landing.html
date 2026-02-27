@@ -2,7 +2,7 @@
 
 <div class="landing-container">
   <div class="hero-wrapper">
-    <div class="hero-section" #animateUp>
+    <div class="hero-section">
       <h1 class="hero-title" #animateUp>Toma el control de tu salud cardiovascular.</h1>
       <p class="hero-description" #animateUp>
         La herramienta integral diseñada para el manejo inteligente de la hipertensión arterial.
@@ -13,13 +13,13 @@
     <div class="hero-layer hero-layer--2"></div>
   </div>
 
-  <div id="appmovil" class="app-promo-section" #animateUp>
+  <div id="appmovil" class="app-promo-section">
     <!-- Background Decor -->
     <div class="promo-decor decor-top-right"><i class="bi bi-qr-code-scan"></i></div>
     <div class="promo-decor decor-bottom-left"><i class="bi bi-shield-lock-fill"></i></div>
 
-    <div class="content-block" #animateUp>
-      <div class="content-text" #animateUp>
+    <div class="content-block">
+      <div class="content-text">
         <span class="promo-badge">DISPONIBLE AHORA</span>
         <h2 #animateUp>Tu aliado diario en el control tensional.</h2>
         <p #animateUp>Nuestra aplicación facilita el autocontrol de tu condición de manera organizada y sencilla.
@@ -35,7 +35,7 @@
         </div>
       </div>
 
-      <div class="phone-mockup-wrapper" #animateUp>
+      <div class="phone-mockup-wrapper">
         <!-- Dynamic Feature Boxes -->
         @for (feature of appScreens[activeScreenIndex].features; track feature.title) {
         <div class="feature-label-box" [ngClass]="feature.position" #animateUp>
@@ -70,9 +70,9 @@
     </div>
   </div>
 
-  <section class="bracelet-schematic-section" #animateUp>
-    <div class="tech-circles-container" #animateUp>
-      <div class="ellipses-container" #animateUp>
+  <section class="bracelet-schematic-section">
+    <div class="tech-circles-container">
+      <div class="ellipses-container">
         <div class="ellipses ellipses__outer--thin">
           <div class="ellipses ellipses__orbit"></div>
         </div>
@@ -80,8 +80,8 @@
       </div>
     </div>
 
-    <div class="schematic-container" #animateUp>
-      <div class="feature-column left" #animateUp>
+    <div class="schematic-container">
+      <div class="feature-column left">
         <div class="feature-mini-box">
           <div class="feature-card">
             <div class="pointer-line"></div>
@@ -98,12 +98,12 @@
         </div>
       </div>
 
-      <div class="bracelet-center-display" #animateUp>
+      <div class="bracelet-center-display">
         <img src="assets/pulsera.png" class="bracelet-hero-img" alt="Smart Bracelet" #animateUp>
         <div class="bracelet-shadow-ellipse" #animateUp></div>
       </div>
 
-      <div class="feature-column right" #animateUp>
+      <div class="feature-column right">
         <div class="feature-mini-box">
           <div class="feature-card">
             <div class="pointer-line"></div>
@@ -122,16 +122,16 @@
     </div>
   </section>
 
-  <div class="interactive-section" #animateUp>
+  <div class="interactive-section">
     <div class="decor-section-icon icon-bg-left"><i class="bi bi-heart-pulse"></i></div>
     <div class="decor-section-icon icon-bg-right"><i class="bi bi-clipboard2-pulse"></i></div>
-    <div class="section-header" #animateUp>
+    <div class="section-header">
       <h2 #animateUp>Control Integral de tu Bienestar</h2>
     </div>
 
-    <div class="dashboard-wrapper" #animateUp>
+    <div class="dashboard-wrapper">
       <!-- Menú Lateral de Selectores -->
-      <div class="dashboard-nav" #animateUp>
+      <div class="dashboard-nav">
         @for (item of modalData; track $index) {
         <div class="nav-item" [class.active]="activeFeatureIndex === $index" (click)="setActiveFeature($index)"
           #animateUp>
@@ -142,7 +142,7 @@
         }
       </div>
 
-      <div class="dashboard-display" #animateUp>
+      <div class="dashboard-display">
         @if (modalData[activeFeatureIndex]; as selected) {
         <div class="display-content">
           <div class="display-header">
@@ -175,12 +175,12 @@
     </div>
   </div>
 
-  <div id="diseño" class="gallery-section" #animateUp>
-    <div class="section-header" #animateUp>
+  <div id="diseño" class="gallery-section">
+    <div class="section-header">
       <h2 #animateUp>Nuestra Tecnología</h2>
     </div>
 
-    <div class="filter-pills" #animateUp>
+    <div class="filter-pills">
       <button class="pill" [class.active]="activeGalleryTab === 1" (click)="setActiveGalleryTab(1)" #animateUp>Monitoreo
         App</button>
       <button class="pill" [class.active]="activeGalleryTab === 2" (click)="setActiveGalleryTab(2)" #animateUp>Pulsera
@@ -191,7 +191,7 @@
     </div>
 
     <!-- Slider Container -->
-    <div class="slider-window" #animateUp>
+    <div class="slider-window">
       <div class="slider-track" [style.transform]="sliderTransform">
 
         <div class="slide" [class.active]="activeGalleryTab === 1" (click)="setActiveGalleryTab(1)">

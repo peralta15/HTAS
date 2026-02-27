@@ -229,3 +229,9 @@
         padding: 40px;
     }
 }
+
+/* Estilos para soportar la animación staggered on-load */
+.animate-entrance {
+    opacity: 0;
+    transform: translateY(40px);
+}

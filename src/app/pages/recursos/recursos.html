@@ -1,6 +1,6 @@
 <app-headermenu></app-headermenu>
 <div class="hero-wrapper">
-    <div id="appweb" class="hero-section" #animateUp>
+    <div id="appweb" class="hero-section">
         <h1 class="hero-title" #animateUp>Recursos Tecnológicos</h1>
         <p class="hero-description" #animateUp>
             Explora las herramientas tecnológicas diseñadas para el control preciso de la hipertensión y el seguimiento
@@ -11,7 +11,7 @@
     <div class="hero-layer hero-layer--2"></div>
 </div>
 
-<div class="gallery-wrapper" *ngIf="isBrowser" #animateUp>
+<div class="gallery-wrapper" *ngIf="isBrowser">
     <div #canvasContainer id="canvas-container"></div>
 
     <div id="ui-layer">
@@ -75,9 +75,9 @@
 </div>
 <br>
 
-<section class="info-section" #animateUp [class.section-expanded]="expandedCardIndex !== null">
-    <div class="main-wrapper" #animateUp>
-        <div class="info-grid" #animateUp>
+<section class="info-section" [class.section-expanded]="expandedCardIndex !== null">
+    <div class="main-wrapper">
+        <div class="info-grid">
             @for (card of infoCardsContent; track $index) {
             <div class="info-card" #infoCard [class.expanded]="expandedCardIndex === $index">
                 <div class="card-image-container">
@@ -104,12 +104,12 @@
     </div>
 </section>
 
-<section class="accordion-section" #animateUp>
-    <div class="section-header" #animateUp>
+<section class="accordion-section">
+    <div class="section-header">
         <h2 #animateUp>Centro de Información HTAS</h2>
     </div>
 
-    <div class="accordion-container" #animateUp>
+    <div class="accordion-container">
         <div class="accordion-item">
             <div class="accordion-header" onclick="this.parentElement.classList.toggle('active')">
                 <div class="accordion-icon-box">

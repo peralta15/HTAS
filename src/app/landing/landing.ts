@@ -34,66 +34,36 @@ export class Landing implements AfterViewInit {
    * Al recargar, los elementos visibles se disparan automáticamente.
    */
   private initScrollAnimations() {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.animate([
-            { opacity: 0, transform: 'translateY(60px)' },
-            { opacity: 1, transform: 'translateY(0)' }
-          ], {
-            duration: 800,
-            easing: 'ease-out',
-            fill: 'forwards'
-          });
-        } else {
-          // Detecta si el elemento salió por arriba o abajo
-          entry.target.animate([
-            { opacity: 1, transform: 'translateY(0)' },
-            { opacity: 0, transform: 'translateY(60px)' }
-          ], {
-            duration: 600,
-            easing: 'ease-in',
-            fill: 'forwards'
-          });
-        }
+    if (!this.elementsToAnimate) return;
+    this.elementsToAnimate.forEach((el, index) => {
+      el.nativeElement.animate([
+        { opacity: 0, transform: 'translateY(40px)' },
+        { opacity: 1, transform: 'translateY(0)' }
+      ], {
+        duration: 800,
+        delay: index * 40,
+        easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+        fill: 'both'
       });
-    }, {
-      threshold: 0.05, // Umbral bajo para que se active apenas asome un pixel
-      rootMargin: '0px 0px -50px 0px' // Ajuste para disparar la animación un poco antes
     });
-
-    this.elementsToAnimate.forEach(el => observer.observe(el.nativeElement));
   }
 
   /**
    * Animación 3D Reversible para Cards
    */
   private initCard3DAnimations() {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.animate([
-            { transform: 'perspective(1000px) rotateX(30deg) scale(0.9)', opacity: 0 },
-            { transform: 'perspective(1000px) rotateX(0deg) scale(1)', opacity: 1 }
-          ], {
-            duration: 900,
-            easing: 'ease-out',
-            fill: 'forwards'
-          });
-        } else {
-          entry.target.animate([
-            { transform: 'perspective(1000px) rotateX(0deg) scale(1)', opacity: 1 },
-            { transform: 'perspective(1000px) rotateX(30deg) scale(0.9)', opacity: 0 }
-          ], {
-            duration: 700,
-            easing: 'ease-in',
-            fill: 'forwards'
-          });
-        }
+    if (!this.infoCards) return;
+    this.infoCards.forEach((card, index) => {
+      card.nativeElement.animate([
+        { transform: 'perspective(1000px) rotateX(30deg) scale(0.9)', opacity: 0 },
+        { transform: 'perspective(1000px) rotateX(0deg) scale(1)', opacity: 1 }
+      ], {
+        duration: 900,
+        delay: (this.elementsToAnimate?.length || 0) * 40 + (index * 80),
+        easing: 'ease-out',
+        fill: 'both'
       });
-    }, { threshold: 0.1 });
-
-    this.infoCards.forEach(card => observer.observe(card.nativeElement));
+    });
   }
 
   // --- Lógica de Galería ---
