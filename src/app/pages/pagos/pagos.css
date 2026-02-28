@@ -11,8 +11,8 @@
 .hero-section {
     background: linear-gradient(135deg, #b0001e 0%, #7a0015 100%);
     color: #ffffff;
-    padding: 5rem 5% 7rem;
-    /* Standardized top, left/right, and extra bottom for peaks */
+    padding: 5rem 5% 4rem;
+    /* Reduced bottom padding from 7rem */
     text-align: center;
     clip-path: polygon(0 0, 100% 0, 100% 75%, 50% 100%, 0 75%);
     position: relative;
@@ -59,7 +59,9 @@
 }
 
 .pricing-container {
-    padding: 90px 20px 100px;
+    padding: 40px 20px 40px;
+    /* Reduced top padding from 90px */
+    /* Reduced bottom padding from 100px */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -67,12 +69,15 @@
 }
 
 .pricing-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
     gap: 40px;
     width: 100%;
     max-width: 1100px;
     justify-content: center;
+    position: relative;
+    padding: 60px 0 20px;
+    /* Reduced top padding from 60px */
 }
 
 .pricing-card {
@@ -86,6 +91,10 @@
     border: 1px solid rgba(0, 0, 0, 0.05);
     position: relative;
     overflow: hidden;
+    width: 100%;
+    max-width: 480px;
+    z-index: 5;
+    /* Higher than lines, lower than box content */
 }
 
 .pricing-card:hover {
@@ -211,22 +220,228 @@
     color: #5717d1;
 } */
 
-@media (max-width: 768px) {
-    .pricing-header h1 {
-        font-size: 2.2rem;
+/* ===== FEATURE LABEL BOXES ===== */
+.feature-label-box {
+    position: absolute;
+    width: 260px;
+    /* Even slightly larger */
+    background: rgba(255, 255, 255, 0.9);
+    /* More opaque */
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    padding: 24px;
+    border-radius: 26px;
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+    z-index: 4;
+    /* Below pricing card, but child transforms will affect this */
+    transition: all 0.3s ease;
+    animation: floatingBox 4s ease-in-out infinite;
+    transform-style: preserve-3d;
+}
+
+@keyframes floatingBox {
+
+    0%,
+    100% {
+        transform: translateY(0) rotate(var(--rot));
+    }
+
+    50% {
+        transform: translateY(-15px) rotate(var(--rot));
+    }
+}
+
+.feature-label-box:hover {
+    transform: scale(1.05) translateY(-5px) !important;
+    background: #ffffff;
+    box-shadow: 0 20px 45px rgba(176, 0, 30, 0.15);
+    border-color: #b0001e;
+}
+
+.label-icon {
+    width: 46px;
+    /* Slightly larger */
+    height: 46px;
+    background: linear-gradient(135deg, #b0001e 0%, #d40024 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+    box-shadow: 0 5px 15px rgba(176, 0, 30, 0.3);
+}
+
+.feature-label-box h4 {
+    font-size: 0.95rem;
+    color: #111;
+    margin-bottom: 3px;
+    font-weight: 800;
+}
+
+.feature-label-box p {
+    font-size: 0.75rem;
+    color: #666;
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* Positions around the single card - Scattered & Asymmetrical */
+.pos-1 {
+    top: 15%;
+    left: -6%;
+    --rot: -3deg;
+    animation-delay: 0s;
+}
+
+.pos-2 {
+    bottom: 22%;
+    left: -5%;
+    --rot: 2deg;
+    animation-delay: 1.5s;
+}
+
+.pos-3 {
+    top: 25%;
+    right: -6%;
+    --rot: 3deg;
+    animation-delay: 0.8s;
+}
+
+.pos-4 {
+    bottom: 12%;
+    right: -5%;
+    --rot: -2deg;
+    animation-delay: 2.2s;
+}
+
+/* Pointer Lines */
+.pointer-line {
+    position: absolute;
+    height: 2px;
+    background: rgba(176, 0, 30, 0.2);
+    width: 220px;
+    /* Increased to reach from further away */
+    top: 50%;
+    z-index: -1;
+    pointer-events: none;
+}
+
+.pos-1 .pointer-line,
+.pos-2 .pointer-line {
+    right: -200px;
+    /* Adjusted length */
+    background: linear-gradient(90deg, transparent, rgba(176, 0, 30, 0.4));
+}
+
+.pos-1 .pointer-line::after,
+.pos-2 .pointer-line::after {
+    content: '';
+    position: absolute;
+    right: 0px;
+    top: -5px;
+    width: 0;
+    height: 0;
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+    border-left: 10px solid rgba(176, 0, 30, 0.6);
+}
+
+.pos-3 .pointer-line,
+.pos-4 .pointer-line {
+    left: -200px;
+    /* Adjusted length */
+    background: linear-gradient(-90deg, transparent, rgba(176, 0, 30, 0.4));
+}
+
+.pos-3 .pointer-line::after,
+.pos-4 .pointer-line::after {
+    content: '';
+    position: absolute;
+    left: 0px;
+    top: -5px;
+    width: 0;
+    height: 0;
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+    border-right: 10px solid rgba(176, 0, 30, 0.6);
+}
+
+.feature-label-box:nth-child(even) {
+    animation-delay: 0.2s;
+}
+
+@media (max-width: 1300px) {
+    .pricing-container {
+        padding: 60px 15px 20px;
+        /* Reduced from 80px */
+        overflow-x: hidden;
+        /* Prevent horizontal scroll */
     }
 
     .pricing-grid {
-        grid-template-columns: 1fr;
-        padding: 0 10px;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+        padding: 0;
+        max-width: 100%;
     }
 
-    .hero-title {
-        font-size: 2.8rem;
+    .feature-label-box {
+        position: relative !important;
+        width: 100%;
+        max-width: 450px;
+        top: auto !important;
+        left: auto !important;
+        right: auto !important;
+        bottom: auto !important;
+        transform: translate(0, 0) rotate(0) !important;
+        animation: none !important;
+        margin: 0 auto;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+        /* Softer shadow for stack */
+    }
+
+    .pointer-line {
+        display: none !important;
     }
 
     .pricing-card {
-        padding: 40px;
+        order: -1;
+        /* Keep the card on top */
+        margin-bottom: 30px;
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 1.8rem;
+    }
+
+    .hero-description {
+        font-size: 1rem;
+    }
+
+    .pricing-card {
+        padding: 30px 20px;
+    }
+
+    .plan-name {
+        font-size: 1.6rem;
+    }
+
+    .price-amount {
+        font-size: 2.2rem;
+    }
+
+    .feature-label-box {
+        padding: 18px;
     }
 }
 

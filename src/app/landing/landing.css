@@ -186,7 +186,7 @@
 .promo-decor {
     position: absolute;
     font-size: 500px;
-    color: rgba(176, 0, 30, 0.04);
+    color: rgba(176, 0, 29, 0.151);
     pointer-events: none;
     line-height: 1;
     z-index: 0;

@@ -178,7 +178,7 @@
   <app-root></app-root>
 
   <script>
-    // Remover preloader tras la carga
+    // Remover preloader de forma segura tras la carga completa de recursos
     window.addEventListener('load', function () {
       setTimeout(function () {
         var preloader = document.getElementById('global-preloader');
@@ -188,7 +188,7 @@
             preloader.remove();
           }, 800);
         }
-      }, 2500);
+      }, 200); // 200ms es suficiente para que Angular inicie pero se sienta rápido
     });
   </script>
 
