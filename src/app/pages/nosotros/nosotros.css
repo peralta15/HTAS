@@ -599,7 +599,8 @@
 .methodology-section {
     padding: 4rem 5%;
     background-color: #fdfdfd;
-    margin-bottom: 2rem;
+    margin-bottom: 0px;
+    /* Reduced from 2rem to eliminate gap */
     border-radius: 20px;
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
     max-width: 1400px;
@@ -694,17 +695,21 @@
 /* ===== VALUES SECTION (Carrusel 3D) ===== */
 .values-section {
     width: 100%;
-    padding: 50px 20px;
+    padding: 20px 20px 0px;
+    /* Reduced from 50px 20px */
     border-radius: 20px;
-    margin: 2rem 0;
+    margin: 1rem 0 0;
+    /* Reduced from 2rem 0 */
     overflow: hidden;
 }
 
 .cont-carrusel {
     width: 100%;
-    height: 500px;
+    height: 470px;
+    /* Reduced height from 500px to tighten space */
     display: grid;
-    grid-template-rows: 400px 50px;
+    grid-template-rows: 380px 40px;
+    /* Adjusted row heights */
     grid-template-columns: 1fr 30px 30px 30px 1fr;
     align-items: center;
     justify-items: center;
@@ -923,7 +928,8 @@ input#pos3:checked~main#items-carrusel {
     .purpose-section,
     .methodology-section,
     .values-section {
-        padding: 3rem 5%;
+        padding: 2rem 5% 1rem;
+        /* Reduced from 3rem 5% */
     }
 
     .content-block {
