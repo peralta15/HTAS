@@ -321,6 +321,11 @@ h2 {
         /* Ajuste de pico */
     }
 
+    .hero-layer--1,
+    .hero-layer--2 {
+        clip-path: polygon(0 0, 100% 0, 100% 92%, 50% 100%, 0 92%);
+    }
+
     .hero-title {
         font-size: 1.8rem;
     }

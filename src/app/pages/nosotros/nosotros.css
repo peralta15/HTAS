@@ -4,6 +4,7 @@
     width: 100%;
     min-height: 100vh;
     padding-top: 0px;
+    overflow-x: hidden;
 }
 
 /* ===== HERO SECTION ===== */
@@ -89,16 +90,17 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 4rem;
-    max-width: 1200px;
+    justify-content: center;
+    gap: 5rem;
+    max-width: 1100px;
     margin: 0 auto;
 }
 
 
 
 .content-text {
-    flex: 1;
-    min-width: 300px;
+    flex: 1 1 400px;
+    max-width: 550px;
 }
 
 .content-text h2 {
@@ -142,6 +144,7 @@
     height: 400px;
     background: radial-gradient(circle, #ffffff 0%, #f0f2f5 100%);
     border-radius: 20px;
+    perspective: 2000px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -174,10 +177,9 @@
     width: 400px;
     height: 260px;
     transform-style: preserve-3d;
-    /* Movido un poco hacia arriba y a la izquierda con translate al inicio para mover sobre la pantalla */
-    transform: translate(-50px, -40px) rotateX(15deg) rotateY(-45deg);
+    transform: rotateX(15deg) rotateY(-35deg);
     transition: transform 0.8s ease;
-    margin: 60px auto 100px auto;
+    margin: 20px 40px 60px -20px;
 }
 
 /* --- BASE: AQUÍ ESTÁ EL TRUCO --- */
@@ -189,7 +191,7 @@
     background: #1e272e;
     /* Color grafito del phone */
     border-radius: 15px;
-    transform: rotateX(90deg);
+    transform: rotateX(90deg) translateZ(-1px);
     transform-origin: bottom;
     box-shadow: -30px 30px 60px rgba(0, 0, 0, 0.4);
 
@@ -224,6 +226,11 @@
     grid-template-rows: repeat(5, 1fr);
     gap: 4px;
     margin-top: 15px;
+    position: relative;
+    z-index: 1;
+    /* Mantén esto bajo */
+    transform: translateZ(0);
+    /* Obliga a que se queden pegados a la base */
     /* Espacio respecto al touchpad que ahora está al frente */
 }
 
@@ -255,6 +262,30 @@
     border-radius: 6px;
     border: 1px solid rgba(255, 255, 255, 0.05);
     box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.4);
+    position: relative;
+    z-index: 1;
+    /* Mantén esto bajo */
+    transform: translateZ(0);
+    /* Obliga a que se queden pegados a la base */
+}
+
+.lid-back {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #1e272e;
+    /* El mismo color grafito de la base */
+    border-radius: 15px;
+    /* Movemos la tapa un poco hacia atrás para que tenga grosor */
+    transform: translateZ(-3px);
+    backface-visibility: visible !important;
+    -webkit-backface-visibility: visible !important;
+    z-index: 1;
+    /* Sombra interna para dar efecto de metal */
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* --- PANTALLA --- */
@@ -265,8 +296,9 @@
     bottom: 0;
     transform-style: preserve-3d;
     transform-origin: bottom;
-    transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
-    transform: rotateX(-90deg);
+    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateZ(10px) rotateX(90deg);
+    z-index: 50;
     /* Estado cerrado */
 }
 
@@ -276,13 +308,18 @@
     height: 100%;
     background: #000;
     border-radius: 15px;
-    backface-visibility: hidden;
+    transform: translateZ(1px);
+    /* La empujamos 1px hacia el frente */
+    backface-visibility: visible !important;
+    -webkit-backface-visibility: visible !important;
+    z-index: 2;
     display: flex;
     justify-content: center;
     align-items: center;
     border: 12px solid #1e272e;
     /* Color grafito del phone */
     box-sizing: border-box;
+    isolation: isolate;
     /* Grosor de la pantalla: Aumentado */
     box-shadow:
         inset 0 0 0 2px rgba(255, 255, 255, 0.05),
@@ -305,6 +342,8 @@
     padding: 20px;
     box-sizing: border-box;
     overflow: hidden;
+    transform: translateZ(0);
+    transform-style: flat !important;
 }
 
 /* UI Estilo Phone dentro del Laptop */
@@ -400,11 +439,17 @@
 
 /* --- TUS ANIMACIONES --- */
 .laptop:hover .lid {
-    transform: rotateX(-20deg);
+    transform: translateZ(5px) rotateX(-25deg);
 }
 
 .laptop:hover {
-    transform: translate(-50px, -40px) rotateX(20deg) rotateY(-40deg);
+    transform: rotateX(20deg) rotateY(-30deg);
+}
+
+/* Al quitar el hover (Cuando se cierra) */
+.laptop:not(:hover) .lid {
+    /* Reforzamos que al cerrar use este valor */
+    transform: translateZ(10px) rotateX(90deg);
 }
 
 /* ===== SECTION HEADER (通用) ===== */
@@ -912,19 +957,46 @@ input#pos3:checked~main#items-carrusel {
     .values-section .section-header h2 {
         font-size: 2rem;
     }
+
+    .laptop {
+        transform: scale(0.8) rotateX(15deg) rotateY(-35deg);
+        margin: -20px auto 20px auto;
+    }
+
+    .laptop:hover {
+        transform: scale(0.8) rotateX(20deg) rotateY(-30deg);
+    }
 }
 
 /* 768px */
 @media (max-width: 768px) {
+    .content-section {
+        margin-top: -60px;
+    }
+
     .hero-section {
         padding: 4rem 5%;
+        clip-path: polygon(0 0, 100% 0, 100% 88%, 50% 100%, 0 88%);
+    }
+
+    .hero-layer--1,
+    .hero-layer--2 {
+        clip-path: polygon(0 0, 100% 0, 100% 88%, 50% 100%, 0 88%);
     }
 
     .hero-title {
         font-size: 2.2rem;
     }
 
-    .content-section,
+    .content-text {
+        flex: 1 1 100%;
+        max-width: 100%;
+    }
+
+    .content-section {
+        padding: 8rem 5% 1rem;
+    }
+
     .purpose-section,
     .methodology-section,
     .values-section {
@@ -944,10 +1016,39 @@ input#pos3:checked~main#items-carrusel {
     .image-placeholder {
         height: 300px;
     }
+
+    .laptop {
+        transform: scale(0.7) rotateX(15deg) rotateY(-35deg);
+        margin: -40px auto 0px auto;
+    }
+
+    .laptop:hover {
+        transform: scale(0.7) rotateX(20deg) rotateY(-30deg);
+    }
+
+    .cont-carrusel {
+        height: 400px;
+        grid-template-rows: 320px 40px;
+        grid-template-columns: 1fr 20px 20px 20px 1fr;
+    }
+
+    .item {
+        width: 280px;
+        height: 330px;
+    }
 }
 
 /* 480px */
 @media (max-width: 480px) {
+    .hero-section {
+        clip-path: polygon(0 0, 100% 0, 100% 92%, 50% 100%, 0 92%);
+    }
+
+    .hero-layer--1,
+    .hero-layer--2 {
+        clip-path: polygon(0 0, 100% 0, 100% 92%, 50% 100%, 0 92%);
+    }
+
     .hero-title {
         font-size: 1.9rem;
     }
@@ -973,5 +1074,30 @@ input#pos3:checked~main#items-carrusel {
     .purpose-section .section-header h2,
     .values-section .section-header h2 {
         font-size: 1.8rem;
+    }
+
+    .laptop {
+        transform: scale(0.5) rotateX(15deg) rotateY(-35deg);
+        margin: -80px auto -60px auto;
+    }
+
+    .laptop:hover {
+        transform: scale(0.5) rotateX(20deg) rotateY(-30deg);
+    }
+
+    .cont-carrusel {
+        height: 350px;
+        grid-template-rows: 280px 40px;
+    }
+
+    .item {
+        width: 240px;
+        height: 280px;
+        /* Ajustar la translación para pantallas pequeñas para que no se salgan del borde */
+        transform: rotateY(calc(-15deg * var(--r))) translateX(calc(-150px * var(--r))) translateZ(calc(-80px * var(--abs)));
+    }
+
+    .item:hover:not([for^="pos"]) {
+        transform: rotateY(calc(-15deg * var(--r))) translateX(calc(-150px * var(--r))) translateZ(calc(-30px * var(--abs))) scale(1.02);
     }
 }
