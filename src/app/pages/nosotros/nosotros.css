@@ -972,6 +972,7 @@ input#pos3:checked~main#items-carrusel {
 @media (max-width: 768px) {
     .content-section {
         margin-top: -60px;
+        align-items: center;
     }
 
     .hero-section {
@@ -1056,6 +1057,7 @@ input#pos3:checked~main#items-carrusel {
     .section-header h2,
     .content-text h2 {
         font-size: 1.8rem;
+        text-align: center;
     }
 
     .image-placeholder {
@@ -1074,6 +1076,7 @@ input#pos3:checked~main#items-carrusel {
     .purpose-section .section-header h2,
     .values-section .section-header h2 {
         font-size: 1.8rem;
+        text-align: center;
     }
 
     .laptop {

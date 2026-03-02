@@ -20,18 +20,18 @@
 
                 <div class="info-text">
                     <div class="item animate-entrance" #animateUp>
-                        <i class="fa-solid fa-location-dot"></i>
-                        <span>Lorem ipsum dolor sit amet consectetur adipisicing elit.</span>
+                        <i class="bi bi-heart-pulse-fill"></i>
+                        <span>La hipertensión afecta a 1 de cada 3 adultos; HTAS te ayuda a tomar el control.</span>
                     </div>
 
                     <div class="item animate-entrance" #animateUp>
-                        <i class="fa-solid fa-envelope"></i>
-                        <span>loremIpsum@gmail.com</span>
+                        <i class="bi bi-envelope-at-fill"></i>
+                        <span>soporte@htas-proyecto.com</span>
                     </div>
 
                     <div class="item animate-entrance" #animateUp>
-                        <i class="fa-solid fa-phone"></i>
-                        <span>+00 123 456</span>
+                        <i class="bi bi-phone-vibrate-fill"></i>
+                        <span>Monitoreo inteligente y seguimiento médico en tiempo real.</span>
                     </div>
 
                 </div> <!-- info - text-->
@@ -55,27 +55,30 @@
             <div class="form-box">
 
                 <div class="input-box w50 animate-entrance" #animateUp>
-                    <input type="text" required>
+                    <input type="text" required maxlength="20" pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+"
+                        oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ ]/g, '')">
                     <span>Nombre</span>
                 </div>
 
                 <div class="input-box w50 animate-entrance" #animateUp>
-                    <input type="text" required>
+                    <input type="text" required maxlength="40" pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+"
+                        oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ ]/g, '')">
                     <span>Apellidos</span>
                 </div>
 
                 <div class="input-box w50 animate-entrance" #animateUp>
-                    <input type="text" required>
+                    <input type="email" required maxlength="60">
                     <span>Email</span>
                 </div>
 
                 <div class="input-box w50 animate-entrance" #animateUp>
-                    <input type="text" required>
+                    <input type="tel" required maxlength="10" pattern="[0-9]*"
+                        oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                     <span>Teléfono</span>
                 </div>
 
                 <div class="input-box w100 animate-entrance" #animateUp>
-                    <textarea required></textarea>
+                    <textarea required maxlength="300"></textarea>
                     <span>Escribe tu mensaje...</span>
                 </div>
 

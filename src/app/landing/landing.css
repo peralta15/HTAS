@@ -1915,7 +1915,7 @@
     }
 
     .hero-wrapper {
-        margin-top: 70px;
+        margin-top: 90px;
         margin-bottom: 0;
     }
 
@@ -1926,12 +1926,10 @@
 
     .hero-layer--1 {
         clip-path: polygon(0 0, 100% 0, 100% 85%, 50% 100%, 0 85%);
-        transform: translateY(15px);
     }
 
     .hero-layer--2 {
         clip-path: polygon(0 0, 100% 0, 100% 85%, 50% 100%, 0 85%);
-        transform: translateY(30px);
     }
 
     .app-promo-section {
@@ -2023,18 +2021,15 @@
 /* 480px */
 @media (max-width: 480px) {
     .hero-section {
-        padding: 3rem 5% 5rem;
         clip-path: polygon(0 0, 100% 0, 100% 88%, 50% 100%, 0 88%);
     }
 
     .hero-layer--1 {
         clip-path: polygon(0 0, 100% 0, 100% 88%, 50% 100%, 0 88%);
-        transform: translateY(10px);
     }
 
     .hero-layer--2 {
         clip-path: polygon(0 0, 100% 0, 100% 88%, 50% 100%, 0 88%);
-        transform: translateY(20px);
     }
 
     .content-section,
