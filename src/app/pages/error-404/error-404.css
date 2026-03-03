@@ -1,0 +1,153 @@
+.error-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f0f2f5;
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+}
+
+.error-card {
+    position: relative;
+    width: 95%;
+    max-width: 850px;
+    background: white;
+    border-radius: 40px;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.1);
+    padding: 80px 0;
+    overflow: hidden;
+    /* Corta el pulso en los bordes de la card */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.stage {
+    position: relative;
+    width: 100%;
+    height: 180px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* PULSO: Ocupa el 100% real sin márgenes */
+.pulse-layer {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 120px;
+    transform: translateY(-50%);
+    z-index: 1;
+}
+
+.ekg-svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.ekg-line {
+    fill: none;
+    stroke: #b0001e;
+    stroke-width: 5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* NÚMEROS Y CORAZÓN */
+.numbers-layer {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    font-size: clamp(120px, 20vw, 180px);
+    font-weight: 900;
+    color: #222222cc;
+    /* Transparencia para ver el pulso */
+    line-height: 1;
+}
+
+.heart-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 120px;
+    height: 120px;
+    transform: translateY(22px);
+}
+
+.heart {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    background-color: #b0001e;
+    transform: rotate(-45deg);
+    animation: heart-beat 1.3s infinite ease-in-out;
+    filter: drop-shadow(0 0 15px rgba(176, 0, 30, 0.4));
+}
+
+.heart::before,
+.heart::after {
+    content: "";
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    background-color: #b0001e;
+    border-radius: 50%;
+}
+
+.heart::before {
+    top: -40px;
+    left: 0;
+}
+
+.heart::after {
+    left: 40px;
+    top: 0;
+}
+
+/* TEXTO Y BOTÓN */
+.info-layer {
+    text-align: center;
+    margin-top: 30px;
+    padding: 0 40px;
+    z-index: 3;
+}
+
+.btn-reanimate {
+    margin-top: 30px;
+    padding: 18px 60px;
+    background-color: #b0001e;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-weight: bold;
+    font-size: 1.2rem;
+    cursor: pointer;
+    box-shadow: 0 10px 20px rgba(176, 0, 30, 0.2);
+}
+
+@keyframes heart-beat {
+
+    0%,
+    100% {
+        transform: rotate(-45deg) scale(1);
+    }
+
+    15% {
+        transform: rotate(-45deg) scale(1.15);
+    }
+
+    30% {
+        transform: rotate(-45deg) scale(1);
+    }
+
+    45% {
+        transform: rotate(-45deg) scale(1.1);
+    }
+}
