@@ -1,0 +1,48 @@
+<div class="wrapper">
+    <nav class="navbar-top d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center h-100">
+            <div class="logo-box d-flex align-items-center justify-content-center" [class.collapsed]="isCollapsed">
+                <span class="logo-text">HTAS</span>
+            </div>
+
+            <button class="btn-toggle-menu" (click)="toggleSidebar()">
+                <i class="bi bi-list"></i>
+            </button>
+        </div>
+
+        <div class="header-right-icons d-flex align-items-center">
+
+            <div class="search-container d-flex align-items-center" [class.active]="showSearch">
+                <input type="text" class="search-input" placeholder="Buscar..." #searchInput
+                    (keyup.enter)="onSearch(searchInput.value)">
+                <i class="bi bi-search icon-gray" (click)="toggleSearch()"></i>
+            </div>
+
+            <a routerLink="/notificaciones" class="notif-wrapper">
+                <i class="bi bi-bell icon-gray"></i>
+                <span class="notif-badge">8</span>
+            </a>
+
+            <a routerLink="/perfil" class="user-pill d-flex align-items-center">
+                <img src="https://ui-avatars.com/api/?name=John&background=00f2c3&color=fff" class="user-img"
+                    alt="User">
+                <span class="user-name-text">John</span>
+            </a>
+        </div>
+    </nav>
+
+    <aside class="sidebar-menu" [class.collapsed]="isCollapsed">
+        <ul class="nav-links-list">
+            @for (item of navItems; track item.label) {
+            <li>
+                <a [routerLink]="item.route" routerLinkActive="active-item" class="nav-item-link">
+                    <i class="bi {{item.icon}}"></i>
+                    @if (!isCollapsed) {
+                    <span class="nav-label">{{item.label}}</span>
+                    }
+                </a>
+            </li>
+            }
+        </ul>
+    </aside>
+</div>

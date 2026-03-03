@@ -1,0 +1,62 @@
+.main-container {
+    /* Espacio cuando el menú está abierto (250px) */
+    margin-left: 250px;
+    padding-top: 60px;
+    /* Para que no lo tape la barra superior */
+    transition: margin-left 0.3s ease;
+    min-height: 100vh;
+    background-color: #f8f9fa;
+}
+
+/* Cuando el menú se colapsa, el contenido se estira */
+.main-container.menu-collapsed {
+    margin-left: 70px;
+}
+
+.dashboard-content {
+    padding: 30px;
+}
+
+.content-header {
+    margin-bottom: 30px;
+}
+
+/* Estilo de las tarjetas (Cards) */
+.stat-card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    height: 100%;
+}
+
+.border-htas {
+    border-top: 4px solid #b0001e;
+    /* Tu color rojo */
+}
+
+.stat-title {
+    font-size: 0.85rem;
+    color: #6c757d;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.stat-value {
+    font-size: 1.7rem;
+    font-weight: 800;
+    margin: 10px 0;
+    color: #212529;
+}
+
+.stat-meta {
+    font-size: 0.75rem;
+    color: #adb5bd;
+}
+
+.placeholder-chart {
+    height: 350px;
+    background: #fdfdfd;
+    border: 2px dashed #eee;
+    border-radius: 8px;
+}

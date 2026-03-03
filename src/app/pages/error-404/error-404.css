@@ -67,7 +67,7 @@
     gap: 20px;
     font-size: clamp(120px, 20vw, 180px);
     font-weight: 900;
-    color: #222222cc;
+    color: #2e2e2eb3;
     /* Transparencia para ver el pulso */
     line-height: 1;
 }

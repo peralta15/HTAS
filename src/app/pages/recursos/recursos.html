@@ -33,18 +33,19 @@
 </div>
 
 <div class="marquee-footer-ekg">
-    <div class="ekg-container">
+    <div class="ekg-active-layer">
         <svg class="ekg-svg" viewBox="0 0 120 20" preserveAspectRatio="none">
-            <path class="ekg-path"
-                d="M0 10 L4 9 L8 11 L12 7 L14 13 L16 10 L20 9 L24 11 L27 2 L30 18 L33 10 L37 9 L41 11 L45 10 L48 8 L52 12 L55 10 L60 9 L65 11 L70 10 L72 7 L74 13 L76 10 L80 9 L85 11 L90 10 L93 8 L95 12 L98 10" />
+            <defs>
+                <mask id="footer-sweep">
+                    <rect x="-120" y="0" width="120" height="20" fill="white">
+                        <animate attributeName="x" from="-120" to="120" dur="3s" repeatCount="indefinite" />
+                    </rect>
+                </mask>
+            </defs>
 
-            <text x="100.5" y="12" class="heart-icon" dominant-baseline="middle" text-anchor="start">❤</text>
-        </svg>
+            <path class="ekg-path" mask="url(#footer-sweep)"
+                d="M0,10 L10,10 L15,3 L20,17 L25,10 L40,10 L45,3 L50,17 L55,10 L70,10 L75,3 L80,17 L85,10 L100,10 L105,3 L110,17 L115,10 L120,10" />
 
-        <svg class="ekg-svg" viewBox="0 0 120 20" preserveAspectRatio="none">
-            <path class="ekg-path"
-                d="M0 10 L4 9 L8 11 L12 7 L14 13 L16 10 L20 9 L24 11 L27 2 L30 18 L33 10 L37 9 L41 11 L45 10 L48 8 L52 12 L55 10 L60 9 L65 11 L70 10 L72 7 L74 13 L76 10 L80 9 L85 11 L90 10 L93 8 L95 12 L98 10" />
-            <text x="100.5" y="12" class="heart-icon" dominant-baseline="middle" text-anchor="start">❤</text>
         </svg>
     </div>
 </div>

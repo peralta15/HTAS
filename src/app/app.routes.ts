@@ -8,6 +8,9 @@ import { Recursos } from './pages/recursos/recursos';
 import { Contacto } from './pages/contacto/contacto';
 import { Pagos } from './pages/pagos/pagos';
 import { Error404 } from './pages/error-404/error-404';
+import { Menu } from './admin/template/menu/menu';
+import { Inicio } from './admin/pages/inicio/inicio';
+import { Usuarios } from './admin/pages/usuarios/usuarios';
 
 export const routes: Routes = [
   {
@@ -46,6 +49,18 @@ export const routes: Routes = [
   {
     path: 'pagos',
     component: Pagos,
+  },
+  {
+    path: 'admin',
+    component: Menu,
+  },
+  {
+    path: 'inicio',
+    component: Inicio
+  },
+  {
+    path: 'usuarios',
+    component: Usuarios
   },
   {
     path: '**',

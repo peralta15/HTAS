@@ -1,0 +1,65 @@
+<app-menu #sidebar></app-menu>
+
+<div class="main-container" [class.menu-collapsed]="sidebar.isCollapsed">
+
+    <section class="dashboard-content">
+        <header class="content-header">
+            <h2 class="fw-bold">Dashboard del cuidador</h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item text-secondary">Admin</li>
+                    <li class="breadcrumb-item active">Inicio</li>
+                </ol>
+            </nav>
+        </header>
+
+        <main class="dashboard-body">
+            <div class="row g-4 mb-4">
+                <div class="col-md-3">
+                    <article class="stat-card border-htas">
+                        <h3 class="stat-title">Última presión arterial</h3>
+                        <p class="stat-value">120 / 80</p>
+                        <p class="stat-meta">Hoy, 08:30 AM</p>
+                    </article>
+                </div>
+                <div class="col-md-3">
+                    <article class="stat-card">
+                        <h3 class="stat-title">Adherencia (7 días)</h3>
+                        <p class="stat-value text-success">95%</p>
+                    </article>
+                </div>
+                <div class="col-md-3">
+                    <article class="stat-card">
+                        <h3 class="stat-title">Alertas activas</h3>
+                        <p class="stat-value text-danger">3</p>
+                    </article>
+                </div>
+                <div class="col-md-3">
+                    <article class="stat-card">
+                        <h3 class="stat-title">Próxima cita</h3>
+                        <p class="stat-value">15 de Octubre</p>
+                    </article>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-8">
+                    <div class="chart-container p-4 shadow-sm bg-white rounded">
+                        <h4 class="mb-4">Tendencia de Salud</h4>
+                        <div class="placeholder-chart d-flex align-items-center justify-content-center">
+                            <span class="text-muted">Gráfica de Tendencia</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="alerts-container p-4 shadow-sm bg-white rounded">
+                        <h4 class="mb-4">Alertas recientes</h4>
+                        <div class="alert alert-warning py-2 small">Presión alta detectada</div>
+                        <div class="alert alert-info py-2 small">Medicamento tomado</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </section>
+</div>
