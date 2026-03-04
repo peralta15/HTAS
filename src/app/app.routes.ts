@@ -11,6 +11,7 @@ import { Error404 } from './pages/error-404/error-404';
 import { Menu } from './admin/template/menu/menu';
 import { Inicio } from './admin/pages/inicio/inicio';
 import { Usuarios } from './admin/pages/usuarios/usuarios';
+import { Perfil } from './admin/template/perfil/perfil';
 
 export const routes: Routes = [
   {
@@ -61,6 +62,10 @@ export const routes: Routes = [
   {
     path: 'usuarios',
     component: Usuarios
+  },
+  {
+    path: 'perfil',
+    component: Perfil
   },
   {
     path: '**',

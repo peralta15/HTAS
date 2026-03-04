@@ -204,28 +204,42 @@ export class Login {
 
   inicializarCalendario() {
     if (isPlatformBrowser(this.platformId)) {
-      const hoy = new Date();
-      const fechaMaxima = new Date(hoy.getFullYear(), hoy.getMonth() + 2, hoy.getDate());
+      // Agregamos un pequeño delay para asegurar que el input sea visible en el DOM
+      setTimeout(() => {
+        const hoy = new Date();
+        const fechaMaxima = new Date(hoy.getFullYear(), hoy.getMonth() + 2, hoy.getDate());
 
-      const config = {
-        locale: Spanish,
-        dateFormat: "Y-m-d",
-        minDate: "today",
-        maxDate: fechaMaxima,
-        appendTo: document.body,
-        static: false,
-        onChange: (selectedDates: any, dateStr: string) => {
-          const control = this.registerForm.get('FechaAsignacion');
-          if (control) {
-            control.setValue(dateStr);
-            control.markAsDirty();
-            control.updateValueAndValidity();
+        const config: any = {
+          locale: Spanish,
+          dateFormat: "Y-m-d",
+          minDate: "today",
+          maxDate: fechaMaxima,
+          appendTo: document.body,
+          static: false,
+          disableMobile: true, // Esto quita el calendario "feo" del celular
+          onChange: (selectedDates: any, dateStr: string) => {
+            const control = this.registerForm.get('FechaAsignacion');
+            if (control) {
+              control.setValue(dateStr);
+              control.markAsDirty();
+              control.updateValueAndValidity();
+            }
+            this.cdr.detectChanges();
           }
-          this.cdr.detectChanges();
-        }
-      };
+        };
 
-      (flatpickr('#fechaInput', config) as any).open();
+        const fp = flatpickr('#fechaInput', config);
+
+        // Verificación de seguridad para evitar el "TypeError: undefined"
+        if (fp) {
+          const instance = Array.isArray(fp) ? fp[0] : fp;
+          if (instance && typeof instance.open === 'function') {
+            instance.open();
+          }
+        } else {
+          console.warn('No se encontró el elemento #fechaInput en el DOM');
+        }
+      }, 50); // 50ms son suficientes
     }
   }
 

@@ -243,75 +243,74 @@
 /* Responsive Styles */
 @media (max-width: 768px) {
   .login-container {
-    /* Remove centering and use padding to push content down */
     display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    padding-top: 2rem;
-    padding-bottom: 2rem;
-    height: auto;
-    min-height: calc(100vh - 200px);
-    /* Allow footer to be visible without excessive scrolling */
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+    min-height: 100vh;
+    background-color: #f5f5f5;
+    /* Opcional, para que resalte más la tarjeta blanca */
   }
 
   .container {
-    width: 90%;
+    width: 100%;
     max-width: 400px;
-    /* Limit width */
     height: auto;
     min-height: auto;
     flex-direction: column;
-    margin: 0 auto;
-    /* Center card horizontally */
-    padding: 2rem 0;
-    /* Add padding inside card */
+    margin: 0;
+    padding: 40px 20px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   }
 
   .container-welcome {
     display: none;
   }
 
-  /* Show Sign In wrapper by default */
-  .container-form:nth-child(1) {
-    display: block;
-    width: 100%;
-    height: auto;
-  }
-
-  /* Hide Sign Up wrapper by default */
-  .container-form:nth-child(2) {
-    display: none;
+  .container-form {
     width: 100%;
     height: auto;
   }
 
   /* Forms reset */
-  .container-form form {
+  .container-form form,
+  .sign-in {
     transform: none !important;
-    padding: 0 1.5rem;
+    padding: 0;
     height: auto;
+    position: relative;
+    width: 100%;
+    overflow: visible;
   }
 
-  /* Toggle State: Switch visibility */
-  .container.toggle .container-form:nth-child(1) {
-    display: none;
+  /* Toggle States */
+  .container:not(.toggle) #google {
+    display: block !important;
+  }
+
+  .container:not(.toggle) .container-form:nth-child(2) {
+    display: none !important;
+  }
+
+  .container.toggle #google {
+    display: none !important;
   }
 
   .container.toggle .container-form:nth-child(2) {
-    display: block;
+    display: block !important;
   }
 
-  /* Ensure Sign In/Up transforms are ignored/reset specifically if needed */
   .sign-up,
   .container.toggle .sign-in,
   .container.toggle .sign-up {
     transform: none !important;
   }
 
-  /* Mobile Toggle Text */
   .mobile-toggle {
     display: block;
-    margin-top: 20px;
+    margin-top: 25px;
     font-size: 14px;
     width: 100%;
     text-align: center;
@@ -319,23 +318,69 @@
 
   .mobile-toggle a {
     color: #b0001e;
-    text-decoration: underline;
+    text-decoration: none;
+    font-weight: 700;
   }
 
   .container-input {
     width: 100%;
-    /* Full width inputs on mobile */
     max-width: 100%;
   }
 
   .container-form h2 {
-    font-size: 24px;
-    margin-bottom: 1.5rem;
+    font-size: 26px;
+    margin-bottom: 0.8rem;
     text-align: center;
   }
 
   .google-btn {
-    width: 100%;
+    width: 100% !important;
+    max-width: 300px !important;
+    margin: 1.5rem auto !important;
+    padding: 0 10px !important;
+    font-size: 13px !important;
+    white-space: nowrap !important;
+  }
+
+  .button.google-style {
+    width: 100% !important;
+    max-width: 300px !important;
+    margin: 1rem auto !important;
+    font-size: 13px !important;
+  }
+
+  .social-networks {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 15px 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+
+  /* Bootstrap/Decorative Icons on Mobile */
+  .decor-icon {
+    display: block !important;
+    position: absolute !important;
+    top: 5px !important;
+    right: 5px !important;
+    font-size: 80px !important;
+    color: rgba(176, 0, 29, 0.08) !important;
+    z-index: 0 !important;
+    pointer-events: none;
+    transform: rotate(15deg) !important;
+  }
+
+  .decor-icon-2 {
+    display: block !important;
+    position: absolute !important;
+    bottom: 5px !important;
+    left: 5px !important;
+    font-size: 80px !important;
+    color: rgba(176, 0, 29, 0.08) !important;
+    z-index: 0 !important;
+    pointer-events: none;
+    transform: rotate(-15deg) !important;
   }
 }
 
@@ -349,7 +394,6 @@
   background: rgba(0, 0, 0, 0.8);
   z-index: 10000000;
   display: none;
-  /* Oculto por defecto */
   justify-content: center;
   align-items: center;
   padding: 20px;
