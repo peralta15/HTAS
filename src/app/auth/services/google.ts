@@ -15,7 +15,6 @@ export class GoogleService {
     emailjs.init('RH7T2EvEV4pbSWkXQ');
   }
 
-  // REGISTRO: Crea el usuario con pinVerificado en false
   async registerWithGoogle(datosFormulario: any) {
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: 'select_account' });
@@ -24,18 +23,18 @@ export class GoogleService {
     const user = result.user;
 
     const userRef = doc(this.firestore, `usuarios/${user.uid}`);
-    await setDoc(userRef, {
+
+    // Unimos los datos del formulario con los de Google Auth
+    const payload = {
+      ...datosFormulario,
       uid: user.uid,
       correo: user.email,
-      nombre: datosFormulario.NombreCompleto,
-      telefono: datosFormulario.Telefono,
-      rol: datosFormulario.Rol,
-      pin: datosFormulario.pin,
-      pinVerificado: false, // Flag para saber si ya validó el PIN alguna vez
-      activo: true,
       fechaRegistro: new Date()
-    });
+    };
 
+    await setDoc(userRef, payload);
+
+    // Configuración EmailJS
     const ahora = new Date();
     const expiracion = new Date(ahora.getTime() + 25 * 60000);
     const horaFormateada = expiracion.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -43,13 +42,13 @@ export class GoogleService {
     const templateParams = {
       pin_seguridad: datosFormulario.pin,
       fecha: horaFormateada,
-      to_email: user.email, // IMPORTANTE: Asegúrate que en EmailJS tu plantilla use {{to_email}}
-      nombre_usuario: datosFormulario.NombreCompleto
+      to_email: user.email,
+      nombre_usuario: datosFormulario.nombre || datosFormulario.NombreCompleto
     };
 
     try {
       await emailjs.send('service_tqqxijq', 'template_8gjdtqx', templateParams);
-      console.log('Correo de HTAS enviado con éxito');
+      console.log('Correo enviado');
     } catch (error) {
       console.error('Error EmailJS:', error);
     }
@@ -57,7 +56,6 @@ export class GoogleService {
     return user;
   }
 
-  // LOGIN: Obtiene los datos para verificar el estado del PIN
   async loginWithGoogle() {
     const provider = new GoogleAuthProvider();
     const result = await signInWithPopup(this.auth, provider);
@@ -70,10 +68,13 @@ export class GoogleService {
       throw new Error('No tienes una cuenta creada. Por favor, regístrate primero.');
     }
 
-    return docSnap.data();
+    // Retornamos todo el objeto para que el componente valide el PIN
+    return {
+      uid: result.user.uid,
+      ...docSnap.data()
+    };
   }
 
-  // Actualiza el estado para que no vuelva a pedir el PIN
   async marcarPinComoVerificado(uid: string) {
     const userRef = doc(this.firestore, `usuarios/${uid}`);
     return await updateDoc(userRef, { pinVerificado: true });

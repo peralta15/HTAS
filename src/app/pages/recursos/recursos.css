@@ -471,8 +471,6 @@ h1 {
     stroke-width: 0.8;
     stroke-linecap: round;
     stroke-linejoin: round;
-    /* Efecto de resplandor (Glow) */
-    filter: drop-shadow(0 0 4px #fff) drop-shadow(0 0 8px rgba(255, 255, 255, 0.6));
 }
 
 .heart-icon {

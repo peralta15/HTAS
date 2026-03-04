@@ -1,4 +1,4 @@
-import { Component, inject, ChangeDetectorRef, NgZone, PLATFORM_ID, Inject, AfterViewInit } from '@angular/core';
+import { Component, inject, ChangeDetectorRef, NgZone, PLATFORM_ID } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { soloLetrasValidator, soloLetras } from '../../../validations/validators';
 import { GoogleService } from '../../services/google';
@@ -19,7 +19,6 @@ import { Spanish } from 'flatpickr/dist/l10n/es.js';
   styleUrl: './login.css',
 })
 export class Login {
-  // Usamos inject() para todo, es más limpio
   private googleService = inject(GoogleService);
   private router = inject(Router);
   private fb = inject(FormBuilder);
@@ -41,6 +40,8 @@ export class Login {
   modalMessage = '';
   modalIcon = '';
   modalType: 'modal-success' | 'modal-error' = 'modal-success';
+
+  // Variables del calendario
   fechaMinima: string = '';
   fechaMaxima: string = '';
 
@@ -66,6 +67,7 @@ export class Login {
   private configurarLimitesFecha() {
     const hoy = new Date();
     this.fechaMinima = hoy.toISOString().split('T')[0];
+    // Límite de 3 meses para la fecha máxima
     const maxFecha = new Date(hoy.getFullYear(), hoy.getMonth() + 3, 0);
     this.fechaMaxima = maxFecha.toISOString().split('T')[0];
     this.registerForm.patchValue({ FechaAsignacion: this.fechaMinima });
@@ -102,13 +104,32 @@ export class Login {
     if (this.registerForm.valid) {
       this.loading = true;
       this.cdr.detectChanges();
+
+      const f = this.registerForm.value;
       const generadoPin = Math.floor(100000 + Math.random() * 900000).toString();
 
+      let datosUsuario: any = {
+        nombre: f.NombreCompleto || '',
+        telefono: f.Telefono || '',
+        rol: f.Rol || '',
+        activo: true,
+        pin: generadoPin,
+        pinVerificado: false
+      };
+
+      if (f.Rol === 'Doctor') {
+        datosUsuario.cedula = f.Cedula || '';
+        datosUsuario.especialidad = f.Especialidad || '';
+        datosUsuario.direccionClinica = f.DireccionClinica || '';
+      } else if (f.Rol === 'Acompañante') {
+        datosUsuario.fechaAsignacion = f.FechaAsignacion || '';
+      }
+
       try {
-        await this.googleService.registerWithGoogle({ ...this.registerForm.value, pin: generadoPin });
+        await this.googleService.registerWithGoogle(datosUsuario);
         this.ngZone.run(() => {
           this.loading = false;
-          this.openModal('¡Registro Exitoso!', `Cuenta creada. Revisa tu correo para obtener tu PIN de acceso único.`, 'modal-success');
+          this.openModal('¡Registro Exitoso!', `Cuenta creada. Revisa tu correo para tu PIN.`, 'modal-success');
           this.cdr.detectChanges();
         });
       } catch (error: any) {
@@ -117,6 +138,8 @@ export class Login {
           this.openModal('Error al Registrar', error.message, 'modal-error');
         });
       }
+    } else {
+      this.openModal('Formulario Incompleto', 'Por favor revisa los campos marcados.', 'modal-error');
     }
   }
 
@@ -125,14 +148,15 @@ export class Login {
     this.cdr.detectChanges();
 
     try {
-      const datosUsuario = await this.googleService.loginWithGoogle();
+      // Usamos : any para evitar el error TS7053 del bundle
+      const datosUsuario: any = await this.googleService.loginWithGoogle();
       this.ngZone.run(() => {
         this.loading = false;
-        if (datosUsuario['pinVerificado'] === true) {
+        if (datosUsuario.pinVerificado === true) {
           this.router.navigate(['/inicio']);
         } else {
-          this.usuarioUidTemporal = datosUsuario['uid'];
-          this.pinCorrectoBD = datosUsuario['pin'];
+          this.usuarioUidTemporal = datosUsuario.uid;
+          this.pinCorrectoBD = datosUsuario.pin;
           this.esperandoPin = true;
           this.cdr.detectChanges();
         }
@@ -151,7 +175,7 @@ export class Login {
         await this.googleService.marcarPinComoVerificado(this.usuarioUidTemporal);
         this.openModal('Verificado', 'Identidad confirmada. Bienvenido a HTAS.', 'modal-success');
         setTimeout(() => {
-          this.ngZone.run(() => this.router.navigate(['/recursos']));
+          this.ngZone.run(() => this.router.navigate(['/inicio']));
         }, 1500);
       } catch (e) {
         this.openModal('Error', 'No se pudo actualizar el estado de verificación.', 'modal-error');
@@ -178,40 +202,40 @@ export class Login {
 
   closeModal() { this.showModal = false; }
 
-  // 1. Quitamos el error de "open" con (flatpickr(...) as any)
   inicializarCalendario() {
     if (isPlatformBrowser(this.platformId)) {
-      // Calculamos la fecha máxima (hoy + 2 meses)
       const hoy = new Date();
       const fechaMaxima = new Date(hoy.getFullYear(), hoy.getMonth() + 2, hoy.getDate());
 
       const config = {
         locale: Spanish,
         dateFormat: "Y-m-d",
-        minDate: "today",     // No permite fechas pasadas
-        maxDate: fechaMaxima, // Solo permite el mes actual y los 2 siguientes
+        minDate: "today",
+        maxDate: fechaMaxima,
         appendTo: document.body,
         static: false,
         onChange: (selectedDates: any, dateStr: string) => {
-          this.registerForm.get('FechaAsignacion')?.setValue(dateStr);
+          const control = this.registerForm.get('FechaAsignacion');
+          if (control) {
+            control.setValue(dateStr);
+            control.markAsDirty();
+            control.updateValueAndValidity();
+          }
+          this.cdr.detectChanges();
         }
       };
 
-      // Mantenemos el 'as any' que ya te funcionó
       (flatpickr('#fechaInput', config) as any).open();
     }
   }
 
-  // 2. Esta es la ÚNICA versión de toggleToSignUp que debe quedar
   toggleToSignUp() {
     this.isToggled = true;
-    // Esperamos a que Angular muestre el formulario de registro
     setTimeout(() => {
       this.inicializarCalendario();
     }, 200);
   }
 
-  // 3. El resto de tus funciones de apoyo
   toggleToSignIn() {
     this.isToggled = false;
     this.esperandoPin = false;
