@@ -1,0 +1,82 @@
+/* Reset global */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;  /* Evita scroll doble */
+}
+
+/* Layout principal */
+.app-layout {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+/* Sidebar - fijo a la izquierda */
+app-sidebar {
+  width: 260px;
+  height: 100vh;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+}
+
+/* Contenido principal - ocupa el resto */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  background-color: #F5F6F8;
+}
+
+/* Header - parte superior */
+app-header {
+  flex-shrink: 0;
+  width: 100%;
+  z-index: 5;
+}
+
+/* Wrapper del contenido (donde va el dashboard) */
+.content-wrapper {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0;
+  margin: 0;
+  background-color: #F5F6F8;
+}
+
+/* Container interno para el dashboard */
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px 24px;
+  height: 100%;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  app-sidebar {
+    width: 100%;
+    height: auto;
+    position: fixed;
+    bottom: 0;
+    z-index: 100;
+  }
+
+  .app-layout {
+    flex-direction: column;
+  }
+
+  .main-content {
+    height: calc(100vh - 60px); /* Altura del sidebar móvil */
+    margin-bottom: 60px;
+  }
+
+  .container {
+    padding: 16px;
+  }
+}

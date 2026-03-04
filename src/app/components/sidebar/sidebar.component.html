@@ -1,0 +1,27 @@
+<aside class="sidebar" [class.collapsed]="collapsed">
+  <div class="sidebar-header">
+    <h1 class="logo">HTAS</h1>
+  </div>
+  
+  <nav class="sidebar-nav">
+    <a href="#" class="nav-item" [class.active]="currentRoute === 'dashboard'">
+      <span class="nav-icon">📊</span>
+      <span class="nav-text" *ngIf="!collapsed">Dashboard</span>
+    </a>
+    
+    <a href="#" class="nav-item">
+      <span class="nav-icon">👥</span>
+      <span class="nav-text" *ngIf="!collapsed">Usuarios</span>
+    </a>
+    
+    <a href="#" class="nav-item">
+      <span class="nav-icon">📈</span>
+      <span class="nav-text" *ngIf="!collapsed">Reportes</span>
+    </a>
+    
+    <a href="#" class="nav-item">
+      <span class="nav-icon">⚙️</span>
+      <span class="nav-text" *ngIf="!collapsed">Configuración</span>
+    </a>
+  </nav>
+</aside>

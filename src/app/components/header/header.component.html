@@ -1,0 +1,31 @@
+<header class="header">
+  <div class="header-left">
+    <button class="menu-btn" (click)="toggleSidebar()" aria-label="Menu">
+      ☰
+    </button>
+    
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input type="search" placeholder="Buscar..." class="search-input">
+    </div>
+  </div>
+
+  <div class="header-right">
+    <button class="notification-btn" aria-label="Notificaciones">
+      🔔
+      <span class="notification-badge" *ngIf="notifications && notifications > 0">{{ notifications }}</span>
+    </button>
+
+    <!-- Mostrar usuario cuando no está cargando -->
+    <div class="user-profile" *ngIf="!loading">
+      <div class="user-avatar">{{ userInitials }}</div>
+      <span class="user-name">{{ userName }}</span>
+    </div>
+
+    <!-- Mostrar skeleton cuando está cargando -->
+    <div class="user-profile loading" *ngIf="loading">
+      <div class="user-avatar skeleton"></div>
+      <div class="skeleton-text"></div>
+    </div>
+  </div>
+</header>
