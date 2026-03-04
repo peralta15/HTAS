@@ -1,9 +1,11 @@
-import { Component, inject, ChangeDetectorRef, NgZone } from '@angular/core';
+import { Component, inject, ChangeDetectorRef, NgZone, PLATFORM_ID, Inject, AfterViewInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { soloLetrasValidator, soloLetras } from '../../../validations/validators';
 import { GoogleService } from '../../services/google';
 import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import flatpickr from 'flatpickr';
+import { Spanish } from 'flatpickr/dist/l10n/es.js';
 
 @Component({
   selector: 'app-login',
@@ -17,11 +19,13 @@ import { CommonModule } from '@angular/common';
   styleUrl: './login.css',
 })
 export class Login {
+  // Usamos inject() para todo, es más limpio
   private googleService = inject(GoogleService);
   private router = inject(Router);
   private fb = inject(FormBuilder);
   private cdr = inject(ChangeDetectorRef);
   private ngZone = inject(NgZone);
+  private platformId = inject(PLATFORM_ID);
 
   isToggled = false;
   registerForm: FormGroup;
@@ -30,7 +34,7 @@ export class Login {
   esperandoPin = false;
   pinIngresado = '';
   pinCorrectoBD = '';
-  usuarioUidTemporal = ''; // Para saber a quién actualizar el pinVerificado
+  usuarioUidTemporal = '';
 
   showModal = false;
   modalTitle = '';
@@ -61,16 +65,9 @@ export class Login {
 
   private configurarLimitesFecha() {
     const hoy = new Date();
-
-    // Fecha mínima: Hoy
     this.fechaMinima = hoy.toISOString().split('T')[0];
-
-    // Fecha máxima: Último día del mes actual + 2 meses siguientes
-    // Ejemplo: Si es Marzo, el límite es el último día de Mayo.
     const maxFecha = new Date(hoy.getFullYear(), hoy.getMonth() + 3, 0);
     this.fechaMaxima = maxFecha.toISOString().split('T')[0];
-
-    // Seteamos la fecha por defecto como hoy en el formulario
     this.registerForm.patchValue({ FechaAsignacion: this.fechaMinima });
   }
 
@@ -78,7 +75,6 @@ export class Login {
     const doctorFields = ['Cedula', 'Especialidad', 'DireccionClinica'];
     const acompananteFields = ['FechaAsignacion'];
 
-    // Validaciones para Doctor
     doctorFields.forEach(fieldName => {
       const control = this.registerForm.get(fieldName);
       if (rol === 'Doctor') {
@@ -90,7 +86,6 @@ export class Login {
       control?.updateValueAndValidity();
     });
 
-    // Validaciones para Acompañante
     acompananteFields.forEach(fieldName => {
       const control = this.registerForm.get(fieldName);
       if (rol === 'Acompañante') {
@@ -102,9 +97,6 @@ export class Login {
       control?.updateValueAndValidity();
     });
   }
-
-  toggleToSignUp() { this.isToggled = true; }
-  toggleToSignIn() { this.isToggled = false; this.esperandoPin = false; }
 
   async onSubmitSignUp() {
     if (this.registerForm.valid) {
@@ -136,13 +128,9 @@ export class Login {
       const datosUsuario = await this.googleService.loginWithGoogle();
       this.ngZone.run(() => {
         this.loading = false;
-
-        // REVISIÓN DE SEGURIDAD: ¿Ya verificó el PIN antes?
         if (datosUsuario['pinVerificado'] === true) {
-          // Si ya lo hizo, entra directo
           this.router.navigate(['/inicio']);
         } else {
-          // Si es su primer login tras el registro, pide el PIN
           this.usuarioUidTemporal = datosUsuario['uid'];
           this.pinCorrectoBD = datosUsuario['pin'];
           this.esperandoPin = true;
@@ -160,9 +148,7 @@ export class Login {
   async verificarPin() {
     if (this.pinIngresado === this.pinCorrectoBD) {
       try {
-        // Marcamos en la BD que ya no se le pida más el PIN
         await this.googleService.marcarPinComoVerificado(this.usuarioUidTemporal);
-
         this.openModal('Verificado', 'Identidad confirmada. Bienvenido a HTAS.', 'modal-success');
         setTimeout(() => {
           this.ngZone.run(() => this.router.navigate(['/recursos']));
@@ -191,4 +177,43 @@ export class Login {
   }
 
   closeModal() { this.showModal = false; }
+
+  // 1. Quitamos el error de "open" con (flatpickr(...) as any)
+  inicializarCalendario() {
+    if (isPlatformBrowser(this.platformId)) {
+      // Calculamos la fecha máxima (hoy + 2 meses)
+      const hoy = new Date();
+      const fechaMaxima = new Date(hoy.getFullYear(), hoy.getMonth() + 2, hoy.getDate());
+
+      const config = {
+        locale: Spanish,
+        dateFormat: "Y-m-d",
+        minDate: "today",     // No permite fechas pasadas
+        maxDate: fechaMaxima, // Solo permite el mes actual y los 2 siguientes
+        appendTo: document.body,
+        static: false,
+        onChange: (selectedDates: any, dateStr: string) => {
+          this.registerForm.get('FechaAsignacion')?.setValue(dateStr);
+        }
+      };
+
+      // Mantenemos el 'as any' que ya te funcionó
+      (flatpickr('#fechaInput', config) as any).open();
+    }
+  }
+
+  // 2. Esta es la ÚNICA versión de toggleToSignUp que debe quedar
+  toggleToSignUp() {
+    this.isToggled = true;
+    // Esperamos a que Angular muestre el formulario de registro
+    setTimeout(() => {
+      this.inicializarCalendario();
+    }, 200);
+  }
+
+  // 3. El resto de tus funciones de apoyo
+  toggleToSignIn() {
+    this.isToggled = false;
+    this.esperandoPin = false;
+  }
 }

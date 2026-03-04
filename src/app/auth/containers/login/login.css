@@ -971,3 +971,10 @@ input[type="date"] {
   font-size: 18px;
   z-index: 1;
 }
+
+/* Esto asegura que el calendario flote sobre el modal */
+.flatpickr-calendar {
+  background: #ffffff !important;
+  z-index: 9999999 !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+}

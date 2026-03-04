@@ -90,13 +90,11 @@
           </div>
         </ng-container>
 
-        <ng-container *ngIf="registerForm.get('Rol')?.value === 'Acompañante'">
-          <div class="container-input date-wrapper-premium">
-            <i class="bi bi-calendar-event-fill main-icon"></i>
-            <input type="date" formControlName="FechaAsignacion" [min]="fechaMinima" [max]="fechaMaxima"
-              class="input-clean">
-          </div>
-        </ng-container>
+        <div class="container-input date-wrapper-premium" *ngIf="registerForm.get('Rol')?.value === 'Acompañante'">
+          <i class="bi bi-calendar-check main-icon"></i>
+          <input type="text" id="fechaInput" formControlName="FechaAsignacion" placeholder="Seleccione fecha"
+            class="input-clean" (focus)="inicializarCalendario()" readonly>
+        </div>
 
         <button type="submit" class="button google-style" [disabled]="registerForm.invalid || loading">
           <i class="bi bi-google"></i>
