@@ -12,6 +12,10 @@ import { Menu } from './admin/template/menu/menu';
 import { Inicio } from './admin/pages/inicio/inicio';
 import { Usuarios } from './admin/pages/usuarios/usuarios';
 import { Perfil } from './admin/template/perfil/perfil';
+import { Acompanantes } from './admin/pages/acompanantes/acompanantes';
+import { Pacientes } from './admin/pages/pacientes/pacientes';
+import { Medicos } from './admin/pages/medicos/medicos';
+import { Notificaciones } from './admin/template/notificaciones/notificaciones';
 
 export const routes: Routes = [
   {
@@ -64,8 +68,24 @@ export const routes: Routes = [
     component: Usuarios
   },
   {
+    path: 'medicos',
+    component: Medicos
+  },
+  {
+    path: 'pacientes',
+    component: Pacientes
+  },
+  {
+    path: 'acompanantes',
+    component: Acompanantes
+  },
+  {
     path: 'perfil',
     component: Perfil
+  },
+  {
+    path: 'notificaciones',
+    component: Notificaciones
   },
   {
     path: '**',

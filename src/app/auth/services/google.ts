@@ -89,6 +89,11 @@ export class GoogleService {
     })) as any[];
   }
 
+  async updateUsuario(uid: string, data: any) {
+    const userRef = doc(this.firestore, `usuarios/${uid}`);
+    return await updateDoc(userRef, data);
+  }
+
   logout() { return signOut(this.auth); }
   get user$(): Observable<any> { return authState(this.auth); }
 }

@@ -23,9 +23,7 @@ export class Usuarios implements OnInit {
   paginaActual = 0;
   itemsPorPagina = 10;
 
-  // Selección y Modal
-  usuarioSeleccionado: any = null;
-  mostrarModalEdit = false;
+  // Selección y Modal removidos para vista de solo lectura
 
   async ngOnInit() {
     await this.cargarUsuarios();
@@ -46,7 +44,8 @@ export class Usuarios implements OnInit {
     return this.usuariosTodo.filter(u =>
       u.NombreCompleto?.toLowerCase().includes(term) ||
       u.nombre?.toLowerCase().includes(term) ||
-      u.correo?.toLowerCase().includes(term)
+      u.correo?.toLowerCase().includes(term) ||
+      u.telefono?.toLowerCase().includes(term)
     );
   }
 
@@ -60,32 +59,11 @@ export class Usuarios implements OnInit {
     const nuevaPagina = this.paginaActual + delta;
     if (nuevaPagina >= 0 && nuevaPagina < totalPaginas) {
       this.paginaActual = nuevaPagina;
-      this.usuarioSeleccionado = null;
     }
-  }
-
-  seleccionar(u: any) {
-    this.usuarioSeleccionado = u;
   }
 
   toggleExpand(id: string, event: Event) {
     event.stopPropagation();
     this.expandedId = this.expandedId === id ? null : id;
-  }
-
-  abrirEditar() {
-    this.mostrarModalEdit = true;
-  }
-
-  async eliminar() {
-    if (confirm(`¿Estás seguro de eliminar a ${this.usuarioSeleccionado.NombreCompleto || this.usuarioSeleccionado.nombre}?`)) {
-      // Implementar eliminación real si es necesario, por ahora local
-      this.usuariosTodo = this.usuariosTodo.filter(u => u.id !== this.usuarioSeleccionado.id);
-      this.usuarioSeleccionado = null;
-    }
-  }
-
-  cerrarModal() {
-    this.mostrarModalEdit = false;
   }
 }
