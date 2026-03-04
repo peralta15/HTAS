@@ -90,6 +90,14 @@
           </div>
         </ng-container>
 
+        <ng-container *ngIf="registerForm.get('Rol')?.value === 'Acompañante'">
+          <div class="container-input date-wrapper-premium">
+            <i class="bi bi-calendar-event-fill main-icon"></i>
+            <input type="date" formControlName="FechaAsignacion" [min]="fechaMinima" [max]="fechaMaxima"
+              class="input-clean">
+          </div>
+        </ng-container>
+
         <button type="submit" class="button google-style" [disabled]="registerForm.invalid || loading">
           <i class="bi bi-google"></i>
           <span>{{ loading ? 'Procesando...' : 'Completar con Google' }}</span>

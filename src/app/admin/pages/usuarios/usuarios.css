@@ -1,0 +1,193 @@
+.main-content {
+    margin-left: 250px;
+    /* Ancho de tu sidebar */
+    padding-top: 80px;
+    /* Altura de tu navbar + margen */
+    padding-left: 30px;
+    padding-right: 30px;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+
+.title-page {
+    color: #333;
+    font-weight: 700;
+}
+
+/* Acciones arriba de la tabla */
+.action-buttons {
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    pointer-events: none;
+}
+
+.action-buttons.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.btn {
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    margin-left: 10px;
+}
+
+.btn-edit {
+    background: #007bff;
+    color: white;
+}
+
+.btn-delete {
+    background: #b0001e;
+    color: white;
+}
+
+/* Tabla Estilo */
+.table-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.custom-table th {
+    background: #f1f3f4;
+    padding: 15px;
+    text-align: left;
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.custom-table td {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.custom-table tr:hover {
+    background: #fff8f8;
+}
+
+.custom-table tr.selected {
+    background: #ffebeb;
+    border-left: 4px solid #b0001e;
+}
+
+/* Badges */
+.badge-rol {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+.badge-rol[data-rol="Médico"] {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+.badge-rol[data-rol="Paciente"] {
+    background: #f3e5f5;
+    color: #7b1fa2;
+}
+
+.badge-rol[data-rol="Acompañante"] {
+    background: #e8f5e9;
+    color: #388e3c;
+}
+
+/* Paginación */
+.pagination-bar {
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fdfdfd;
+}
+
+.nav-arrows button {
+    border: 1px solid #ddd;
+    background: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.nav-arrows button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* Modal Centrado */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.modal-content {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    width: 400px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn-save {
+    background: #b0001e;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-cancel {
+    background: #eee;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+}

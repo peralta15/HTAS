@@ -13,11 +13,31 @@ export class Menu {
   showSearch = false;
 
   navItems = [
-    { route: '/inicio', icon: 'bi-speedometer2', label: 'Dashboard' },
-    { route: '/usuarios', icon: 'bi-people', label: 'Usuarios' },
-    { route: '/reportes', icon: 'bi-bar-chart', label: 'Reportes' },
-    { route: '/config', icon: 'bi-gear', label: 'Configuración' },
-    { route: '/login', icon: 'bi-box-arrow-right', label: 'Cerrar Sesión' }
+    {
+      category: 'General', items: [
+        { route: '/inicio', icon: 'bi-speedometer2', label: 'Dashboard' }
+      ]
+    },
+    {
+      category: 'Administración', items: [
+        { route: '/usuarios', icon: 'bi-people', label: 'Usuarios' },
+        { route: '/medicos', icon: 'bi-person-badge', label: 'Médicos' },
+        { route: '/pacientes', icon: 'bi-person-heart', label: 'Pacientes' },
+        { route: '/acompanantes', icon: 'bi-person-fill-add', label: 'Acompañantes' }
+      ]
+    },
+    {
+      category: 'Seguimiento', items: [
+        { route: '/tratamientos', icon: 'bi-clipboard-pulse', label: 'Tratamientos' },
+        { route: '/dispositivos', icon: 'bi-phone', label: 'Dispositivos' }
+      ]
+    },
+    {
+      category: 'Cuenta', items: [
+        { route: '/config', icon: 'bi-gear', label: 'Configuración' },
+        { route: '/login', icon: 'bi-box-arrow-right', label: 'Cerrar Sesión' }
+      ]
+    }
   ];
 
   toggleSidebar() {

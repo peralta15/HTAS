@@ -842,3 +842,132 @@
   margin-top: 15px;
   font-size: 13px;
 }
+
+/* --- VISTA COMPACTA PARA ROLES CON CAMPOS EXTRA --- */
+.sign-up:has([formControlName="Rol"]:not([value="Paciente"])) h2 {
+  font-size: 24px;
+  margin-bottom: 5px;
+}
+
+.sign-up:has([formControlName="Rol"]:not([value="Paciente"])) .container-input {
+  height: 34px;
+  /* Un poco más pequeño para que quepa la fecha */
+  margin-bottom: 6px;
+}
+
+/* Estilo específico para el input tipo fecha */
+input[type="date"] {
+  color: #666;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+/* Asegurar que el botón de Google no sea tan gigante en registros largos */
+.sign-up:has([formControlName="Rol"]:not([value="Paciente"])) .button.google-style {
+  height: 42px;
+  margin-top: 8px;
+}
+
+/* Estilo general para el contenedor de fecha */
+.container-input input[type="date"] {
+  cursor: pointer;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 1px;
+  font-size: 0.8rem;
+  color: #444;
+}
+
+/* Personalización del icono del calendario nativo (Chrome/Edge) */
+::-webkit-calendar-picker-indicator {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%23b0001e" class="bi bi-calendar-check" viewBox="0 0 16 16"><path d="M10.854 7.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 9.793l2.646-2.647a.5.5 0 0 1 .708 0z"/><path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/></svg>');
+  cursor: pointer;
+  padding: 5px;
+  filter: invert(0);
+  /* Mantiene el color original del SVG */
+}
+
+/* Efecto cuando el input es obligatorio y falta (Acompañante activo) */
+.sign-up.doctor-active .container-input:has(input:invalid) {
+  border: 1px solid rgba(176, 0, 29, 0.2);
+}
+
+/* Ajuste compacto para que el input date no se vea gigante */
+.sign-up:has([formControlName="Rol"][value="Acompañante"]) .container-input {
+  height: 34px;
+  margin-bottom: 6px;
+}
+
+/* Contenedor principal con el estilo de tu login */
+.date-wrapper-premium {
+  background-color: #EEEEEE !important;
+  border: 2px solid transparent;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.date-wrapper-premium:focus-within {
+  background-color: #fff !important;
+  border-color: #b0001e;
+  box-shadow: 0 4px 12px rgba(176, 0, 30, 0.1);
+}
+
+/* El input invisible pero funcional */
+.input-clean {
+  border: none;
+  outline: none;
+  background: transparent;
+  width: 100%;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+/* Personalización del ICONO del calendario nativo */
+/* Esto lo hace ver como un botón de acción limpio */
+.input-clean::-webkit-calendar-picker-indicator {
+  background: transparent;
+  bottom: 0;
+  color: transparent;
+  cursor: pointer;
+  height: auto;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: auto;
+  z-index: 2;
+  /* El calendario se abre al tocar cualquier parte del input */
+}
+
+/* ESTILO DEL PANEL (Solo funciona en algunos navegadores, pero ayuda) */
+/* Forzamos que el texto de la fecha se vea profesional */
+::-webkit-datetime-edit {
+  padding: 0 10px;
+}
+
+::-webkit-datetime-edit-month-field {
+  color: #b0001e;
+  text-transform: uppercase;
+}
+
+::-webkit-datetime-edit-day-field {
+  font-weight: 800;
+}
+
+::-webkit-datetime-edit-year-field {
+  color: #888;
+}
+
+/* Icono visual (el de la izquierda) */
+.main-icon {
+  color: #b0001e !important;
+  font-size: 18px;
+  z-index: 1;
+}

@@ -37,6 +37,8 @@ export class Login {
   modalMessage = '';
   modalIcon = '';
   modalType: 'modal-success' | 'modal-error' = 'modal-success';
+  fechaMinima: string = '';
+  fechaMaxima: string = '';
 
   constructor() {
     this.registerForm = this.fb.group({
@@ -46,25 +48,56 @@ export class Login {
       Cedula: [''],
       Especialidad: [''],
       DireccionClinica: [''],
+      FechaAsignacion: [''],
       Activo: [true]
     });
 
-    // Escuchar cambios en el Rol para ajustar validaciones
     this.registerForm.get('Rol')?.valueChanges.subscribe(rol => {
-      this.actualizarValidacionesDoctor(rol);
+      this.actualizarValidacionesDinamicas(rol);
     });
+
+    this.configurarLimitesFecha();
   }
 
-  private actualizarValidacionesDoctor(rol: string) {
-    const doctorFields = ['Cedula', 'Especialidad', 'DireccionClinica'];
+  private configurarLimitesFecha() {
+    const hoy = new Date();
 
+    // Fecha mínima: Hoy
+    this.fechaMinima = hoy.toISOString().split('T')[0];
+
+    // Fecha máxima: Último día del mes actual + 2 meses siguientes
+    // Ejemplo: Si es Marzo, el límite es el último día de Mayo.
+    const maxFecha = new Date(hoy.getFullYear(), hoy.getMonth() + 3, 0);
+    this.fechaMaxima = maxFecha.toISOString().split('T')[0];
+
+    // Seteamos la fecha por defecto como hoy en el formulario
+    this.registerForm.patchValue({ FechaAsignacion: this.fechaMinima });
+  }
+
+  private actualizarValidacionesDinamicas(rol: string) {
+    const doctorFields = ['Cedula', 'Especialidad', 'DireccionClinica'];
+    const acompananteFields = ['FechaAsignacion'];
+
+    // Validaciones para Doctor
     doctorFields.forEach(fieldName => {
       const control = this.registerForm.get(fieldName);
       if (rol === 'Doctor') {
         control?.setValidators([Validators.required]);
       } else {
         control?.clearValidators();
-        control?.setValue(''); // Limpiar si cambia a otro rol
+        control?.setValue('');
+      }
+      control?.updateValueAndValidity();
+    });
+
+    // Validaciones para Acompañante
+    acompananteFields.forEach(fieldName => {
+      const control = this.registerForm.get(fieldName);
+      if (rol === 'Acompañante') {
+        control?.setValidators([Validators.required]);
+      } else {
+        control?.clearValidators();
+        control?.setValue('');
       }
       control?.updateValueAndValidity();
     });
@@ -107,7 +140,7 @@ export class Login {
         // REVISIÓN DE SEGURIDAD: ¿Ya verificó el PIN antes?
         if (datosUsuario['pinVerificado'] === true) {
           // Si ya lo hizo, entra directo
-          this.router.navigate(['/recursos']);
+          this.router.navigate(['/inicio']);
         } else {
           // Si es su primer login tras el registro, pide el PIN
           this.usuarioUidTemporal = datosUsuario['uid'];

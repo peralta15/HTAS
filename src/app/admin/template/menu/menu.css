@@ -208,23 +208,24 @@
 
 .nav-links-list {
     list-style: none;
-    padding: 15px 0;
+    padding: 5px 0;
     margin: 0;
 }
 
 .nav-item-link {
     display: flex;
     align-items: center;
-    padding: 12px 20px;
+    padding: 8px 18px;
     color: white;
     text-decoration: none;
     transition: background 0.2s;
     white-space: nowrap;
+    font-size: 0.85rem;
 }
 
 .nav-item-link i {
-    font-size: 1.3rem;
-    min-width: 30px;
+    font-size: 1.1rem;
+    min-width: 25px;
 }
 
 /* Estilo cuando el menú está pequeño */
@@ -237,11 +238,34 @@
     margin: 0;
 }
 
-/* Estado Activo / Hover */
-.nav-item-link:hover,
+/* Títulos de sección */
+.nav-section-title {
+    padding: 12px 18px 4px;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.5);
+    /* Blanco semi-transparente */
+    letter-spacing: 0.5px;
+    font-weight: 700;
+}
+
+/* Divisor para cuando está colapsado */
+.sidebar-divider {
+    border: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin: 5px 15px;
+}
+
+/* Ajuste sutil al hover para que no se vea tan brusco */
+.nav-item-link:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    color: #fff;
+}
+
 .active-item {
-    background-color: rgba(255, 255, 255, 0.15);
-    border-left: 4px solid white;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-left: 4px solid #fff;
+    font-weight: 500;
 }
 
 .nav-label {

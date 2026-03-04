@@ -1,1 +1,82 @@
 <app-menu></app-menu>
+
+<main class="main-content">
+    <div class="container-fluid">
+
+        <div class="d-flex justify-content-between align-items-center mb-4 mt-3">
+            <h2 class="title-page">Gestión de Usuarios</h2>
+
+            <div class="action-buttons" [class.visible]="usuarioSeleccionado">
+                <button class="btn btn-edit" (click)="abrirEditar()">
+                    <i class="bi bi-pencil-square"></i> Editar
+                </button>
+                <button class="btn btn-delete" (click)="eliminar()">
+                    <i class="bi bi-trash"></i> Eliminar
+                </button>
+            </div>
+        </div>
+
+        <div class="table-card">
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Correo</th>
+                        <th>Rol</th>
+                        <th>Dispositivo</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (u of usuariosPaginados; track u.id) {
+                    <tr (click)="seleccionar(u)" [class.selected]="usuarioSeleccionado?.id === u.id">
+                        <td>{{u.nombre}}</td>
+                        <td>{{u.correo}}</td>
+                        <td><span class="badge-rol" [attr.data-rol]="u.rol">{{u.rol}}</span></td>
+                        <td>{{u.dispositivo}}</td>
+                        <td>
+                            <span class="status-dot" [class.active]="u.activo"></span>
+                            {{u.activo ? 'Activo' : 'Inactivo'}}
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+
+            <div class="pagination-bar">
+                <span>Mostrando 10 de {{usuariosTodo.length}} usuarios</span>
+                <div class="nav-arrows">
+                    <button (click)="cambiarPagina(-1)" [disabled]="paginaActual === 0">
+                        <i class="bi bi-chevron-left"></i>
+                    </button>
+                    <span class="page-num">{{paginaActual + 1}}</span>
+                    <button (click)="cambiarPagina(1)"
+                        [disabled]="(paginaActual + 1) * itemsPorPagina >= usuariosTodo.length">
+                        <i class="bi bi-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+@if (mostrarModalEdit) {
+<div class="modal-overlay">
+    <div class="modal-content">
+        <h3>Editar Usuario</h3>
+        <hr>
+        <div class="form-group">
+            <label>Nombre Completo</label>
+            <input type="text" [(ngModel)]="usuarioSeleccionado.nombre">
+        </div>
+        <div class="form-group">
+            <label>Correo Electrónico</label>
+            <input type="email" [(ngModel)]="usuarioSeleccionado.correo">
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" (click)="cerrarModal()">Cancelar</button>
+            <button class="btn-save" (click)="cerrarModal()">Guardar Cambios</button>
+        </div>
+    </div>
+</div>
+}

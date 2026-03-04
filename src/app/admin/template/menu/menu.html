@@ -33,7 +33,14 @@
 
     <aside class="sidebar-menu" [class.collapsed]="isCollapsed">
         <ul class="nav-links-list">
-            @for (item of navItems; track item.label) {
+            @for (section of navItems; track section.category) {
+            @if (!isCollapsed) {
+            <li class="nav-section-title">{{ section.category }}</li>
+            } @else {
+            <hr class="sidebar-divider">
+            }
+
+            @for (item of section.items; track item.label) {
             <li>
                 <a [routerLink]="item.route" routerLinkActive="active-item" class="nav-item-link">
                     <i class="bi {{item.icon}}"></i>
@@ -42,6 +49,7 @@
                     }
                 </a>
             </li>
+            }
             }
         </ul>
     </aside>
