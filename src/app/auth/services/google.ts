@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { Auth, signInWithPopup, GoogleAuthProvider, signOut, authState } from '@angular/fire/auth';
-import { Firestore, doc, setDoc, getDoc, updateDoc } from '@angular/fire/firestore';
+import { Firestore, doc, setDoc, getDoc, updateDoc, collection, getDocs } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import emailjs from '@emailjs/browser';
 
@@ -78,6 +78,15 @@ export class GoogleService {
   async marcarPinComoVerificado(uid: string) {
     const userRef = doc(this.firestore, `usuarios/${uid}`);
     return await updateDoc(userRef, { pinVerificado: true });
+  }
+
+  async getUsuarios() {
+    const usersRef = collection(this.firestore, 'usuarios');
+    const snapshot = await getDocs(usersRef);
+    return snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    })) as any[];
   }
 
   logout() { return signOut(this.auth); }
