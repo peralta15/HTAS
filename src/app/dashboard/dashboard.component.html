@@ -1,0 +1,164 @@
+<!-- Estado de carga -->
+<ng-template #loadingTpl>
+  <div class="loading" role="status" aria-live="polite">
+    <div class="spinner"></div>
+    <p>Cargando información del paciente…</p>
+  </div>
+</ng-template>
+
+<!-- Estado de error -->
+<ng-template #errorTpl>
+  <div class="error" role="alert">
+    <span class="error-icon">⚠️</span>
+    <p>{{ error }}</p>
+    <button class="btn-retry" (click)="refresh()">Reintentar</button>
+  </div>
+</ng-template>
+
+<!-- Dashboard principal -->
+<section class="htas-dashboard" *ngIf="!loading && !error; else loadingTpl">
+  
+  <!-- Header con indicador WebSocket -->
+  <header class="dashboard-header" role="banner" aria-label="Cabecera del dashboard">
+    <div class="brand">
+      <img alt="HTAS" src="/assets/htas-logo.svg" class="logo" />
+      <h1 class="title">HTAS — Dashboard del cuidador</h1>
+      <span class="websocket-indicator" 
+            [class.connected]="websocketConnected"
+            [attr.aria-label]="websocketConnected ? 'Conectado en tiempo real' : 'Reconectando...'">
+        {{ websocketConnected ? '🔴 En vivo' : '⚪ Reconectando...' }}
+      </span>
+    </div>
+
+    <div class="session" role="region" aria-label="Información de sesión">
+      <div class="caregiver" aria-live="polite">
+        <span class="name" *ngIf="dashboard?.caregiverName">{{ dashboard?.caregiverName }}</span>
+        <span class="status active" aria-hidden="false" aria-label="Sesión activa">Sesión activa</span>
+      </div>
+      <button class="logout" (click)="logout()" aria-label="Cerrar sesión">Cerrar sesión</button>
+    </div>
+  </header>
+
+  <main class="dashboard-main" role="main">
+    
+    <!-- Summary cards grid -->
+    <section class="summary-cards" aria-labelledby="summary-heading">
+      <h2 id="summary-heading" class="visually-hidden">Resumen general</h2>
+
+      <!-- Última presión arterial -->
+      <article class="card" role="region" aria-labelledby="bp-heading"
+               [ngClass]="getPressureClass(
+                 dashboard?.vitals?.bloodPressure?.last?.systolic,
+                 dashboard?.vitals?.bloodPressure?.last?.diastolic
+               )">
+        <h3 id="bp-heading">Última presión arterial</h3>
+        <p class="value">
+          <span *ngIf="dashboard?.vitals?.bloodPressure?.last">
+            {{ dashboard?.vitals?.bloodPressure?.last?.systolic }} / {{ dashboard?.vitals?.bloodPressure?.last?.diastolic }}
+          </span>
+          <span *ngIf="!dashboard?.vitals?.bloodPressure?.last">Sin datos</span>
+        </p>
+        <p class="meta">
+          <span *ngIf="dashboard?.vitals?.bloodPressure?.last?.timestamp">
+            {{ dashboard?.vitals?.bloodPressure?.last?.timestamp | date:'HH:mm, dd/MM' }}
+          </span>
+          <span *ngIf="!dashboard?.vitals?.bloodPressure?.last?.timestamp">
+            Sin marca temporal
+          </span>
+        </p>
+      </article>
+
+      <!-- Adherencia -->
+      <article class="card" role="region" aria-labelledby="adh-heading">
+        <h3 id="adh-heading">Adherencia (últimos 7 días)</h3>
+        <p class="value">{{ adherenceDisplay }}</p>
+        <p class="meta" *ngIf="dashboard?.vitals?.measurementsFrequency?.weekly">
+          {{ dashboard?.vitals?.measurementsFrequency?.weekly }} mediciones esta semana
+        </p>
+      </article>
+
+      <!-- Alertas activas -->
+      <article class="card" role="region" aria-labelledby="alerts-heading"
+               (click)="scrollToAlerts()" style="cursor: pointer">
+        <h3 id="alerts-heading">Alertas activas</h3>
+        <p class="value" [class.has-alerts]="activeAlertsCount > 0">
+          {{ activeAlertsCount || '0' }}
+        </p>
+        <p class="meta" *ngIf="activeAlertsCount > 0">
+          {{ activeAlertsCount }} alerta(s) sin resolver
+        </p>
+      </article>
+
+      <!-- Próxima cita -->
+      <article class="card" role="region" aria-labelledby="appt-heading">
+        <h3 id="appt-heading">Próxima cita médica</h3>
+        <p class="value">
+          {{ dashboard?.summary?.nextAppointment ? (dashboard?.summary?.nextAppointment | date:'dd/MM/yyyy') : 'Sin cita programada' }}
+        </p>
+        <p class="meta" *ngIf="dashboard?.summary?.nextAppointment">
+          {{ dashboard?.summary?.nextAppointment | date:'HH:mm' }}
+        </p>
+      </article>
+    </section>
+
+    <!-- Charts grid -->
+    <section class="charts-grid" aria-labelledby="charts-heading">
+      <h2 id="charts-heading" class="visually-hidden">Gráficas clínicas</h2>
+
+      <!-- Tendencia de presión arterial -->
+      <figure class="chart" role="region" aria-labelledby="chart-bp">
+        <figcaption id="chart-bp">Tendencia de presión arterial (30 días)</figcaption>
+        <app-charts 
+          [bloodPressureTrend]="dashboard?.vitals?.bloodPressure?.trend || []"
+          [adherencePercentage]="null"
+          [measurementsFrequency]="null">
+        </app-charts>
+      </figure>
+
+      <!-- Adherencia a medicación -->
+      <figure class="chart" role="region" aria-labelledby="chart-adh">
+        <figcaption id="chart-adh">Adherencia a medicación</figcaption>
+        <app-charts 
+          [bloodPressureTrend]="[]"
+          [adherencePercentage]="dashboard?.summary?.adherencePercentage ?? null"
+          [measurementsFrequency]="null">
+        </app-charts>
+      </figure>
+
+      <!-- Frecuencia de mediciones -->
+      <figure class="chart" role="region" aria-labelledby="chart-freq">
+        <figcaption id="chart-freq">Frecuencia de mediciones</figcaption>
+        <app-charts 
+          [bloodPressureTrend]="[]"
+          [adherencePercentage]="null"
+          [measurementsFrequency]="dashboard?.vitals?.measurementsFrequency || null">
+        </app-charts>
+      </figure>
+    </section>
+
+    <!-- Alertas list -->
+    <section class="alerts" aria-labelledby="alerts-list-heading" *ngIf="dashboard?.alerts?.length">
+      <h2 id="alerts-list-heading">Alertas recientes</h2>
+      <app-alerts-list 
+        [alerts]="dashboard?.alerts || []"
+        (onResolve)="resolveAlert($event)">
+      </app-alerts-list>
+    </section>
+
+    <!-- Quick actions -->
+    <aside class="quick-actions-region" role="complementary" aria-labelledby="qa-heading">
+      <h2 id="qa-heading" class="visually-hidden">Acciones rápidas</h2>
+      <app-quick-actions (onAction)="onQuickAction($event)"></app-quick-actions>
+    </aside>
+  </main>
+
+  <!-- Botón flotante para recargar -->
+  <button class="btn-floating" (click)="refresh()" aria-label="Actualizar datos">
+    🔄
+  </button>
+
+  <footer class="dashboard-footer">
+    <small>Información clínica sensible — manejo conforme a políticas de privacidad.</small>
+    <small class="version">v1.0.0</small>
+  </footer>
+</section>

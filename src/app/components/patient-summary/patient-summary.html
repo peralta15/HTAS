@@ -1,0 +1,11 @@
+<div class="patient-summary">
+	<h2>Resumen del paciente</h2>
+	<div *ngIf="summary; else empty">
+		<p><strong>Nombre:</strong> {{ summary.name || summary.patientName }}</p>
+		<p *ngIf="summary.age !== undefined"><strong>Edad:</strong> {{ summary.age }}</p>
+		<p *ngIf="summary.lastSeen"><strong>Última actualización:</strong> {{ summary.lastSeen }}</p>
+	</div>
+	<ng-template #empty>
+		<p>Sin datos de resumen disponibles.</p>
+	</ng-template>
+</div>

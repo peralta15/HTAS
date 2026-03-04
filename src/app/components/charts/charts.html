@@ -1,0 +1,14 @@
+<div class="charts">
+	<h2>Gráficas clínicas</h2>
+	<div *ngIf="vitals; else none">
+		<!-- Minimal presentational rendering. Real charting should be delegated to a chart library. -->
+		<ul>
+			<li *ngFor="let k of (vitals | keyvalue)">
+				<strong>{{ k.key }}:</strong> {{ k.value }}
+			</li>
+		</ul>
+	</div>
+	<ng-template #none>
+		<p>No hay datos de signos vitales.</p>
+	</ng-template>
+</div>
