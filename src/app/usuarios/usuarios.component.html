@@ -1,0 +1,93 @@
+<div class="usuarios-container">
+  <!-- Header de la sección -->
+  <div class="usuarios-header">
+    <div>
+      <h1 class="usuarios-title">Usuarios</h1>
+      <div class="breadcrumb">
+        <span>Admin</span>
+        <span class="separator">/</span>
+        <span class="active">Usuarios</span>
+      </div>
+    </div>
+
+    <!-- Barra de búsqueda -->
+    <div class="search-bar">
+      <span class="search-icon">🔍</span>
+      <input 
+        type="text" 
+        class="search-input"
+        placeholder="Buscar usuarios..."
+        [(ngModel)]="searchTerm"
+        (ngModelChange)="filterUsers()">
+    </div>
+  </div>
+
+  <!-- Tabla de usuarios -->
+  <div class="table-container">
+    <table class="users-table">
+      <thead>
+        <tr>
+          <th>Nombre completo</th>
+          <th>Email</th>
+          <th>Rol</th>
+          <th>Estado</th>
+          <th>Acompañante</th>
+          <th>Dispositivo</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of filteredUsuarios; trackBy: trackById">
+          <td class="user-name">{{ user.fullName }}</td>
+          <td>{{ user.email }}</td>
+          <td>
+            <span class="role-badge" [ngClass]="getRoleClass(user.role)">
+              {{ getRoleText(user.role) }}
+            </span>
+          </td>
+          <td>
+            <span class="status-badge" [ngClass]="getStatusClass(user.isActive)">
+              {{ getStatusText(user.isActive) }}
+            </span>
+          </td>
+          <td>
+            <span class="caregiver-badge" [ngClass]="getCaregiverClass(user.hasCaregiver)">
+              {{ getCaregiverText(user.hasCaregiver) }}
+            </span>
+          </td>
+          <td>
+            <span class="device-badge" *ngIf="user.device; else noDevice">
+              {{ user.device }}
+            </span>
+            <ng-template #noDevice>
+              <span class="no-device">—</span>
+            </ng-template>
+          </td>
+          <td class="actions">
+            <button class="action-btn view" (click)="openModal(user, 'view')" title="Ver">
+              👁️
+            </button>
+            <button class="action-btn edit" (click)="openModal(user, 'edit')" title="Editar">
+              ✏️
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="filteredUsuarios.length === 0">
+          <td colspan="7" class="no-results">
+            No se encontraron usuarios
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal -->
+<app-user-modal
+  *ngIf="showModal"
+  [user]="selectedUser"
+  [mode]="modalMode"
+  (close)="closeModal()"
+  (save)="saveUser()"
+  (userChange)="selectedUser = $event">
+</app-user-modal>

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
@@ -15,7 +15,6 @@ import { QuickActions } from '../components/quick-actions/quick-actions.componen
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  schemas: [CUSTOM_ELEMENTS_SCHEMA], // ← SOLUCIÓN EXTREMA
   imports: [
     CommonModule,
     Charts,
@@ -41,6 +40,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private websocket: WebsocketService
   ) {}
 
+  // ============= GETTERS =============
+  
   get activeAlertsCount(): number {
     return (this.dashboard?.alerts ?? []).filter(a => a?.status === 'active').length;
   }
@@ -50,15 +51,35 @@ export class DashboardComponent implements OnInit, OnDestroy {
     return v !== undefined && v !== null ? `${v}%` : 'Sin datos';
   }
 
+  get lastBloodPressureDisplay(): string {
+    const bp = this.dashboard?.vitals?.bloodPressure?.last;
+    return bp ? `${bp.systolic}/${bp.diastolic}` : 'Sin datos';
+  }
+
+  get lastBloodPressureTime(): string {
+    return this.dashboard?.vitals?.bloodPressure?.last?.timestamp 
+      ? this.formatDate(this.dashboard.vitals.bloodPressure.last.timestamp)
+      : '';
+  }
+
+  // ============= LIFECYCLE =============
+
   ngOnInit(): void {
+    // Obtener patientId de la ruta (ej: /dashboard/1)
     this.patientId = this.route.snapshot.paramMap.get('patientId');
+    
     if (!this.patientId) {
       this.error = 'Identificador del paciente no encontrado';
       this.loading = false;
       return;
     }
 
+    console.log('📌 Dashboard para paciente:', this.patientId);
+    
+    // Cargar datos iniciales
     this.loadDashboard(this.patientId);
+
+    // Configurar WebSocket
     this.setupWebSocket();
   }
 
@@ -67,6 +88,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
     this.websocket.disconnect();
   }
+
+  // ============= CARGA DE DATOS =============
 
   private loadDashboard(patientId: string): void {
     this.loading = true;
@@ -78,106 +101,198 @@ export class DashboardComponent implements OnInit, OnDestroy {
         next: (data) => {
           this.dashboard = data;
           this.loading = false;
+          console.log('✅ Dashboard cargado:', data);
         },
         error: (err) => {
           this.error = 'No se pudo cargar el estado del paciente';
           this.loading = false;
-          console.error('Error loading dashboard:', err);
+          console.error('❌ Error loading dashboard:', err);
         }
       });
   }
 
+  refresh(): void {
+    if (this.patientId) {
+      this.loadDashboard(this.patientId);
+    }
+  }
+
+  // ============= WEBSOCKET =============
+
   private setupWebSocket(): void {
-    const ws = this.websocket.connect('ws://localhost/ws/notifications');
-    this.websocketConnected = this.websocket.isConnected();
+    try {
+      const ws = this.websocket.connect('ws://localhost/ws/notifications');
+      this.websocketConnected = this.websocket.isConnected();
 
-    ws.messages.pipe(takeUntil(this.destroy$)).subscribe(msg => {
-      console.log('📨 WebSocket message:', msg);
-    });
+      // Mensajes generales
+      ws.messages
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(msg => {
+          console.log('📨 WebSocket message:', msg);
+        });
 
-    ws.pressure.pipe(takeUntil(this.destroy$)).subscribe((update: PressureUpdate) => {
-      if (!this.dashboard || update.patientId !== this.patientId) return;
-      this.dashboard = {
-        ...this.dashboard,
-        vitals: {
-          ...this.dashboard.vitals,
-          bloodPressure: {
-            last: {
+      // Actualizaciones de presión
+      ws.pressure
+        .pipe(takeUntil(this.destroy$))
+        .subscribe((update: PressureUpdate) => {
+          this.handlePressureUpdate(update);
+        });
+
+      // Actualizaciones de alertas
+      ws.alerts
+        .pipe(takeUntil(this.destroy$))
+        .subscribe((update: AlertUpdate) => {
+          this.handleAlertUpdate(update);
+        });
+
+      // Actualizaciones de adherencia
+      ws.adherence
+        .pipe(takeUntil(this.destroy$))
+        .subscribe((update: AdherenceUpdate) => {
+          this.handleAdherenceUpdate(update);
+        });
+    } catch (error) {
+      console.error('❌ Error conectando WebSocket:', error);
+      this.websocketConnected = false;
+    }
+  }
+
+  private handlePressureUpdate(update: PressureUpdate): void {
+    if (!this.dashboard || update.patientId !== this.patientId) return;
+
+    this.dashboard = {
+      ...this.dashboard,
+      vitals: {
+        ...this.dashboard.vitals,
+        bloodPressure: {
+          last: {
+            systolic: update.systolic,
+            diastolic: update.diastolic,
+            timestamp: update.timestamp
+          },
+          trend: [
+            ...(this.dashboard.vitals?.bloodPressure?.trend || []),
+            {
               systolic: update.systolic,
               diastolic: update.diastolic,
               timestamp: update.timestamp
-            },
-            trend: [
-              ...(this.dashboard.vitals?.bloodPressure?.trend || []),
-              { systolic: update.systolic, diastolic: update.diastolic, timestamp: update.timestamp }
-            ].slice(-30)
-          }
+            }
+          ].slice(-30) // Mantener últimas 30 lecturas
         }
-      };
-    });
-
-    ws.alerts.pipe(takeUntil(this.destroy$)).subscribe((update: AlertUpdate) => {
-      if (!this.dashboard) return;
-      const alerts = this.dashboard.alerts || [];
-      if (update.status === 'active') {
-        const newAlert: AlertItem = {
-          id: update.id,
-          status: update.status,
-          severity: update.severity,
-          timestamp: update.timestamp,
-          type: 'system',
-          title: this.getAlertTitle(update.severity),
-          message: this.getAlertMessage(update)
-        };
-        this.dashboard = { ...this.dashboard, alerts: [newAlert, ...alerts] };
-      } else {
-        this.dashboard = {
-          ...this.dashboard,
-          alerts: alerts.map(a => a.id === update.id ? { ...a, status: update.status } : a)
-        };
       }
-    });
+    };
+  }
 
-    ws.adherence.pipe(takeUntil(this.destroy$)).subscribe((update: AdherenceUpdate) => {
-      if (!this.dashboard || update.patientId !== this.patientId) return;
+  private handleAlertUpdate(update: AlertUpdate): void {
+    if (!this.dashboard) return;
+
+    const alerts = this.dashboard.alerts || [];
+    
+    if (update.status === 'active') {
+      // Nueva alerta activa
+      const newAlert: AlertItem = {
+        id: update.id,
+        status: update.status,
+        severity: update.severity,
+        timestamp: update.timestamp,
+        type: 'system',
+        title: this.getAlertTitle(update.severity),
+        message: this.getAlertMessage(update)
+      };
+      
       this.dashboard = {
         ...this.dashboard,
-        summary: { ...this.dashboard.summary, adherencePercentage: update.adherencePercent },
-        vitals: { ...this.dashboard.vitals, adherence: { last7DaysPercent: update.adherencePercent } }
+        alerts: [newAlert, ...alerts]
       };
-    });
+    } else {
+      // Actualizar estado de alerta existente
+      this.dashboard = {
+        ...this.dashboard,
+        alerts: alerts.map(a => 
+          a.id === update.id ? { ...a, status: update.status } : a
+        )
+      };
+    }
+  }
+
+  private handleAdherenceUpdate(update: AdherenceUpdate): void {
+    if (!this.dashboard || update.patientId !== this.patientId) return;
+
+    this.dashboard = {
+      ...this.dashboard,
+      summary: {
+        ...this.dashboard.summary,
+        adherencePercentage: update.adherencePercent
+      },
+      vitals: {
+        ...this.dashboard.vitals,
+        adherence: {
+          last7DaysPercent: update.adherencePercent
+        }
+      }
+    };
   }
 
   private getAlertTitle(severity?: string): string {
-    const titles = { critical: '¡ALERTA CRÍTICA!', high: 'Alerta de alta prioridad', medium: 'Alerta', low: 'Notificación' };
+    const titles = {
+      critical: '¡ALERTA CRÍTICA!',
+      high: 'Alerta de alta prioridad',
+      medium: 'Alerta',
+      low: 'Notificación'
+    };
     return titles[severity as keyof typeof titles] || 'Alerta del sistema';
   }
 
   private getAlertMessage(update: AlertUpdate): string {
-    if (update.id.includes('pressure')) return 'Presión arterial fuera de rango normal';
-    if (update.id.includes('medication')) return 'Medicación no tomada según lo programado';
+    if (update.id.includes('pressure')) {
+      return 'Presión arterial fuera de rango normal';
+    }
+    if (update.id.includes('medication')) {
+      return 'Medicación no tomada según lo programado';
+    }
     return 'Se ha detectado una incidencia';
   }
 
+  // ============= ACCIONES =============
+
   onQuickAction(action: string): void {
+    console.log('🚀 Acción rápida:', action);
+    
     switch(action) {
-      case 'open-messaging': this.router.navigate(['/messages']); break;
-      case 'schedule-visit': this.router.navigate(['/appointments']); break;
-      case 'view-reports': this.router.navigate(['/reports', this.patientId]); break;
-      case 'emergency': this.handleEmergency(); break;
-      default: console.warn('Acción no reconocida:', action);
+      case 'open-messaging':
+        this.router.navigate(['/messages']);
+        break;
+      case 'schedule-visit':
+        this.router.navigate(['/appointments']);
+        break;
+      case 'view-reports':
+        this.router.navigate(['/reports', this.patientId]);
+        break;
+      case 'emergency':
+        this.handleEmergency();
+        break;
+      default:
+        console.warn('Acción no reconocida:', action);
     }
   }
 
   private handleEmergency(): void {
-    if (window.confirm('¿Contactar a servicios de emergencia?')) {
-      alert('🚨 Contactando a emergencias...');
+    if (window.confirm('¿Está seguro de que desea contactar a servicios de emergencia?')) {
+      alert('🚨 Contactando a servicios de emergencia...');
+      // Aquí iría la lógica real de emergencia
     }
   }
 
   resolveAlert(alert: AlertItem): void {
-    if (!this.patientId) return;
-    if (!window.confirm(`¿Resolver ${alert.title || alert.type || 'alerta'}?`)) return;
+    if (!this.patientId) {
+      console.warn('No se puede resolver alerta: patientId no disponible');
+      return;
+    }
+    
+    const alertDescription = alert.title || alert.type || 'alerta';
+    if (!window.confirm(`¿Resolver ${alertDescription}?`)) {
+      return;
+    }
     
     try {
       this.websocket.send('alert_update', {
@@ -186,22 +301,26 @@ export class DashboardComponent implements OnInit, OnDestroy {
         status: 'resolved',
         timestamp: new Date().toISOString()
       });
+      
       if (this.dashboard) {
         this.dashboard = {
           ...this.dashboard,
-          alerts: this.dashboard.alerts?.map(a => a.id === alert.id ? { ...a, status: 'resolved' } : a)
+          alerts: this.dashboard.alerts?.map(a =>
+            a.id === alert.id ? { ...a, status: 'resolved' } : a
+          )
         };
       }
+      
       console.log('✅ Alerta resuelta:', alert.id);
+      
     } catch (error) {
-      console.error('❌ Error:', error);
+      console.error('❌ Error al resolver alerta:', error);
       this.error = 'No se pudo resolver la alerta';
-      setTimeout(() => this.error = null, 3000);
+      
+      setTimeout(() => {
+        this.error = null;
+      }, 3000);
     }
-  }
-
-  refresh(): void {
-    if (this.patientId) this.loadDashboard(this.patientId);
   }
 
   logout(): void {
@@ -210,6 +329,22 @@ export class DashboardComponent implements OnInit, OnDestroy {
       sessionStorage.clear();
       localStorage.removeItem('auth');
     });
+  }
+
+  // ============= UTILIDADES =============
+
+  formatDate(dateString: string): string {
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleString('es-ES', {
+        hour: '2-digit',
+        minute: '2-digit',
+        day: '2-digit',
+        month: '2-digit'
+      });
+    } catch {
+      return dateString;
+    }
   }
 
   getPressureClass(systolic?: number, diastolic?: number): string {
@@ -221,6 +356,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   scrollToAlerts(): void {
-    document.querySelector('.alerts')?.scrollIntoView({ behavior: 'smooth' });
+    const element = document.querySelector('.alerts');
+    element?.scrollIntoView({ behavior: 'smooth' });
   }
 }

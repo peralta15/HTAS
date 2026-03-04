@@ -1,0 +1,58 @@
+.configuracion-container {
+  padding: 24px 0;
+}
+
+.configuracion-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #2C3E50;
+  margin: 0 0 8px 0;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #7F8C8D;
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+.breadcrumb .separator {
+  color: #7F8C8D;
+}
+
+.breadcrumb .active {
+  color: #C8102E;
+  font-weight: 500;
+}
+
+.placeholder-card {
+  background: white;
+  border-radius: 16px;
+  padding: 60px 40px;
+  text-align: center;
+  color: #7F8C8D;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  border: 1px solid #E9ECEF;
+}
+
+.placeholder-icon {
+  font-size: 64px;
+  margin-bottom: 20px;
+  opacity: 0.5;
+}
+
+.placeholder-card h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #2C3E50;
+  margin-bottom: 12px;
+}
+
+.placeholder-card p {
+  font-size: 15px;
+  color: #7F8C8D;
+  max-width: 500px;
+  margin: 0 auto;
+}

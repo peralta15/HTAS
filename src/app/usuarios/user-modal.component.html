@@ -1,0 +1,229 @@
+<div class="modal-overlay" *ngIf="user">
+  <div class="modal-container" [class.modal-edit]="mode === 'edit'">
+    
+    <!-- Header del modal -->
+    <div class="modal-header">
+      <h2 class="modal-title">
+        {{ mode === 'view' ? 'Detalles del Usuario' : 'Editar Usuario' }}
+      </h2>
+      <button class="close-btn" (click)="close.emit()" aria-label="Cerrar">✕</button>
+    </div>
+
+    <!-- Contenido del modal -->
+    <div class="modal-body">
+      
+      <!-- Información General -->
+      <section class="modal-section">
+        <h3 class="section-title">Información General</h3>
+        
+        <div class="info-grid">
+          <!-- Nombre -->
+          <div class="info-item">
+            <span class="info-label">Nombre completo</span>
+            <span class="info-value" *ngIf="mode === 'view'">{{ user.fullName }}</span>
+            <input 
+              *ngIf="mode === 'edit'"
+              type="text"
+              class="form-input"
+              [(ngModel)]="user.fullName"
+              (ngModelChange)="onFieldChange()">
+          </div>
+
+          <!-- Email -->
+          <div class="info-item">
+            <span class="info-label">Email</span>
+            <span class="info-value" *ngIf="mode === 'view'">{{ user.email }}</span>
+            <input 
+              *ngIf="mode === 'edit'"
+              type="email"
+              class="form-input"
+              [(ngModel)]="user.email"
+              (ngModelChange)="onFieldChange()">
+          </div>
+
+          <!-- Rol -->
+          <div class="info-item">
+            <span class="info-label">Rol</span>
+            <span class="info-value" *ngIf="mode === 'view'">
+              <span class="role-badge" [ngClass]="'role-' + user.role.toLowerCase()">
+                {{ getRoleText(user.role) }}
+              </span>
+            </span>
+            <select 
+              *ngIf="mode === 'edit'"
+              class="form-select"
+              [(ngModel)]="user.role"
+              (ngModelChange)="onFieldChange()">
+              <option *ngFor="let role of getRoleOptions()" [value]="role">
+                {{ getRoleText(role) }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Estado -->
+          <div class="info-item">
+            <span class="info-label">Estado</span>
+            <span class="info-value" *ngIf="mode === 'view'">
+              <span class="status-badge" [class.status-active]="user.isActive" [class.status-inactive]="!user.isActive">
+                {{ user.isActive ? 'Activo' : 'Inactivo' }}
+              </span>
+            </span>
+            <label class="toggle-switch" *ngIf="mode === 'edit'">
+              <input 
+                type="checkbox"
+                [checked]="user.isActive"
+                (change)="user.isActive = !user.isActive; onFieldChange()">
+              <span class="toggle-slider"></span>
+              <span class="toggle-label">{{ user.isActive ? 'Activo' : 'Inactivo' }}</span>
+            </label>
+          </div>
+
+          <!-- Dispositivo -->
+          <div class="info-item">
+            <span class="info-label">Dispositivo asignado</span>
+            <span class="info-value" *ngIf="mode === 'view'">
+              {{ user.device || 'No asignado' }}
+            </span>
+            <input 
+              *ngIf="mode === 'edit'"
+              type="text"
+              class="form-input"
+              [(ngModel)]="user.device"
+              placeholder="Ej: HTAS-001"
+              (ngModelChange)="onFieldChange()">
+          </div>
+
+          <!-- Acompañante (solo si es paciente) -->
+          <div class="info-item" *ngIf="isPaciente()">
+            <span class="info-label">Acompañante</span>
+            <span class="info-value" *ngIf="mode === 'view'">
+              <span class="caregiver-badge" [class.caregiver-yes]="user.hasCaregiver" [class.caregiver-no]="!user.hasCaregiver">
+                {{ user.hasCaregiver ? 'Sí' : 'No' }}
+              </span>
+            </span>
+            <label class="toggle-switch" *ngIf="mode === 'edit'">
+              <input 
+                type="checkbox"
+                [checked]="user.hasCaregiver"
+                (change)="user.hasCaregiver = !user.hasCaregiver; onFieldChange()">
+              <span class="toggle-slider"></span>
+              <span class="toggle-label">{{ user.hasCaregiver ? 'Sí' : 'No' }}</span>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <!-- Perfil Médico (solo si es paciente) -->
+      <section class="modal-section" *ngIf="isPaciente() && user.medicalProfile">
+        <h3 class="section-title">Perfil Médico</h3>
+        
+        <div class="info-grid">
+          <!-- Tipo de sangre -->
+          <div class="info-item">
+            <span class="info-label">Tipo de sangre</span>
+            <span class="info-value" *ngIf="mode === 'view'">{{ user.medicalProfile.bloodType }}</span>
+            <input 
+              *ngIf="mode === 'edit'"
+              type="text"
+              class="form-input"
+              [(ngModel)]="user.medicalProfile.bloodType"
+              placeholder="Ej: O+"
+              (ngModelChange)="onFieldChange()">
+          </div>
+
+          <!-- Última presión -->
+          <div class="info-item" *ngIf="user.medicalProfile.lastBloodPressure">
+            <span class="info-label">Última presión</span>
+            <span class="info-value">{{ user.medicalProfile.lastBloodPressure }}</span>
+          </div>
+
+          <!-- Contacto de emergencia -->
+          <div class="info-item full-width">
+            <span class="info-label">Contacto de emergencia</span>
+            <span class="info-value" *ngIf="mode === 'view'">{{ user.medicalProfile.emergencyContact }}</span>
+            <input 
+              *ngIf="mode === 'edit'"
+              type="text"
+              class="form-input"
+              [(ngModel)]="user.medicalProfile.emergencyContact"
+              placeholder="Nombre y teléfono"
+              (ngModelChange)="onFieldChange()">
+          </div>
+
+          <!-- Enfermedades crónicas -->
+          <div class="info-item full-width">
+            <span class="info-label">Enfermedades crónicas</span>
+            <div class="tags-container" *ngIf="mode === 'view'">
+              <span class="tag" *ngFor="let condition of user.medicalProfile.chronicConditions">
+                {{ condition }}
+              </span>
+              <span class="no-tags" *ngIf="!user.medicalProfile.chronicConditions?.length">
+                No registradas
+              </span>
+            </div>
+            <textarea 
+              *ngIf="mode === 'edit'"
+              class="form-textarea"
+              [value]="getChronicConditionsString()"
+              (input)="onChronicConditionsChange($event)"
+              placeholder="Separar por comas"
+              rows="2">
+            </textarea>
+          </div>
+
+          <!-- Alergias -->
+          <div class="info-item full-width">
+            <span class="info-label">Alergias</span>
+            <div class="tags-container" *ngIf="mode === 'view'">
+              <span class="tag" *ngFor="let allergy of user.medicalProfile.allergies">
+                {{ allergy }}
+              </span>
+              <span class="no-tags" *ngIf="!user.medicalProfile.allergies?.length">
+                No registradas
+              </span>
+            </div>
+            <textarea 
+              *ngIf="mode === 'edit'"
+              class="form-textarea"
+              [value]="getAllergiesString()"
+              (input)="onAllergiesChange($event)"
+              placeholder="Separar por comas"
+              rows="2">
+            </textarea>
+          </div>
+
+          <!-- Medicamentos -->
+          <div class="info-item full-width">
+            <span class="info-label">Medicamentos actuales</span>
+            <div class="tags-container" *ngIf="mode === 'view'">
+              <span class="tag" *ngFor="let medication of user.medicalProfile.medications">
+                {{ medication }}
+              </span>
+              <span class="no-tags" *ngIf="!user.medicalProfile.medications?.length">
+                No registrados
+              </span>
+            </div>
+            <textarea 
+              *ngIf="mode === 'edit'"
+              class="form-textarea"
+              [value]="getMedicationsString()"
+              (input)="onMedicationsChange($event)"
+              placeholder="Separar por comas"
+              rows="2">
+            </textarea>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Footer del modal -->
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="close.emit()">
+        Cancelar
+      </button>
+      <button class="btn-primary" (click)="save.emit()" *ngIf="mode === 'edit'">
+        Guardar cambios
+      </button>
+    </div>
+  </div>
+</div>
