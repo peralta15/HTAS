@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { Auth, signInWithPopup, GoogleAuthProvider, signOut, authState } from '@angular/fire/auth';
-import { Firestore, doc, setDoc, getDoc, updateDoc, collection, getDocs } from '@angular/fire/firestore';
+import { Firestore, doc, setDoc, getDoc, updateDoc, collection, getDocs, deleteDoc } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import emailjs from '@emailjs/browser';
 
@@ -129,6 +129,11 @@ export class GoogleService {
   async updateUsuario(uid: string, data: any) {
     const userRef = doc(this.firestore, `usuarios/${uid}`);
     return await updateDoc(userRef, data);
+  }
+
+  async deleteUsuario(uid: string) {
+    const userRef = doc(this.firestore, `usuarios/${uid}`);
+    return await deleteDoc(userRef);
   }
 
   logout() { return signOut(this.auth); }

@@ -28,7 +28,9 @@ export class Acompanantes implements OnInit {
   // Selección y Modal
   usuarioSeleccionado: any = null;
   mostrarModalEdit = false;
+  mostrarModalDelete = false;
   isSaving = false;
+  isDeleting = false;
 
   async ngOnInit() {
     await this.cargarUsuarios();
@@ -36,7 +38,8 @@ export class Acompanantes implements OnInit {
 
   cargarUsuarios() {
     this.googleService.getUsuarios().then(users => {
-      this.usuariosTodo = users;
+      // Filtrar solo para que muestre Acompañantes
+      this.usuariosTodo = users.filter(u => (u.rol || u.Rol) === 'Acompañante');
       this.cdr.detectChanges();
     }).catch(error => {
       console.error('Error al cargar usuarios:', error);
@@ -81,6 +84,10 @@ export class Acompanantes implements OnInit {
     this.mostrarModalEdit = true;
   }
 
+  abrirEliminar() {
+    this.mostrarModalDelete = true;
+  }
+
   async guardarCambios() {
     if (!this.usuarioSeleccionado) return;
 
@@ -105,17 +112,34 @@ export class Acompanantes implements OnInit {
     }
   }
 
-  async eliminar() {
-    if (confirm(`¿Estás seguro de eliminar a ${this.usuarioSeleccionado.NombreCompleto || this.usuarioSeleccionado.nombre}?`)) {
-      // Implementar eliminación real si es necesario, por ahora local
-      this.usuariosTodo = this.usuariosTodo.filter(u => u.id !== this.usuarioSeleccionado.id);
-      this.usuarioSeleccionado = null;
+  async confirmarEliminar() {
+    if (!this.usuarioSeleccionado) return;
+
+    const idAEliminar = this.usuarioSeleccionado.id;
+
+    // Actualización Optimista: Quitamos de la lista y cerramos modal al instante
+    this.usuariosTodo = this.usuariosTodo.filter(u => u.id !== idAEliminar);
+    this.usuarioSeleccionado = null;
+    this.cerrarModal();
+    this.cdr.detectChanges();
+
+    try {
+      await this.googleService.deleteUsuario(idAEliminar);
+      console.log('Usuario eliminado de la base de datos');
+    } catch (error) {
+      console.error('Error al eliminar en segundo plano:', error);
+      // Opcional: Podrías alertar que hubo un problema técnico aunque visualmente se borró
+    } finally {
+      this.isDeleting = false;
+      this.cdr.detectChanges();
     }
   }
 
   cerrarModal() {
     this.mostrarModalEdit = false;
+    this.mostrarModalDelete = false;
     this.isSaving = false;
+    this.isDeleting = false;
   }
 
   inicializarCalendario() {
