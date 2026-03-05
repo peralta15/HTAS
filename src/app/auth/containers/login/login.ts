@@ -185,6 +185,20 @@ export class Login {
     }
   }
 
+  async reenviarPin() {
+    this.loading = true;
+    this.cdr.detectChanges();
+    try {
+      await this.googleService.reenviarPin(this.usuarioUidTemporal);
+      this.openModal('PIN Reenviado', 'Se ha enviado un nuevo código a tu correo.', 'modal-success');
+    } catch (error: any) {
+      this.openModal('Error', error.message, 'modal-error');
+    } finally {
+      this.loading = false;
+      this.cdr.detectChanges();
+    }
+  }
+
   onKeyPress(event: KeyboardEvent): boolean { return soloLetras(event); }
   soloNumeros(event: KeyboardEvent): boolean {
     const charCode = event.key.charCodeAt(0);

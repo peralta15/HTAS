@@ -37,7 +37,6 @@
                                 </button>
                                 <div class="user-info-stack">
                                     <span class="user-name-main">{{u.NombreCompleto || u.nombre}}</span>
-                                    <span class="user-id-small">ID: {{u.id | slice:0:8}}...</span>
                                 </div>
                             </div>
                         </td>
@@ -73,10 +72,10 @@
                             <div class="detail-content">
                                 <div class="detail-cards-grid">
                                     <div class="detail-card-item">
-                                        <div class="detail-icon"><i class="bi bi-key"></i></div>
+                                        <div class="detail-icon"><i class="bi bi-person"></i></div>
                                         <div class="detail-data">
-                                            <label>UID Completo</label>
-                                            <span class="uid-text-display">{{u.id || u.uid}}</span>
+                                            <label>Nombre Completo</label>
+                                            <span class="uid-text-display">{{u.NombreCompleto || u.nombre}}</span>
                                         </div>
                                     </div>
                                     <div class="detail-card-item">

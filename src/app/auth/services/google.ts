@@ -101,6 +101,22 @@ export class GoogleService {
     return await updateDoc(userRef, { pinVerificado: true });
   }
 
+  async reenviarPin(uid: string) {
+    const userRef = doc(this.firestore, `usuarios/${uid}`);
+    const docSnap = await getDoc(userRef);
+
+    if (docSnap.exists()) {
+      const userData = docSnap.data() as any;
+      await this.enviarEmailPin(
+        userData.correo || userData.email,
+        userData.nombre || userData.NombreCompleto || 'Usuario',
+        userData.pin
+      );
+    } else {
+      throw new Error('Usuario no encontrado para reenviar el PIN.');
+    }
+  }
+
   async getUsuarios() {
     const usersRef = collection(this.firestore, 'usuarios');
     const snapshot = await getDocs(usersRef);

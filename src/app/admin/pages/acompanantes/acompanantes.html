@@ -36,7 +36,6 @@
                         <th>Nombre</th>
                         <th>Correo</th>
                         <th>Rol</th>
-                        <th>Teléfono</th>
                         <th>Asignación</th>
                         <th>Estado</th>
                     </tr>
@@ -52,7 +51,6 @@
                                 </button>
                                 <div class="user-info-stack">
                                     <span class="user-name-main">{{u.NombreCompleto || u.nombre}}</span>
-                                    <span class="user-id-small">ID: {{u.id | slice:0:8}}...</span>
                                 </div>
                             </div>
                         </td>
@@ -68,12 +66,7 @@
                                 {{u.rol || u.Rol || 'Paciente'}}
                             </span>
                         </td>
-                        <td>
-                            <div class="phone-cell">
-                                <i class="bi bi-telephone me-2 text-muted"></i>
-                                {{u.telefono || 'No reg.'}}
-                            </div>
-                        </td>
+
                         <td>
                             <div class="date-cell">
                                 <i class="bi bi-calendar-event me-2 text-muted"></i>
@@ -90,14 +83,14 @@
                     </tr>
                     @if (expandedId === u.id) {
                     <tr class="detail-row">
-                        <td colspan="6">
+                        <td colspan="5">
                             <div class="detail-content">
                                 <div class="detail-cards-grid">
                                     <div class="detail-card-item">
-                                        <div class="detail-icon"><i class="bi bi-key"></i></div>
+                                        <div class="detail-icon"><i class="bi bi-person"></i></div>
                                         <div class="detail-data">
-                                            <label>UID Completo</label>
-                                            <span class="uid-text-display">{{u.id || u.uid}}</span>
+                                            <label>Nombre Completo</label>
+                                            <span class="uid-text-display">{{u.NombreCompleto || u.nombre}}</span>
                                         </div>
                                     </div>
                                     <div class="detail-card-item">

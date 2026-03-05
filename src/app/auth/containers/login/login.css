@@ -1022,3 +1022,29 @@ input[type="date"] {
   z-index: 9999999 !important;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
 }
+
+.resend-pin-text {
+  margin-top: 15px;
+  font-size: 0.9rem;
+  color: #666;
+  text-align: center;
+}
+
+.resend-pin-text a {
+  color: #b0001e;
+  text-decoration: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.resend-pin-text a:hover {
+  color: #8a0017;
+  text-decoration: underline;
+}
+
+.resend-pin-text a.disabled {
+  color: #ccc;
+  cursor: not-allowed;
+  pointer-events: none;
+}

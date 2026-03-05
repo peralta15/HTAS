@@ -26,6 +26,12 @@
           <button type="button" class="button google-style" (click)="verificarPin()">
             <i class="bi bi-shield-check"></i> Verificar y Entrar
           </button>
+          <p class="resend-pin-text" *ngIf="esperandoPin">
+            ¿No recibiste el código?
+            <a (click)="reenviarPin()" [class.disabled]="loading">
+              {{ loading ? 'Reenviando...' : 'Reenviar PIN' }}
+            </a>
+          </p>
           <p class="mobile-toggle"><a (click)="esperandoPin = false">Intentar con otra cuenta</a></p>
         </div>
 
