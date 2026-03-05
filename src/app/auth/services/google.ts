@@ -34,33 +34,42 @@ export class GoogleService {
 
     await setDoc(userRef, payload);
 
-    // Configuración EmailJS
+    // Enviar el PIN por correo al registrarse
+    await this.enviarEmailPin(
+      user.email!,
+      datosFormulario.nombre || datosFormulario.NombreCompleto || 'Usuario',
+      datosFormulario.pin
+    );
+
+    return user;
+  }
+
+  private async enviarEmailPin(email: string, nombre: string, pin: string) {
     const ahora = new Date();
     const expiracion = new Date(ahora.getTime() + 25 * 60000);
     const horaFormateada = expiracion.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
     const templateParams = {
-      pin_seguridad: datosFormulario.pin,
+      pin_seguridad: pin,
       fecha: horaFormateada,
-      to_email: user.email,
-      nombre_usuario: datosFormulario.nombre || datosFormulario.NombreCompleto
+      to_email: email,
+      nombre_usuario: nombre
     };
 
     try {
       await emailjs.send('service_tqqxijq', 'template_8gjdtqx', templateParams);
-      console.log('Correo enviado');
+      console.log(`PIN enviado exitosamente a: ${email}`);
     } catch (error) {
-      console.error('Error EmailJS:', error);
+      console.error('Error al enviar el PIN con EmailJS:', error);
     }
-
-    return user;
   }
 
   async loginWithGoogle() {
     const provider = new GoogleAuthProvider();
     const result = await signInWithPopup(this.auth, provider);
+    const user = result.user;
 
-    const userRef = doc(this.firestore, `usuarios/${result.user.uid}`);
+    const userRef = doc(this.firestore, `usuarios/${user.uid}`);
     const docSnap = await getDoc(userRef);
 
     if (!docSnap.exists()) {
@@ -68,10 +77,22 @@ export class GoogleService {
       throw new Error('No tienes una cuenta creada. Por favor, regístrate primero.');
     }
 
+    const userData = docSnap.data() as any;
+
+    // Si el usuario existe pero no ha verificado su PIN, se lo reenviamos automáticamente
+    if (userData.pinVerificado === false) {
+      console.log('Usuario no verificado, re-enviando PIN...');
+      await this.enviarEmailPin(
+        user.email!,
+        userData.nombre || userData.NombreCompleto || 'Usuario',
+        userData.pin
+      );
+    }
+
     // Retornamos todo el objeto para que el componente valide el PIN
     return {
-      uid: result.user.uid,
-      ...docSnap.data()
+      uid: user.uid,
+      ...userData
     };
   }
 
