@@ -147,16 +147,32 @@
         <hr>
         <div class="form-grid">
             <div class="form-group">
-                <label>Nombre Completo</label>
-                <input type="text" [(ngModel)]="usuarioSeleccionado.nombre">
+                <label>Nombre(s)</label>
+                <input type="text" required maxlength="40" pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+"
+                    oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ ]/g, '')"
+                    [(ngModel)]="usuarioSeleccionado.tempNombre">
+            </div>
+            <div class="form-group">
+                <label>Apellido Paterno</label>
+                <input type="text" required maxlength="30" pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+"
+                    oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ ]/g, '')"
+                    [(ngModel)]="usuarioSeleccionado.tempApellidoPaterno">
+            </div>
+            <div class="form-group">
+                <label>Apellido Materno</label>
+                <input type="text" required maxlength="30" pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+"
+                    oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ ]/g, '')"
+                    [(ngModel)]="usuarioSeleccionado.tempApellidoMaterno">
             </div>
             <div class="form-group">
                 <label>Correo Electrónico</label>
-                <input type="email" [(ngModel)]="usuarioSeleccionado.correo">
+                <input type="email" maxlength="60" [(ngModel)]="usuarioSeleccionado.correo">
             </div>
             <div class="form-group">
                 <label>Teléfono</label>
-                <input type="text" [(ngModel)]="usuarioSeleccionado.telefono" placeholder="Ej: +52 55 1234 5678">
+                <input type="text" required maxlength="10" pattern="[0-9]*"
+                    oninput="this.value = this.value.replace(/[^0-9]/g, '')" [(ngModel)]="usuarioSeleccionado.telefono"
+                    placeholder="Ej: +52 55 1234 5678">
             </div>
             <div class="form-group">
                 <label>Fecha de Asignación</label>

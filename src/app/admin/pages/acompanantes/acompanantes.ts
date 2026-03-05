@@ -73,6 +73,27 @@ export class Acompanantes implements OnInit {
 
   seleccionar(u: any) {
     this.usuarioSeleccionado = { ...u }; // Creamos una copia para editar
+
+    // Separar el nombre completo en partes
+    const nombreCompleto = u.NombreCompleto || u.nombre || '';
+    const partes = nombreCompleto.trim().split(/\s+/);
+
+    if (partes.length >= 3) {
+      // Caso ideal: Nombre(s) ApellidoPaterno ApellidoMaterno
+      this.usuarioSeleccionado.tempApellidoMaterno = partes.pop();
+      this.usuarioSeleccionado.tempApellidoPaterno = partes.pop();
+      this.usuarioSeleccionado.tempNombre = partes.join(' ');
+    } else if (partes.length === 2) {
+      // Caso: Nombre Apellido
+      this.usuarioSeleccionado.tempNombre = partes[0];
+      this.usuarioSeleccionado.tempApellidoPaterno = partes[1];
+      this.usuarioSeleccionado.tempApellidoMaterno = '';
+    } else {
+      // Caso: Solo un nombre o vacío
+      this.usuarioSeleccionado.tempNombre = nombreCompleto;
+      this.usuarioSeleccionado.tempApellidoPaterno = '';
+      this.usuarioSeleccionado.tempApellidoMaterno = '';
+    }
   }
 
   toggleExpand(id: string, event: Event) {
@@ -93,7 +114,18 @@ export class Acompanantes implements OnInit {
 
     this.isSaving = true;
     try {
-      const { id, ...data } = this.usuarioSeleccionado;
+      // Reconstruir el nombre completo
+      const nombre = (this.usuarioSeleccionado.tempNombre || '').trim();
+      const apPaterno = (this.usuarioSeleccionado.tempApellidoPaterno || '').trim();
+      const apMaterno = (this.usuarioSeleccionado.tempApellidoMaterno || '').trim();
+
+      const nombreCompleto = [nombre, apPaterno, apMaterno].filter(p => p).join(' ');
+
+      this.usuarioSeleccionado.nombre = nombre;
+      this.usuarioSeleccionado.NombreCompleto = nombreCompleto;
+
+      // Limpiar campos temporales antes de guardar en la DB
+      const { id, tempNombre, tempApellidoPaterno, tempApellidoMaterno, ...data } = this.usuarioSeleccionado;
       await this.googleService.updateUsuario(id, data);
 
       // Actualizar localmente
