@@ -30,7 +30,7 @@ ul {
     justify-content: space-between;
     align-items: center;
     padding: 1rem 5%;
-    background: linear-gradient(45deg, #d50032, #b0001e);
+    background: linear-gradient(45deg, #8B0015);
     color: #ffffff;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     position: fixed;
