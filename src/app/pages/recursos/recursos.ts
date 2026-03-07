@@ -1,13 +1,11 @@
 import { Component, ElementRef, ViewChild, ViewChildren, QueryList, AfterViewInit, OnDestroy, HostListener, Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser, CommonModule } from '@angular/common';
-import { Headermenu } from "../../template/headermenu/headermenu";
-import { Footer } from "../../template/footer/footer";
 import * as THREE from 'three';
 
 @Component({
   selector: 'app-recursos',
   standalone: true,
-  imports: [Headermenu, Footer, CommonModule],
+  imports: [CommonModule],
   templateUrl: './recursos.html',
   styleUrl: './recursos.css',
 })

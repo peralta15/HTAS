@@ -2,11 +2,15 @@ import { Component, HostListener, AfterViewInit, ElementRef, QueryList, ViewChil
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Headermenu } from "../template/headermenu/headermenu";
 import { Footer } from "../template/footer/footer";
+import { Pagos } from "../pages/pagos/pagos";
+import { Contacto } from "../pages/contacto/contacto";
+import { Nosotros } from "../pages/nosotros/nosotros";
+import { Recursos } from "../pages/recursos/recursos";
 
 @Component({
   selector: 'app-landing',
   standalone: true,
-  imports: [CommonModule, Headermenu, Footer],
+  imports: [CommonModule, Headermenu, Footer, Pagos, Contacto, Nosotros, Recursos],
   templateUrl: './landing.html',
   styleUrl: './landing.css',
 })
@@ -147,5 +151,20 @@ export class Landing implements AfterViewInit {
 
   get screenTransform() {
     return `translateY(-${this.activeScreenIndex * 33.333}%)`;
+  }
+
+  /**
+   * Método para hacer scroll suave a una sección específica
+   * @param sectionId El ID del elemento al que queremos ir
+   */
+  scrollToSection(sectionId: string) {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+        inline: 'nearest'
+      });
+    }
   }
 }

@@ -1,12 +1,10 @@
 import { Component, AfterViewInit, ElementRef, QueryList, ViewChildren, Inject, PLATFORM_ID } from '@angular/core';
-import { CommonModule, isPlatformBrowser } from '@angular/common'; // Añadido
-import { Headermenu } from '../../template/headermenu/headermenu';
-import { Footer } from "../../template/footer/footer";
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-nosotros',
   standalone: true,
-  imports: [CommonModule, Headermenu, Footer],
+  imports: [CommonModule],
   templateUrl: './nosotros.html',
   styleUrl: './nosotros.css',
 })

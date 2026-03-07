@@ -1,12 +1,10 @@
 import { Component, AfterViewInit, ViewChildren, QueryList, ElementRef, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { Headermenu } from "../../template/headermenu/headermenu";
-import { Footer } from "../../template/footer/footer";
 
 @Component({
   selector: 'app-pagos',
   standalone: true,
-  imports: [CommonModule, Headermenu, Footer],
+  imports: [CommonModule],
   templateUrl: './pagos.html',
   styleUrl: './pagos.css',
 })

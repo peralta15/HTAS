@@ -7,12 +7,17 @@
     </div>
     <nav class="main-nav" [class.active]="isMenuOpen">
         <ul>
-            <li><a routerLink="/landing" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"
-                    (click)="closeMenu()">Inicio</a></li>
-            <li><a routerLink="/nosotros" routerLinkActive="active" (click)="closeMenu()">Conocenos</a></li>
-            <li><a routerLink="/recursos" routerLinkActive="active" (click)="closeMenu()">Recursos</a></li>
-            <li><a routerLink="/contactos" routerLinkActive="active" (click)="closeMenu()">Contactos</a></li>
-            <li><a routerLink="/pagos" routerLinkActive="active" (click)="closeMenu()">Pagos</a></li>
+            <li><a style="cursor: pointer;" (click)="scrollToFragment('inicio')"
+                    [class.active]="activeSection === 'inicio'">Inicio</a></li>
+            <li><a style="cursor: pointer;" (click)="scrollToFragment('nosotros')"
+                    [class.active]="activeSection === 'nosotros'">Conocenos</a></li>
+            <li><a style="cursor: pointer;" (click)="scrollToFragment('recursos')"
+                    [class.active]="activeSection === 'recursos'">Recursos</a></li>
+            <li><a style="cursor: pointer;" (click)="scrollToFragment('pagos')"
+                    [class.active]="activeSection === 'pagos'">Pagos</a>
+            </li>
+            <li><a style="cursor: pointer;" (click)="scrollToFragment('contacto')"
+                    [class.active]="activeSection === 'contacto'">Contactos</a></li>
             <li><a routerLink="/login" routerLinkActive="active" (click)="closeMenu()">Iniciar Sesión</a></li>
         </ul>
     </nav>

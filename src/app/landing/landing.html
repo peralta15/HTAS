@@ -1,17 +1,6 @@
 <app-headermenu></app-headermenu>
 
 <div class="landing-container">
-  <div class="hero-wrapper">
-    <div class="hero-section">
-      <h1 class="hero-title" #animateUp>Toma el control de tu salud cardiovascular.</h1>
-      <p class="hero-description" #animateUp>
-        La herramienta integral diseñada para el manejo inteligente de la hipertensión arterial.
-        Empodérate, monitorea tus signos vitales y vive con tranquilidad.
-      </p>
-    </div>
-    <div class="hero-layer hero-layer--1"></div>
-    <div class="hero-layer hero-layer--2"></div>
-  </div>
 
   <div id="appmovil" class="app-promo-section">
     <!-- Background Decor -->
@@ -122,59 +111,6 @@
     </div>
   </section>
 
-  <div class="interactive-section">
-    <div class="decor-section-icon icon-bg-left"><i class="bi bi-heart-pulse"></i></div>
-    <div class="decor-section-icon icon-bg-right"><i class="bi bi-clipboard2-pulse"></i></div>
-    <div class="section-header">
-      <h2 #animateUp>Control Integral de tu Bienestar</h2>
-    </div>
-
-    <div class="dashboard-wrapper">
-      <!-- Menú Lateral de Selectores -->
-      <div class="dashboard-nav">
-        @for (item of modalData; track $index) {
-        <div class="nav-item" [class.active]="activeFeatureIndex === $index" (click)="setActiveFeature($index)"
-          #animateUp>
-          <div class="nav-indicator"></div>
-          <span class="nav-text">{{ item.title }}</span>
-          <i class="bi bi-chevron-right nav-arrow"></i>
-        </div>
-        }
-      </div>
-
-      <div class="dashboard-display">
-        @if (modalData[activeFeatureIndex]; as selected) {
-        <div class="display-content">
-          <div class="display-header">
-            <span class="category-badge">BIENESTAR HTAS</span>
-            <h2>{{ selected.title }}</h2>
-          </div>
-
-          <div class="display-body">
-            <p class="main-text">{{ selected.description }}</p>
-
-            <div class="features-grid">
-              <div class="highlight-box">
-                <h4>{{ selected.additionalTitle }}</h4>
-                <p>{{ selected.additionalText }}</p>
-              </div>
-
-              <ul class="benefit-list">
-                @for (feature of selected.features; track feature) {
-                <li>
-                  <i class="bi bi-check-circle-fill"></i>
-                  <span>{{ feature }}</span>
-                </li>
-                }
-              </ul>
-            </div>
-          </div>
-        </div>
-        }
-      </div>
-    </div>
-  </div>
-
   <div id="diseño" class="gallery-section">
     <div class="section-header">
       <h2 #animateUp>Nuestra Tecnología</h2>
@@ -223,53 +159,20 @@
     </div>
   </div>
 
-  <div class="ecosystem-container">
-    <div class="section-header">
-      <h2>Ecosistema de Cuidado Integral</h2>
-      <div class="underline"></div>
-    </div>
+  <section id="nosotros">
+    <app-nosotros></app-nosotros>
+  </section>
 
-    <div class="cards-wrapper">
-      <div class="eco-card">
-        <div class="icon-circle">
-          <i class="bi bi-activity"></i>
-        </div>
-        <div class="card-content">
-          <h3>MONITOREO</h3>
-          <p>Implementamos un sistema de captura constante que registra tu presión arterial y frecuencia cardíaca en
-            tiempo real. Gracias a nuestra pulsera inteligente de alta precisión, los datos se sincronizan
-            automáticamente, permitiendo detectar irregularidades antes de que se conviertan en problemas mayores.</p>
-        </div>
-        <div class="card-footer-line"></div>
-      </div>
+  <section id="recursos">
+    <app-recursos></app-recursos>
+  </section>
 
-      <div class="eco-card">
-        <div class="icon-circle">
-          <i class="bi bi-bar-chart-line"></i>
-        </div>
-        <div class="card-content">
-          <h3>ANÁLISIS</h3>
-          <p>Nuestros algoritmos de inteligencia artificial procesan grandes volúmenes de datos para generar reportes
-            clínicos detallados. Esta herramienta facilita la labor del profesional sanitario, ofreciendo diagnósticos
-            más precisos y una visión clara de la evolución del paciente mediante gráficas intuitivas y alertas
-            preventivas.</p>
-        </div>
-        <div class="card-footer-line"></div>
-      </div>
+  <section id="pagos">
+    <app-pagos></app-pagos>
+  </section>
 
-      <div class="eco-card">
-        <div class="icon-circle">
-          <i class="bi bi-heart-pulse"></i>
-        </div>
-        <div class="card-content">
-          <h3>BIENESTAR</h3>
-          <p>No solo medimos, también educamos. Fomentamos la adherencia al tratamiento médico y promovemos hábitos
-            saludables personalizados. Nuestro enfoque integral busca reducir los riesgos cardiovasculares a largo
-            plazo, empoderando al usuario con conocimientos clave para una vida plena y equilibrada.</p>
-        </div>
-        <div class="card-footer-line"></div>
-      </div>
-    </div>
-  </div>
+  <section id="contacto">
+    <app-contacto></app-contacto>
+  </section>
 
   <app-footer></app-footer>
