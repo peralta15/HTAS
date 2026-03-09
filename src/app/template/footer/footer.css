@@ -1,5 +1,5 @@
 .main-footer {
-  background: linear-gradient(135deg, #8b0018 0%, #b0001e 100%);
+  background: #8B0015;
   color: #ffffff;
   padding: 60px 5% 0;
   font-family: 'Montserrat', sans-serif;
@@ -237,7 +237,7 @@
 
 .blog-item:hover .blog-thumb {
   background: white;
-  color: #b0001e;
+  color: #8B0015;
   transform: scale(1.1);
 }
 
