@@ -51,11 +51,12 @@
     <div class="footer-column">
       <h3 class="footer-title">Navegación</h3>
       <ul class="footer-nav">
-        <li><a [routerLink]="['/nosotros']" fragment="conocenos">Conocenos</a></li>
-        <li><a [routerLink]="['/landing']" fragment="dieño">Diseños</a></li>
-        <li><a [routerLink]="['/nosotros']" fragment="enfoque">Enfoque</a></li>
-        <li><a [routerLink]="['/recursos']" fragment="appweb">Proyectos</a></li>
-        <li><a [routerLink]="['/landing']" fragment="appmovil">Aplicacion Móvil</a></li>
+        <li><a style="cursor: pointer;" (click)="scrollToFragment('inicio')">Inicio</a></li>
+        <li><a style="cursor: pointer;" (click)="scrollToFragment('nosotros')">Conocenos</a></li>
+        <li><a style="cursor: pointer;" (click)="scrollToFragment('recursos')">Recursos</a></li>
+        <li><a style="cursor: pointer;" (click)="scrollToFragment('pagos')">Pagos</a></li>
+        <li><a style="cursor: pointer;" (click)="scrollToFragment('contacto')">Contactos</a></li>
+        <li><a routerLink="/login">Iniciar Sesión</a></li>
       </ul>
     </div>
 
