@@ -50,7 +50,7 @@ section[id] {
 
 .content-text h2 {
     font-size: 2.4rem;
-    color: #b0001e;
+    color: #8B0015;
     margin-bottom: 1.8rem;
     font-weight: 700;
     line-height: 1.3;
@@ -64,7 +64,7 @@ section[id] {
     position: absolute;
     width: 80px;
     height: 4px;
-    background: linear-gradient(90deg, #b0001e, #ff6b6b);
+    background: linear-gradient(90deg, #8B0015, #8B0015);
     bottom: 0;
     left: 0;
     border-radius: 2px;
@@ -111,12 +111,12 @@ section[id] {
 
 /* ===== APP PROMO SECTION ===== */
 .app-promo-section {
-    padding: 8rem 5% 5rem;
+    padding: 5rem 5% 2rem;
     /* Standardized top padding while keeping content readable */
     background: radial-gradient(circle at 10% 20%, rgba(176, 0, 30, 0.03) 0%, transparent 50%),
         radial-gradient(circle at 90% 80%, rgba(30, 55, 153, 0.03) 0%, transparent 50%),
         #ffffff;
-    margin-top: -80px;
+    margin-top: -40px;
     /* Pulls slightly more for integration */
     margin-bottom: 0rem;
     position: relative;
@@ -148,7 +148,7 @@ section[id] {
 .promo-badge {
     display: inline-block;
     background: rgba(176, 0, 30, 0.1);
-    color: #b0001e;
+    color: #8B0015;
     padding: 6px 15px;
     border-radius: 50px;
     font-size: 0.75rem;
@@ -167,7 +167,7 @@ section[id] {
     display: flex;
     align-items: center;
     gap: 12px;
-    background: linear-gradient(135deg, #b0001e 0%, #d40024 100%);
+    background: linear-gradient(135deg, #8B0015 0%, #8B0015 100%);
     color: white;
     padding: 16px 32px;
     border-radius: 50px;
@@ -179,7 +179,7 @@ section[id] {
 
 .download-btn:hover {
     transform: translateY(-5px) scale(1.05);
-    background: linear-gradient(135deg, #d40024 0%, #b0001e 100%);
+    background: linear-gradient(135deg, #8B0015 0%, #8B0015 100%);
     box-shadow: 0 20px 40px rgba(176, 0, 30, 0.4);
 }
 
@@ -201,8 +201,10 @@ section[id] {
     min-width: 450px;
     /* Increased to fit labels */
     position: relative;
-    padding: 60px;
+    padding: 20px;
     z-index: 5;
+    transform: scale(0.9);
+    transform-origin: center right;
 }
 
 .phone-mockup {
@@ -252,7 +254,7 @@ section[id] {
     transform: scale(1.05) translateX(5px);
     background: #ffffff;
     box-shadow: 0 20px 45px rgba(176, 0, 30, 0.15);
-    border-color: #b0001e;
+    border-color: #8B0015;
 }
 
 @keyframes labelEnter {
@@ -270,7 +272,7 @@ section[id] {
 .label-icon {
     width: 40px;
     height: 40px;
-    background: linear-gradient(135deg, #b0001e 0%, #d40024 100%);
+    background: linear-gradient(135deg, #8B0015 0%, #8B0015 100%);
     border-radius: 12px;
     display: flex;
     align-items: center;
@@ -370,7 +372,7 @@ section[id] {
     height: 14px;
     border-radius: 50%;
     background: #fff;
-    border: 3px solid #b0001e;
+    border: 3px solid #8B0015;
     cursor: pointer;
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     padding: 0;
@@ -384,7 +386,7 @@ section[id] {
     left: -4px;
     right: -4px;
     bottom: -4px;
-    border: 1px solid #b0001e;
+    border: 1px solid #8B0015;
     border-radius: 50%;
     opacity: 0;
     transition: all 0.3s ease;
@@ -404,7 +406,7 @@ section[id] {
 }
 
 .mockup-dot.active {
-    background: #b0001e;
+    background: #8B0015;
     transform: scale(1.4);
     box-shadow: 0 0 15px rgba(176, 0, 30, 0.6);
 }
@@ -542,7 +544,7 @@ section[id] {
 
 .section-header h2 {
     font-size: 2.4rem;
-    color: #b0001e;
+    color: #8B0015;
     font-weight: 700;
     position: relative;
     display: inline-block;
@@ -554,7 +556,7 @@ section[id] {
     position: absolute;
     width: 80px;
     height: 4px;
-    background: linear-gradient(90deg, #b0001e, #ff6b6b);
+    background: linear-gradient(90deg, #8B0015, #8B0015);
     bottom: 0;
     left: 50%;
     transform: translateX(-50%);
@@ -602,7 +604,7 @@ section[id] {
     top: 0;
     width: 6px;
     height: 100%;
-    background: #b0001e;
+    background: #8B0015;
     transform: scaleY(0);
     transition: transform 0.4s ease;
 }
@@ -610,7 +612,7 @@ section[id] {
 .nav-item.active {
     background: rgba(255, 255, 255, 0.8);
     border-color: rgba(176, 0, 30, 0.3);
-    color: #b0001e;
+    color: #8B0015;
     box-shadow: 0 10px 25px rgba(176, 0, 30, 0.1);
     transform: translateX(10px);
 }
@@ -698,7 +700,7 @@ section[id] {
 }
 
 .category-badge {
-    color: #b0001e;
+    color: #8B0015;
     font-weight: 800;
     font-size: 0.8rem;
     letter-spacing: 2px;
@@ -731,7 +733,7 @@ section[id] {
     backdrop-filter: blur(5px);
     padding: 1.8rem;
     border-radius: 20px;
-    border-left: 4px solid #b0001e;
+    border-left: 4px solid #8B0015;
 }
 
 .highlight-box h4 {
@@ -763,7 +765,7 @@ section[id] {
 }
 
 .benefit-list li i {
-    color: #b0001e;
+    color: #8B0015;
     font-size: 1.2rem;
 }
 
@@ -928,14 +930,14 @@ section[id] {
 
 .pill:hover {
     background-color: #ffffff;
-    border-color: #b0001e;
-    color: #b0001e;
+    border-color: #8B0015;
+    color: #8B0015;
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(176, 0, 30, 0.1);
 }
 
 .pill.active {
-    background: linear-gradient(135deg, #b0001e 0%, #d50032 100%);
+    background: linear-gradient(135deg, #8B0015 0%, #8B0015 100%);
     color: white;
     border-color: transparent;
     font-weight: 600;
@@ -1028,7 +1030,7 @@ section[id] {
 }
 
 .dot.active {
-    background-color: #b0001e;
+    background-color: #8B0015;
     transform: scale(1.2);
 }
 
@@ -1087,7 +1089,7 @@ section[id] {
 .ellipses__outer--thick {
     width: 98%;
     height: 98%;
-    border-color: #b0001e transparent;
+    border-color: #8B0015 transparent;
     border-width: 2px;
     transform: rotate(-45deg);
     animation: ellipsesRotate 12s ease-in-out infinite;
@@ -1097,7 +1099,7 @@ section[id] {
 .ellipses__orbit {
     width: 2.2rem;
     height: 2.2rem;
-    border: 1px solid #b0001e;
+    border: 1px solid #8B0015;
     top: 10%;
     right: 15%;
 }
@@ -1107,7 +1109,7 @@ section[id] {
     width: 0.7rem;
     height: 0.7rem;
     border-radius: 50%;
-    background-color: #b0001e;
+    background-color: #8B0015;
     position: absolute;
     top: 50%;
     left: 50%;
@@ -1269,7 +1271,7 @@ section[id] {
 }
 
 .feature-mini-box h3 {
-    color: #b0001e;
+    color: #8B0015;
     font-size: 1rem;
     margin-bottom: 5px;
 }
@@ -1321,7 +1323,7 @@ section[id] {
     width: 10px;
     height: 10px;
     background: #fff;
-    border: 2px solid #b0001e;
+    border: 2px solid #8B0015;
     border-radius: 50%;
     top: -5px;
 }
@@ -1344,7 +1346,7 @@ section[id] {
 
 .feature-card:hover .pointer-line {
     width: 120px !important;
-    background: #b0001e !important;
+    background: #8B0015 !important;
 }
 
 .left .feature-card .pointer-line {
@@ -1440,7 +1442,7 @@ section[id] {
 
     10% {
         width: 120px;
-        background: #b0001e;
+        background: #8B0015;
         right: -120px;
     }
 }
@@ -1457,7 +1459,7 @@ section[id] {
 
     10% {
         width: 120px;
-        background: #b0001e;
+        background: #8B0015;
         left: -120px;
     }
 }
@@ -1512,17 +1514,17 @@ section[id] {
 }
 
 .modal-content::-webkit-scrollbar-thumb {
-    background: #b0001e;
+    background: #8B0015;
     border-radius: 4px;
 }
 
 .modal-content::-webkit-scrollbar-thumb:hover {
-    background: #b0001e;
+    background: #8B0015;
 }
 
 .modal-scrollable {
     scrollbar-width: thin;
-    scrollbar-color: #b0001e #f1f1f1;
+    scrollbar-color: #8B0015 #f1f1f1;
 }
 
 /* ===== ANIMATIONS ===== */

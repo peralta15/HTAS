@@ -1,11 +1,12 @@
 .pricing-container {
-    padding: 40px 20px 40px;
+    padding: 0px;
     /* Reduced top padding from 90px */
     /* Reduced bottom padding from 100px */
     display: flex;
     flex-direction: column;
     align-items: center;
     color: #333;
+    background-color: #4D000D;
 }
 
 .pricing-grid {
@@ -16,7 +17,7 @@
     max-width: 1100px;
     justify-content: center;
     position: relative;
-    padding: 60px 0 20px;
+    padding: 20px 0 20px;
     /* Reduced top padding from 60px */
 }
 
@@ -46,7 +47,7 @@
 .pricing-card.max {
     background: #fffafa;
     /* Very light red tint */
-    border: 2px solid #b0001e;
+    border: 2px solid #8B0015;
 }
 
 .pricing-card.max::before {
@@ -54,7 +55,7 @@
     position: absolute;
     top: 20px;
     right: -45px;
-    background: #b0001e;
+    background: #8B0015;
     color: white;
     padding: 10px 40px;
     font-size: 0.7rem;
@@ -66,11 +67,11 @@
     font-size: 2.2rem;
     font-weight: 800;
     margin-bottom: 10px;
-    color: #b0001e;
+    color: #8B0015;
 }
 
 .max .plan-name {
-    color: #b0001e;
+    color: #8B0015;
 }
 
 .plan-description {
@@ -88,7 +89,7 @@
     display: block;
     font-size: 3rem;
     font-weight: 900;
-    color: #b0001e;
+    color: #8B0015;
     letter-spacing: -1px;
 }
 
@@ -112,7 +113,7 @@
 }
 
 .pro .cta-button {
-    background: #b0001e;
+    background: #8B0015;
     color: #fff;
 }
 
@@ -123,7 +124,7 @@
 }
 
 .max .cta-button {
-    background: linear-gradient(45deg, #b0001e, #7a0015);
+    background: linear-gradient(45deg, #8B0015, #690014);
     color: #fff;
     box-shadow: 0 10px 20px rgba(176, 0, 30, 0.3);
 }
@@ -152,7 +153,7 @@
 
 .feature-list li i {
     font-size: 1.3rem;
-    color: #b0001e;
+    color: #8B0015;
     font-weight: 900;
 }
 
@@ -199,14 +200,14 @@
     transform: scale(1.05) translateY(-5px) !important;
     background: #ffffff;
     box-shadow: 0 20px 45px rgba(176, 0, 30, 0.15);
-    border-color: #b0001e;
+    border-color: #8B0015;
 }
 
 .label-icon {
     width: 46px;
     /* Slightly larger */
     height: 46px;
-    background: linear-gradient(135deg, #b0001e 0%, #d40024 100%);
+    background: linear-gradient(135deg, #8B0015 0%, #690014 100%);
     border-radius: 12px;
     display: flex;
     align-items: center;

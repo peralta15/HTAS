@@ -32,7 +32,7 @@ body {
     position: relative;
     width: 100%;
     /* Calculamos el alto restando el header y un poco del breadcrumb */
-    height: 100%;
+    height: calc(100vh - 60px);
     overflow: hidden;
 }
 
@@ -43,6 +43,7 @@ body {
     width: 100%;
     height: 100%;
     z-index: 1;
+    transform: translateY(-80px);
 }
 
 #ui-layer {
@@ -58,7 +59,7 @@ body {
 
 .slide-content {
     position: absolute;
-    top: 20%;
+    top: 10%;
     left: 8%;
     width: 35%;
     max-width: 480px;
@@ -83,6 +84,37 @@ body {
     /* Sombra suave */
 }
 
+.nav-dots {
+    position: absolute;
+    bottom: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 15px;
+    z-index: 10;
+    pointer-events: auto;
+}
+
+.dot {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background-color: rgba(148, 121, 121, 0.418);
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.dot.active {
+    background-color: #8B0015;
+    border-color: rgba(255, 255, 255, 0.8);
+    transform: scale(1.2);
+}
+
+.dot:hover {
+    background-color: rgba(176, 0, 30, 0.7);
+}
+
 .slide-content.active {
     opacity: 1;
     transform: translateY(0);
@@ -103,7 +135,7 @@ h1 {
     font-size: 0.7rem;
     text-transform: uppercase;
     letter-spacing: 3px;
-    color: #b0001e;
+    color: #8B0015;
     font-weight: 700;
     margin-bottom: 0.5rem;
     display: block;
@@ -366,7 +398,7 @@ h1 {
 
 /* ===== MARQUEE PULSO REALTIME ===== */
 .marquee-footer-ekg {
-    background: radial-gradient(circle at center, #b0001e 0%, #b0001e 100%);
+    background: radial-gradient(circle at center, #8B0015 0%, #8B0015 100%);
     height: 80px;
     width: 100%;
     overflow: hidden;
@@ -445,7 +477,7 @@ h1 {
 
 .main-wrapper {
     background-color: #f4f4f4;
-    padding: 50px 20px;
+    padding: 20px 20px;
     border-radius: 20px;
     display: flex;
     justify-content: center;
@@ -526,7 +558,7 @@ h1 {
 }
 
 .card-body h3 {
-    color: #b0001e;
+    color: #8B0015;
     /* Rojo HTAS */
     font-weight: 800;
     font-size: 1.35rem;
@@ -545,7 +577,7 @@ h1 {
 
 /* --- BOTÓN ACCIÓN --- */
 .btn-action {
-    background-color: #b0001e;
+    background-color: #8B0015;
     color: #ffffff;
     border: none;
     padding: 12px 32px;
@@ -560,7 +592,7 @@ h1 {
 }
 
 .btn-action:hover {
-    background-color: #8b0018;
+    background-color: #8B0015;
     transform: scale(1.05);
     box-shadow: 0 8px 25px rgba(176, 0, 30, 0.4);
 }
@@ -597,7 +629,7 @@ h1 {
     border-color: rgba(176, 0, 30, 0.2);
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
     background: #ffffff;
-    padding-bottom: 35px;
+    padding-bottom: 30px;
     /* Restaurado para balancear el cierre */
 }
 
@@ -622,7 +654,7 @@ h1 {
 }
 
 .info-card.expanded .btn-action {
-    background-color: #b0001e;
+    background-color: #8B0015;
     margin-top: 1.5rem;
     margin-bottom: 10px;
     /* Espacio extra para que no se corte al hacer hover */
