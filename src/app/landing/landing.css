@@ -1011,6 +1011,9 @@ section[id] {
     justify-content: center;
     gap: 12px;
     margin-top: 2rem;
+    margin-bottom: 2.5rem;
+    position: relative;
+    z-index: 20;
 }
 
 .dot {

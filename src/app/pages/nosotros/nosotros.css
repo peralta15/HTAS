@@ -815,14 +815,25 @@ input#pos3:checked~main#items-carrusel {
         height: 300px;
     }
 
+    .container-glass {
+        padding: 1.5rem;
+        gap: 2rem;
+    }
+
+    .laptop-wrapper {
+        min-width: 0;
+        width: 100%;
+    }
+
     /* Laptop ajustada para no crecer de más en hover */
     .laptop {
-        transform: scale(0.6) rotateX(15deg) rotateY(-35deg);
+        transform: scale(0.55) rotateX(15deg) rotateY(-35deg);
         margin: -40px auto 0px auto !important;
+        transform-origin: center center;
     }
 
     .laptop:hover {
-        transform: scale(0.65) rotateX(20deg) rotateY(-30deg) !important;
+        transform: scale(0.6) rotateX(20deg) rotateY(-30deg) !important;
     }
 
     .cont-carrusel {
@@ -876,12 +887,13 @@ input#pos3:checked~main#items-carrusel {
 
     /* Laptop: Mantenemos la escala pequeña incluso en el hover táctil */
     .laptop {
-        transform: scale(0.42) rotateX(15deg) rotateY(-30deg);
+        transform: scale(0.35) rotateX(15deg) rotateY(-30deg);
         margin: -80px auto -60px auto !important;
+        transform-origin: center center;
     }
 
     .laptop:hover {
-        transform: scale(0.45) rotateX(20deg) rotateY(-25deg) !important;
+        transform: scale(0.38) rotateX(20deg) rotateY(-25deg) !important;
     }
 
     .cont-carrusel {
