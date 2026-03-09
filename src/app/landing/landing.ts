@@ -150,7 +150,7 @@ export class Landing implements AfterViewInit {
   }
 
   get screenTransform() {
-    return `translateY(-${this.activeScreenIndex * 33.333}%)`;
+    return `translateY(-${this.activeScreenIndex * 100}%)`;
   }
 
   /**
