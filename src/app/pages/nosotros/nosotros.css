@@ -27,9 +27,14 @@
     padding: 2.5rem;
     background: rgba(255, 255, 255, 0.6);
     backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border-radius: 30px;
     border: 1px solid rgba(255, 255, 255, 0.8);
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.04);
+    /* SOLUCIÓN: Aísla el contexto de apilamiento para evitar errores de renderizado en resize */
+    isolation: isolate;
+    position: relative;
+    overflow: hidden;
 }
 
 .laptop-wrapper {
@@ -89,6 +94,8 @@
 .content-text {
     flex: 1;
     min-width: 300px;
+    position: relative;
+    z-index: 10; /* Asegura que el texto esté por encima de cualquier artefacto visual */
 }
 
 .content-text h2 {
@@ -121,41 +128,7 @@
     font-weight: 400;
 }
 
-.content-image {
-    flex: 1;
-    min-width: 300px;
-}
-
-/* Image Placeholder */
-.image-placeholder {
-    width: 100%;
-    height: 450px;
-    background: radial-gradient(circle, #fdfdfd 0%, #f0f2f5 100%);
-    border-radius: 20px;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    transition: all 0.4s ease;
-}
-
-.image-placeholder:hover {
-    transform: translateY(-10px);
-    background: radial-gradient(circle, #ffffff 0%, #e8ebf0 100%);
-}
-
-.image-placeholder:hover .img-fluid-nosotros {
-    transform: scale(1.05);
-}
-
-.img-fluid-nosotros {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-    filter: drop-shadow(0 15px 35px rgba(0, 0, 0, 0.15));
-    display: block;
-}
+/* Eliminados estilos de placeholder antiguos que causaban ruido visual */
 
 /* Contenedor con la rotación de perfil que te gusta */
 .laptop {
@@ -174,27 +147,27 @@
     bottom: 0;
     width: 100%;
     height: 100%;
-    background: #1e272e;
-    /* Color grafito del phone */
+    background: #1e272e; /* Graphite reverted */
     border-radius: 15px;
     transform: rotateX(90deg) translateZ(-1px);
     transform-origin: bottom;
     box-shadow: -30px 30px 60px rgba(0, 0, 0, 0.4);
 
     display: flex;
-    /* Cambiado a column para que el teclado (primero en HTML) quede arriba y el touchpad abajo */
     flex-direction: column;
     align-items: center;
     padding: 20px;
     box-sizing: border-box;
 
-    /* GROSOR DE LA BASE: Aumentado radicalmente para que se vea mucho más grueso */
-    border-bottom: 15px solid #0f1418;
-    /* Más oscuro para profundidad */
+    /* GROSOR EXTREMO DE LA BASE: Mantenido */
+    border-bottom: 25px solid #0f1418; /* Darker graphite for depth */
+    border-left: 10px solid #141a1f;
+    border-right: 10px solid #141a1f;
+    
     box-shadow:
-        0 1px 1px rgba(0, 0, 0, 0.5),
-        -5px 12px 35px rgba(0, 0, 0, 0.6),
-        -15px 25px 60px rgba(0, 0, 0, 0.4);
+        0 8px 1px rgba(0, 0, 0, 0.5),
+        -15px 25px 50px rgba(0, 0, 0, 0.6),
+        -30px 40px 100px rgba(0, 0, 0, 0.4);
 }
 
 /* TECLADO: Ahora se posiciona arriba (al fondo, junto a la pantalla) */
@@ -221,11 +194,9 @@
 }
 
 .key {
-    background: linear-gradient(145deg, #2d3436, #1e272e);
-    /* Tono exacto botones phone */
-    border-radius: 2px;
-    border-bottom: 2px solid #000;
-    /* Efecto 3D en las teclas */
+    background: linear-gradient(145deg, #2d3436, #1e272e); /* Original graphite-ish */
+    border-radius: 3px;
+    border-bottom: 3px solid #000;
     box-shadow: 0 2px 0 #000;
     transition: transform 0.1s;
 }
@@ -243,16 +214,13 @@
 .touchpad {
     width: 120px;
     height: 70px;
-    background: #252d35;
-    /* Mezcla entre el body y botones del phone */
+    background: #252d35; /* Reverted color */
     border-radius: 6px;
     border: 1px solid rgba(255, 255, 255, 0.05);
     box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.4);
     position: relative;
     z-index: 1;
-    /* Mantén esto bajo */
-    transform: translateZ(0);
-    /* Obliga a que se queden pegados a la base */
+    transform: translateZ(2px);
 }
 
 .lid-back {
@@ -262,16 +230,29 @@
     width: 100%;
     height: 100%;
     background: #1e272e;
-    /* El mismo color grafito de la base */
     border-radius: 15px;
-    /* Movemos la tapa un poco hacia atrás para que tenga grosor */
-    transform: translateZ(-3px);
+    /* Reducimos el translateZ para que estén más pegadas */
+    transform: translateZ(-2px); 
     backface-visibility: visible !important;
     -webkit-backface-visibility: visible !important;
     z-index: 1;
-    /* Sombra interna para dar efecto de metal */
-    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 
+        inset 0 0 40px rgba(0, 0, 0, 0.5),
+        0 0 0 5px #0f1418; /* Borde exterior para sellar el canto */
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.lid-back::after {
+    content: 'HTAS';
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    font-size: 2.5rem;
+    color: rgba(255, 255, 255, 0.15);
+    letter-spacing: 5px;
+    text-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
 }
 
 /* --- PANTALLA --- */
@@ -294,24 +275,27 @@
     height: 100%;
     background: #000;
     border-radius: 15px;
-    transform: translateZ(1px);
-    /* La empujamos 1px hacia el frente */
+    /* Reducimos el translateZ para que estén más pegadas */
+    transform: translateZ(2px); 
     backface-visibility: visible !important;
     -webkit-backface-visibility: visible !important;
     z-index: 2;
     display: flex;
     justify-content: center;
     align-items: center;
-    border: 12px solid #1e272e;
-    /* Color grafito del phone */
+    border: 15px solid #1e272e;
     box-sizing: border-box;
     isolation: isolate;
-    /* Grosor de la pantalla: Aumentado */
+    /* SELLADO DE BORDES: Sombras que cubren el "hueco" lateral */
     box-shadow:
         inset 0 0 0 2px rgba(255, 255, 255, 0.05),
-        2px 0 10px rgba(0, 0, 0, 0.6),
-        4px 0 0 #1e272e;
-    /* Capa sólida lateral */
+        /* Capas de profundidad para cerrar el gap */
+        0 1px 0 #0f1418,
+        0 -1px 0 #0f1418,
+        1px 0 0 #0f1418,
+        -1px 0 0 #0f1418,
+        /* Grosor visual unificado */
+        0 0 0 4px #0f1418;
 }
 
 .screen-content {
@@ -399,7 +383,7 @@
 }
 
 .laptop:hover {
-    transform: rotateX(20deg) rotateY(-30deg);
+    transform: rotateX(25deg) rotateY(-25deg) scale(1.1); /* Better view angle for thickness */
 }
 
 /* Al quitar el hover (Cuando se cierra) */
@@ -818,6 +802,7 @@ input#pos3:checked~main#items-carrusel {
     .container-glass {
         padding: 1.5rem;
         gap: 2rem;
+        overflow: visible; /* Permitir que la laptop sobresalga si es necesario sin "cortar" el cristal */
     }
 
     .laptop-wrapper {
