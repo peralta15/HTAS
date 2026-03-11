@@ -460,11 +460,98 @@ section[id] {
     background: #000;
 }
 
+.status-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 40px; /* Dedicated height for the status bar area */
+    padding: 0 16px;
+    padding-top: 6px; /* Position icons within the 40px area */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 10;
+    color: white;
+    background: #000; /* Solid black background for status bar */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.status-left, .status-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.operator {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+}
+
+.bi-wifi {
+    font-size: 11px;
+    margin-left: -2px;
+}
+
+/* Signal Bars */
+.signal-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 1.5px;
+    height: 10px;
+}
+
+.signal-bars .bar {
+    width: 2.5px;
+    background: white;
+    border-radius: 0.5px;
+}
+
+.bar1 { height: 30%; }
+.bar2 { height: 50%; }
+.bar3 { height: 75%; }
+.bar4 { height: 100%; }
+
+/* Custom Battery */
+.battery-icon {
+    display: flex;
+    align-items: center;
+    height: 10px;
+}
+
+.battery-body {
+    width: 18px;
+    height: 9px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 2px;
+    padding: 1px;
+    position: relative;
+}
+
+.battery-level {
+    width: 70%;
+    height: 100%;
+    background: white;
+    border-radius: 0.5px;
+}
+
+.battery-tip {
+    width: 1.5px;
+    height: 3.5px;
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 0 1px 1px 0;
+    margin-left: 0.5px;
+}
+
 .screen-track {
+    position: absolute; /* Changed to absolute for better control */
+    top: 40px; /* Starts below the status bar */
+    left: 0;
+    width: 100%;
+    height: calc(100% - 40px); /* Fills the rest of the screen */
     display: flex;
     flex-direction: column;
-    width: 100%;
-    height: 100%;
     transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
