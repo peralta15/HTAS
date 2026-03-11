@@ -3,10 +3,74 @@
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background-color: #f0f2f5;
-    font-family: 'Segoe UI', sans-serif;
+    background-color: #f8f9fa;
+    font-family: 'Montserrat', sans-serif;
     margin: 0;
+    position: relative;
+    overflow: hidden;
 }
+
+/* --- Decorative Background Figures (Copied from Login) --- */
+.background-circles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.circle {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.5;
+    background-color: #8B0015;
+    animation: drift 25s infinite alternate ease-in-out;
+}
+
+.circle-1 {
+    width: 500px;
+    height: 500px;
+    top: -150px;
+    left: -150px;
+}
+
+.circle-2 {
+    width: 400px;
+    height: 400px;
+    bottom: -100px;
+    right: -100px;
+    animation-delay: -5s;
+}
+
+.circle-3 {
+    width: 300px;
+    height: 300px;
+    top: 20%;
+    right: 15%;
+    animation-delay: -10s;
+}
+
+.circle-4 {
+    width: 250px;
+    height: 250px;
+    bottom: 10%;
+    left: 10%;
+    animation-delay: -15s;
+}
+
+@keyframes drift {
+    0% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    100% {
+        transform: translate(60px, 40px) scale(1.1);
+    }
+}
+
 
 .error-card {
     position: relative;
@@ -21,6 +85,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    z-index: 10;
 }
 
 .stage {
@@ -51,7 +116,7 @@
 
 .ekg-line {
     fill: none;
-    stroke: #b0001e;
+    stroke: #690014;
     stroke-width: 5;
     stroke-linecap: round;
     stroke-linejoin: round;
@@ -67,8 +132,8 @@
     gap: 20px;
     font-size: clamp(120px, 20vw, 180px);
     font-weight: 900;
-    color: #2e2e2eb3;
-    /* Transparencia para ver el pulso */
+    color: rgba(150, 150, 150, 0.45);
+    /* Gris-blanco un poco más visible pero aún transparente para ver los signos */
     line-height: 1;
 }
 
@@ -85,7 +150,7 @@
     position: relative;
     width: 80px;
     height: 80px;
-    background-color: #b0001e;
+    background-color: #8B0015;
     transform: rotate(-45deg);
     animation: heart-beat 1.3s infinite ease-in-out;
     filter: drop-shadow(0 0 15px rgba(176, 0, 30, 0.4));
@@ -97,7 +162,7 @@
     position: absolute;
     width: 80px;
     height: 80px;
-    background-color: #b0001e;
+    background-color: #8B0015;
     border-radius: 50%;
 }
 
@@ -119,17 +184,40 @@
     z-index: 3;
 }
 
+.info-layer h2 {
+    font-size: 2.2rem;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.info-layer p {
+    font-size: 1.2rem;
+    color: #666;
+}
+
+
 .btn-reanimate {
     margin-top: 30px;
     padding: 18px 60px;
-    background-color: #b0001e;
+    background-color: #8B0015;
     color: white;
     border: none;
     border-radius: 50px;
     font-weight: bold;
-    font-size: 1.2rem;
+    font-size: 1.4rem;
     cursor: pointer;
     box-shadow: 0 10px 20px rgba(176, 0, 30, 0.2);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.btn-reanimate:hover {
+    background-color: #8B0015;
+    transform: scale(1.05);
+    box-shadow: 0 15px 30px rgba(176, 0, 30, 0.4);
+}
+
+.btn-reanimate:active {
+    transform: scale(0.98);
 }
 
 @keyframes heart-beat {
