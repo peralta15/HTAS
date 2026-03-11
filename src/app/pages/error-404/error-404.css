@@ -239,3 +239,65 @@
         transform: rotate(-45deg) scale(1.1);
     }
 }
+
+/* --- Mobile Responsiveness --- */
+@media (max-width: 768px) {
+    .error-card {
+        padding: 50px 20px;
+        border-radius: 30px;
+        width: 90%;
+    }
+
+    .stage {
+        height: 140px;
+    }
+
+    .heart-container {
+        width: 80px;
+        height: 80px;
+        transform: translateY(15px);
+    }
+
+    .heart {
+        width: 50px;
+        height: 50px;
+    }
+
+    .heart::before,
+    .heart::after {
+        width: 50px;
+        height: 50px;
+    }
+
+    .heart::before {
+        top: -25px;
+    }
+
+    .heart::after {
+        left: 25px;
+    }
+
+    .numbers-layer {
+        gap: 10px;
+    }
+
+    .info-layer {
+        padding: 0 20px;
+        margin-top: 20px;
+    }
+
+    .info-layer h2 {
+        font-size: 1.6rem;
+    }
+
+    .info-layer p {
+        font-size: 1rem;
+    }
+
+    .btn-reanimate {
+        padding: 15px 40px;
+        font-size: 1.1rem;
+        width: 100%;
+        max-width: 250px;
+    }
+}
