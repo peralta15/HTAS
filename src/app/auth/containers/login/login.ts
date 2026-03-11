@@ -268,4 +268,8 @@ export class Login {
     this.isToggled = false;
     this.esperandoPin = false;
   }
+  
+  irAInicio() {
+    this.router.navigate(['/landing']);
+  }
 }
