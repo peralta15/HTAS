@@ -770,8 +770,8 @@ input#pos3:checked~main#items-carrusel {
     }
 
     .content-section {
-        margin-top: -60px;
-        padding: 8rem 5% 1rem;
+        margin-top: -30px; /* Reduced to bring content closer to the hero shape */
+        padding: 3rem 5% 1rem; /* Significantly reduced from 8rem to match visual flow */
     }
 
     .hero-section,
@@ -813,7 +813,7 @@ input#pos3:checked~main#items-carrusel {
     /* Laptop ajustada para no crecer de más en hover */
     .laptop {
         transform: scale(0.55) rotateX(15deg) rotateY(-35deg);
-        margin: -40px auto 0px auto !important;
+        margin: 0 auto 0px auto !important; /* Reduced negative margin since padding is now smaller */
         transform-origin: center center;
     }
 
