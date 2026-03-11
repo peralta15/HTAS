@@ -57,7 +57,9 @@
 
     <div class="container-form">
       <form class="sign-up" [formGroup]="registerForm" (ngSubmit)="onSubmitSignUp()"
-        [class.doctor-active]="registerForm.get('Rol')?.value === 'Doctor'">
+        [class.doctor-active]="registerForm.get('Rol')?.value === 'Doctor'"
+        [class.paciente-active]="registerForm.get('Rol')?.value === 'Paciente'"
+        [class.acompanante-active]="registerForm.get('Rol')?.value === 'Acompañante'">
         <div class="decor-icon"><i class="bi bi-person-badge"></i></div>
         <div class="decor-icon-2"><i class="bi bi-person-fill-add"></i></div>
         <h2>Registrarse</h2>

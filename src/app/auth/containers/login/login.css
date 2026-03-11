@@ -152,7 +152,17 @@
   align-items: center;
   transition: transform 0.5s ease-in;
   position: relative;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 20px 0;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE y Edge */
+}
+
+/* Ocultar scrollbar para Chrome, Safari y Opera */
+.container-form form::-webkit-scrollbar,
+.sign-in::-webkit-scrollbar {
+  display: none;
 }
 
 .decor-icon {
@@ -226,9 +236,11 @@
   cursor: pointer;
 }
 
-.container-form span {
+.container-form > div > span,
+.container-form form > span {
   font-size: 12px;
   margin-bottom: 15px;
+  display: block;
 }
 
 .container-input {
@@ -708,10 +720,10 @@
 }
 
 .google-btn span {
-  display: inline-block;
-  line-height: normal;
-  /* Fuerza al texto a usar su altura natural */
-  margin: 0;
+  display: flex;
+  align-items: center;
+  line-height: 1;
+  margin: 0 !important;
   padding: 0;
 }
 
@@ -762,9 +774,10 @@
 }
 
 .button.google-style span {
-  display: inline-block;
-  line-height: normal;
-  margin: 0;
+  display: flex;
+  align-items: center;
+  line-height: 1;
+  margin: 0 !important;
   padding: 0;
 }
 
@@ -955,22 +968,27 @@
   }
 }
 
-/* --- VISTA COMPACTA PARA DOCTOR (Para que todo quepa en 500px) --- */
-.sign-up.doctor-active h2 {
-  font-size: 24px;
-  margin-bottom: 8px;
+/* --- VISTA COMPACTA PARA DOCTOR (Para mejorar espaciado y legibilidad) --- */
+.sign-up.doctor-active {
+  justify-content: flex-start;
+  padding-top: 30px;
 }
 
-.sign-up.doctor-active span {
+.sign-up.doctor-active h2 {
+  font-size: 24px;
+  margin-bottom: 5px;
+}
+
+.sign-up.doctor-active > span {
   display: inline-block;
   line-height: normal;
-  margin: 0;
+  margin: 0 0 10px 0;
   padding: 0;
 }
 
 .sign-up.doctor-active .container-input {
-  height: 36px;
-  margin-bottom: 8px;
+  height: 38px;
+  margin-bottom: 12px;
   padding: 0 15px;
 }
 
@@ -980,30 +998,35 @@
 
 .sign-up.doctor-active .container-input input,
 .sign-up.doctor-active .container-input .select-custom {
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .sign-up.doctor-active .button.google-style {
-  height: 44px;
-  margin-top: 12px;
+  height: 45px;
+  margin-top: 5px;
   font-size: 14px;
 }
 
 .sign-up.doctor-active .mobile-toggle {
-  margin-top: 15px;
+  margin-top: 12px;
+  margin-bottom: 20px;
   font-size: 13px;
 }
 
-/* --- VISTA COMPACTA PARA ROLES CON CAMPOS EXTRA --- */
-.sign-up:has([formControlName="Rol"]:not([value="Paciente"])) h2 {
+/* --- VISTA COMPACTA PARA ACOMPAÑANTE --- */
+.sign-up.acompanante-active {
+  justify-content: flex-start;
+  padding-top: 35px;
+}
+
+.sign-up.acompanante-active h2 {
   font-size: 24px;
   margin-bottom: 5px;
 }
 
-.sign-up:has([formControlName="Rol"]:not([value="Paciente"])) .container-input {
-  height: 34px;
-  /* Un poco más pequeño para que quepa la fecha */
-  margin-bottom: 6px;
+.sign-up.acompanante-active .container-input {
+  height: 38px;
+  margin-bottom: 12px;
 }
 
 /* Estilo específico para el input tipo fecha */
@@ -1013,10 +1036,9 @@ input[type="date"] {
   cursor: pointer;
 }
 
-/* Asegurar que el botón de Google no sea tan gigante en registros largos */
-.sign-up:has([formControlName="Rol"]:not([value="Paciente"])) .button.google-style {
-  height: 42px;
-  margin-top: 8px;
+.sign-up.acompanante-active .button.google-style {
+  height: 45px;
+  margin-top: 10px;
 }
 
 /* Estilo general para el contenedor de fecha */
