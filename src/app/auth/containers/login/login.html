@@ -19,12 +19,28 @@
         <h2>{{ esperandoPin ? 'Verificar Identidad' : 'Iniciar Sesión' }}</h2>
         <span>{{ esperandoPin ? 'Ingresa el PIN de tu correo' : 'Accede de forma segura con tu cuenta' }}</span>
 
-        <div *ngIf="!esperandoPin" class="social-networks">
-          <p>Para ingresar, utiliza el botón de abajo:</p>
-          <button type="button" class="google-btn" (click)="onLoginWithGoogle()" [disabled]="loading">
-            <i class="bi bi-google"></i>
-            <span>{{ loading ? 'Conectando...' : 'Iniciar Sesión con Google' }}</span>
+        <div *ngIf="!esperandoPin" [formGroup]="loginForm" class="login-form-content">
+          <div class="container-input">
+            <i class="bi bi-envelope"></i>
+            <input type="email" formControlName="Email" placeholder="Correo Electrónico">
+          </div>
+          <div class="container-input">
+            <i class="bi bi-lock"></i>
+            <input type="password" formControlName="Password" placeholder="Contraseña">
+          </div>
+          <button type="button" class="button google-style" (click)="onLoginWithEmailPassword()"
+            [disabled]="loading || loginForm.invalid">
+            <i class="bi bi-box-arrow-in-right"></i>
+            <span>{{ loading ? 'Iniciando...' : 'Iniciar Sesión' }}</span>
           </button>
+
+          <div class="social-networks">
+            <p>O inicia sesión con:</p>
+            <button type="button" class="google-btn" (click)="onLoginWithGoogle()" [disabled]="loading">
+              <i class="bi bi-google"></i>
+              <span>{{ loading ? 'Conectando...' : 'Continuar con Google' }}</span>
+            </button>
+          </div>
         </div>
 
         <div *ngIf="esperandoPin" class="pin-verification-container">
@@ -116,7 +132,7 @@
 
         <button type="submit" class="button google-style" [disabled]="registerForm.invalid || loading">
           <i class="bi bi-google"></i>
-          <span>{{ loading ? 'Procesando...' : 'Completar con Google' }}</span>
+          <span>{{ loading ? 'Procesando...' : 'Crear tu cuenta con Google' }}</span>
         </button>
 
         <p class="mobile-toggle">¿Ya tienes cuenta? <a (click)="toggleToSignIn()">Inicia Sesión</a></p>

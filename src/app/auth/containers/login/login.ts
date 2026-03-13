@@ -1,4 +1,6 @@
 import { Component, inject, ChangeDetectorRef, NgZone, PLATFORM_ID } from '@angular/core';
+import { Auth, signInWithEmailAndPassword } from '@angular/fire/auth';
+import { Firestore, doc, getDoc } from '@angular/fire/firestore';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { soloLetrasValidator, soloLetras } from '../../../validations/validators';
 import { GoogleService } from '../../services/google';
@@ -20,6 +22,8 @@ import { Spanish } from 'flatpickr/dist/l10n/es.js';
 })
 export class Login {
   private googleService = inject(GoogleService);
+  private auth = inject(Auth);
+  private firestore = inject(Firestore);
   private router = inject(Router);
   private fb = inject(FormBuilder);
   private cdr = inject(ChangeDetectorRef);
@@ -28,6 +32,7 @@ export class Login {
 
   isToggled = false;
   registerForm: FormGroup;
+  loginForm: FormGroup;
   loading = false;
 
   esperandoPin = false;
@@ -55,6 +60,11 @@ export class Login {
       DireccionClinica: [''],
       FechaAsignacion: [''],
       Activo: [true]
+    });
+
+    this.loginForm = this.fb.group({
+      Email: ['', [Validators.required, Validators.email]],
+      Password: ['', [Validators.required, Validators.minLength(6)]]
     });
 
     this.registerForm.get('Rol')?.valueChanges.subscribe(rol => {
@@ -165,6 +175,58 @@ export class Login {
       this.ngZone.run(() => {
         this.loading = false;
         this.openModal('Acceso Denegado', error.message, 'modal-error');
+      });
+    }
+  }
+
+  async onLoginWithEmailPassword() {
+    if (this.loginForm.invalid) {
+      this.openModal('Formulario Incompleto', 'Por favor ingresa un correo y contraseña válidos.', 'modal-error');
+      return;
+    }
+
+    this.loading = true;
+    this.cdr.detectChanges();
+
+    const { Email, Password } = this.loginForm.value;
+
+    try {
+      const result = await signInWithEmailAndPassword(this.auth, Email, Password);
+      const user = result.user;
+
+      const userRef = doc(this.firestore, `usuarios/${user.uid}`);
+      const docSnap = await getDoc(userRef);
+
+      if (!docSnap.exists()) {
+        await this.auth.signOut();
+        throw new Error('No tienes un registro completo en nuestra base de datos.');
+      }
+
+      const userData = docSnap.data() as any;
+
+      this.ngZone.run(() => {
+        this.loading = false;
+        if (userData.pinVerificado === true) {
+          this.router.navigate(['/inicio']);
+        } else {
+          this.usuarioUidTemporal = user.uid;
+          this.pinCorrectoBD = userData.pin;
+          this.esperandoPin = true;
+          // Disparamos el envío del PIN usando el método existente en el servicio
+          this.googleService.reenviarPin(user.uid).catch(console.error);
+          this.cdr.detectChanges();
+        }
+      });
+    } catch (error: any) {
+      this.ngZone.run(() => {
+        this.loading = false;
+        let mensaje = 'Error al iniciar sesión.';
+        if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+          mensaje = 'Correo o contraseña incorrectos.';
+        } else {
+          mensaje = error.message;
+        }
+        this.openModal('Error de Acceso', mensaje, 'modal-error');
       });
     }
   }

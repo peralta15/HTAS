@@ -154,9 +154,16 @@
   position: relative;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 20px 0;
+  padding: 40px 0; /* Aumentamos el padding para forzar el centrado si es necesario */
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE y Edge */
+}
+
+.login-form-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
 }
 
 /* Ocultar scrollbar para Chrome, Safari y Opera */
@@ -673,7 +680,7 @@
 /* Estilos para el nuevo botón de Google */
 .social-networks {
   width: 300px;
-  margin: 15px 0 25px;
+  margin: 15px 0 10px; /* Reducimos el margen inferior de 25px a 10px */
   display: flex;
   flex-direction: column;
   align-items: center;
