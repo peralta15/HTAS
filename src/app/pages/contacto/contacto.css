@@ -1,8 +1,16 @@
+.contacto-main-container {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    /* No background-color needed, shader will provide it */
+}
+
 .contact-page-content {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 50px 20px 50px;
+    padding: 80px 20px 40px;
+    width: 100%;
 }
 
 .container {
@@ -283,6 +291,14 @@ h2 {
     position: relative;
     display: inline-block;
     padding-bottom: 10px;
+    position: relative;
+    z-index: 2;
+}
+
+.section-header {
+    position: relative;
+    z-index: 2;
+    text-align: center;
 }
 
 /* Estilos para soportar la animación staggered on-load */
@@ -292,19 +308,24 @@ h2 {
 }
 
 .accordion-section {
-    padding: 1rem 5% 4rem;
-    max-width: 1200px;
-    margin: 0 auto;
+    padding: 40px 5% 80px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .accordion-container {
+    width: 100%;
+    max-width: 1200px;
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
-    /* Espacio entre cada acordeón */
 }
 
 .accordion-item {
+    position: relative;
+    z-index: 2;
     background: #ffffff;
     border-radius: 20px;
     /* Igual que tus cards */

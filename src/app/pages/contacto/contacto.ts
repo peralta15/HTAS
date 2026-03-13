@@ -1,10 +1,11 @@
 import { Component, AfterViewInit, ViewChildren, QueryList, ElementRef, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { ShaderBackgroundComponent } from '../../components/ui/shader-background/shader-background.component';
 
 @Component({
   selector: 'app-contacto',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ShaderBackgroundComponent],
   templateUrl: './contacto.html',
   styleUrl: './contacto.css',
 })
