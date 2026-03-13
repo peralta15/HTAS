@@ -1,44 +1,33 @@
 <div class="pricing-container">
+    <div class="pricing-header animate-entrance" #animateUp>
+        <h1 class="pricing-title">Invierte en tu Salud Cardiovascular</h1>
+        <p class="pricing-subtitle">Elige el plan que mejor se adapte a tus necesidades. Desde monitoreo básico hasta atención integral con IA.</p>
+    </div>
 
     <div class="pricing-grid">
-        <!-- Feature Boxes -->
-        <div class="feature-label-box pos-1 animate-entrance" #animateUp>
-            <div class="label-icon"><i class="bi bi-activity"></i></div>
-            <div class="label-content">
-                <h4>Monitoreo 24/7</h4>
-                <p>Seguimiento continuo de signos.</p>
+        <!-- Plan Básico (Gratis) -->
+        <div class="pricing-card animate-entrance" #animateUp>
+            <div class="card-content">
+                <h2 class="plan-name">Plan Básico</h2>
+                <p class="plan-description">Comienza a cuidar tu corazón con herramientas esenciales de seguimiento.</p>
+
+                <div class="price-container">
+                    <span class="price-amount">0 MXN</span>
+                    <span class="price-period">gratis para siempre</span>
+                </div>
+
+                <button class="cta-button secondary">Empezar Gratis</button>
+
+                <ul class="feature-list">
+                    <li><i class="bi bi-check2"></i> Registro manual de presión</li>
+                    <li><i class="bi bi-check2"></i> Historial de los últimos 30 días</li>
+                    <li><i class="bi bi-check2"></i> Perfil de salud básico</li>
+                    <li><i class="bi bi-check2"></i> Consejos generales de salud</li>
+                </ul>
             </div>
-            <div class="pointer-line"></div>
         </div>
 
-        <div class="feature-label-box pos-2 animate-entrance" #animateUp>
-            <div class="label-icon"><i class="bi bi-shield-lock-fill"></i></div>
-            <div class="label-content">
-                <h4>Seguridad</h4>
-                <p>Privacidad total de tus datos.</p>
-            </div>
-            <div class="pointer-line"></div>
-        </div>
-
-        <div class="feature-label-box pos-3 animate-entrance" #animateUp>
-            <div class="label-icon"><i class="bi bi-cpu"></i></div>
-            <div class="label-content">
-                <h4>IA Predictiva</h4>
-                <p>Detección temprana de riesgos.</p>
-            </div>
-            <div class="pointer-line"></div>
-        </div>
-
-        <div class="feature-label-box pos-4 animate-entrance" #animateUp>
-            <div class="label-icon"><i class="bi bi-headset"></i></div>
-            <div class="label-content">
-                <h4>Soporte</h4>
-                <p>Especialistas siempre listos.</p>
-            </div>
-            <div class="pointer-line"></div>
-        </div>
-
-        <!-- Plan HTAS -->
+        <!-- Plan HTAS (Full) -->
         <div class="pricing-card max animate-entrance" #animateUp>
             <div class="card-content">
                 <h2 class="plan-name">Plan HTAS Full</h2>
@@ -61,4 +50,4 @@
             </div>
         </div>
     </div>
-</div>
+</div>
