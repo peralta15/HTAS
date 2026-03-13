@@ -127,14 +127,15 @@
 }
 
 .container {
-  width: 800px;
-  height: 500px;
+  width: 850px;
+  max-width: 95vw;
+  height: 550px;
   display: flex;
   position: relative;
   background-color: white;
-  border-radius: 15px;
+  border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.2);
   z-index: 10;
 }
 
@@ -152,9 +153,8 @@
   align-items: center;
   transition: transform 0.5s ease-in;
   position: relative;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding: 40px 0; /* Aumentamos el padding para forzar el centrado si es necesario */
+  overflow: hidden; /* Ocultamos el scroll */
+  padding: 40px 0;
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE y Edge */
 }
@@ -227,7 +227,8 @@
 
 .container-form h2 {
   font-size: 30px;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
+  font-weight: 700;
 }
 
 .social-networks {
@@ -245,22 +246,24 @@
 
 .container-form > div > span,
 .container-form form > span {
-  font-size: 12px;
-  margin-bottom: 15px;
+  font-size: 14px;
+  margin-bottom: 20px;
   display: block;
+  color: #666;
 }
 
 .container-input {
-  border-radius: 10px;
-  width: 300px;
-  height: 40px;
-  margin-bottom: 10px;
+  border-radius: 12px;
+  width: 320px;
+  height: 45px;
+  margin-bottom: 12px;
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 8px;
-  padding: 0 15px;
+  gap: 12px;
+  padding: 0 20px;
   background-color: #EEEEEE;
+  transition: all 0.3s ease;
 }
 
 .container-input input {
@@ -269,6 +272,7 @@
   width: 100%;
   height: 100%;
   background-color: inherit;
+  font-size: 15px;
 }
 
 .container-form a {
@@ -282,12 +286,14 @@
   width: 170px;
   height: 45px;
   font-size: 15px;
+  font-weight: 600;
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   cursor: pointer;
   margin-top: 10px;
   background-color: #8B0015;
   color: white;
+  transition: all 0.3s ease;
 }
 
 .sign-up {
@@ -679,8 +685,8 @@
 
 /* Estilos para el nuevo botón de Google */
 .social-networks {
-  width: 300px;
-  margin: 15px 0 10px; /* Reducimos el margen inferior de 25px a 10px */
+  width: 320px;
+  margin: 15px 0 10px; 
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -695,14 +701,11 @@
 }
 
 .google-btn {
-  width: 300px;
-  height: 48px;
-  /* Un poco más alto para que respire mejor */
+  width: 320px;
+  height: 45px;
   display: flex;
   align-items: center;
-  /* Centrado vertical */
   justify-content: center;
-  /* Centrado horizontal */
   gap: 12px;
   background-color: #EEEEEE;
   border: 1px solid #e0e0e0;
@@ -713,7 +716,6 @@
   font-weight: 600;
   font-size: 14px;
   padding: 0;
-  /* Evita paddings internos que muevan el contenido */
   margin: 0 auto;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
@@ -755,12 +757,12 @@
 }
 
 .button.google-style {
-  width: 300px;
-  height: 48px;
+  width: 320px;
+  height: 45px;
   background-color: #EEEEEE;
   color: #444;
   border: 1px solid #ddd;
-  border-radius: 10px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;

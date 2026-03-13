@@ -38,7 +38,7 @@
             <p>O inicia sesión con:</p>
             <button type="button" class="google-btn" (click)="onLoginWithGoogle()" [disabled]="loading">
               <i class="bi bi-google"></i>
-              <span>{{ loading ? 'Conectando...' : 'Continuar con Google' }}</span>
+              <span>{{ loading ? 'Conectando...' : 'Google' }}</span>
             </button>
           </div>
         </div>
@@ -152,7 +152,7 @@
     <div class="container-welcome">
       <div class="welcome-sign-up welcome">
         <h3>¡Bienvenido!</h3>
-        <p>Crea tu cuenta vinculada a Google para guardar tus datos</p>
+        <p>Regístrate para crear tu cuenta y empezar a guardar tus datos</p>
         <button class="button" (click)="toggleToSignUp()">Registrarse</button>
       </div>
       <div class="welcome-sign-in welcome">
