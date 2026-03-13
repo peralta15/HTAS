@@ -1,6 +1,6 @@
 import { Component, inject, ChangeDetectorRef, NgZone, PLATFORM_ID } from '@angular/core';
-import { Auth, signInWithEmailAndPassword } from '@angular/fire/auth';
-import { Firestore, doc, getDoc } from '@angular/fire/firestore';
+import { Auth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from '@angular/fire/auth';
+import { Firestore, doc, getDoc, setDoc } from '@angular/fire/firestore';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { soloLetrasValidator, soloLetras } from '../../../validations/validators';
 import { GoogleService } from '../../services/google';
@@ -54,6 +54,8 @@ export class Login {
     this.registerForm = this.fb.group({
       NombreCompleto: ['', [Validators.required, Validators.maxLength(100), soloLetrasValidator()]],
       Telefono: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
+      Email: ['', [Validators.required, Validators.email]],
+      Password: ['', [Validators.required, Validators.minLength(6)]],
       Rol: ['', [Validators.required]],
       Cedula: [''],
       Especialidad: [''],
@@ -118,25 +120,39 @@ export class Login {
       const f = this.registerForm.value;
       const generadoPin = Math.floor(100000 + Math.random() * 900000).toString();
 
-      let datosUsuario: any = {
-        nombre: f.NombreCompleto || '',
-        telefono: f.Telefono || '',
-        rol: f.Rol || '',
-        activo: true,
-        pin: generadoPin,
-        pinVerificado: false
-      };
-
-      if (f.Rol === 'Doctor') {
-        datosUsuario.cedula = f.Cedula || '';
-        datosUsuario.especialidad = f.Especialidad || '';
-        datosUsuario.direccionClinica = f.DireccionClinica || '';
-      } else if (f.Rol === 'Acompañante') {
-        datosUsuario.fechaAsignacion = f.FechaAsignacion || '';
-      }
-
       try {
-        await this.googleService.registerWithGoogle(datosUsuario);
+        // Primero creamos el usuario en Firebase Auth usando Email y Password
+        const userCredential = await createUserWithEmailAndPassword(this.auth, f.Email, f.Password);
+        const user = userCredential.user;
+
+        let datosUsuario: any = {
+          nombre: f.NombreCompleto || '',
+          telefono: f.Telefono || '',
+          rol: f.Rol || '',
+          activo: true,
+          pin: generadoPin,
+          pinVerificado: false,
+          uid: user.uid,
+          correo: user.email,
+          fechaRegistro: new Date()
+        };
+
+        if (f.Rol === 'Doctor') {
+          datosUsuario.cedula = f.Cedula || '';
+          datosUsuario.especialidad = f.Especialidad || '';
+          datosUsuario.direccionClinica = f.DireccionClinica || '';
+        } else if (f.Rol === 'Acompañante') {
+          datosUsuario.fechaAsignacion = f.FechaAsignacion || '';
+        }
+
+        // Guardamos en Firestore directamente
+        const userRef = doc(this.firestore, `usuarios/${user.uid}`);
+        await setDoc(userRef, datosUsuario);
+
+        // Enviar el PIN por correo usando el servicio existente
+        // Aunque no cambiamos el servicio, podemos usar sus métodos públicos
+        await this.googleService.reenviarPin(user.uid);
+
         this.ngZone.run(() => {
           this.loading = false;
           this.openModal('¡Registro Exitoso!', `Cuenta creada. Revisa tu correo para tu PIN.`, 'modal-success');
@@ -145,7 +161,11 @@ export class Login {
       } catch (error: any) {
         this.ngZone.run(() => {
           this.loading = false;
-          this.openModal('Error al Registrar', error.message, 'modal-error');
+          let mensaje = error.message;
+          if (error.code === 'auth/email-already-in-use') {
+            mensaje = 'Este correo ya está registrado.';
+          }
+          this.openModal('Error al Registrar', mensaje, 'modal-error');
         });
       }
     } else {

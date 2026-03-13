@@ -94,6 +94,16 @@
         </div>
 
         <div class="container-input">
+          <i class="bi bi-envelope"></i>
+          <input type="email" formControlName="Email" placeholder="Correo Electrónico">
+        </div>
+
+        <div class="container-input">
+          <i class="bi bi-lock"></i>
+          <input type="password" formControlName="Password" placeholder="Contraseña">
+        </div>
+
+        <div class="container-input">
           <i class="bi bi-person-badge"></i>
           <select formControlName="Rol" class="select-custom">
             <option value="" disabled selected>Selecciona tu Rol</option>
@@ -131,8 +141,8 @@
         </div>
 
         <button type="submit" class="button google-style" [disabled]="registerForm.invalid || loading">
-          <i class="bi bi-google"></i>
-          <span>{{ loading ? 'Procesando...' : 'Crear tu cuenta con Google' }}</span>
+          <i class="bi bi-person-plus-fill"></i>
+          <span>{{ loading ? 'Procesando...' : 'Crear Cuenta' }}</span>
         </button>
 
         <p class="mobile-toggle">¿Ya tienes cuenta? <a (click)="toggleToSignIn()">Inicia Sesión</a></p>
