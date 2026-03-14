@@ -51,8 +51,14 @@ export class ElectricWavesComponent implements OnInit, AfterViewInit, OnDestroy 
 
     // Renderer
     try {
-      this.renderer = new THREE.WebGLRenderer({ antialias: true });
-      this.renderer.setPixelRatio(window.devicePixelRatio);
+      this.renderer = new THREE.WebGLRenderer({ 
+        antialias: true,
+        powerPreference: 'high-performance',
+        alpha: false
+      });
+      // Cap pixel ratio to 1.5 to improve performance on high-DPI screens
+      const pixelRatio = Math.min(window.devicePixelRatio, 1.5);
+      this.renderer.setPixelRatio(pixelRatio);
       container.appendChild(this.renderer.domElement);
     } catch (err) {
       console.error('WebGL not supported', err);
@@ -64,7 +70,9 @@ export class ElectricWavesComponent implements OnInit, AfterViewInit, OnDestroy 
     this.camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
 
     const vertexShader = `
+      varying vec2 vUv;
       void main() {
+        vUv = position.xy * 0.5 + 0.5;
         gl_Position = vec4(position, 1.0);
       }
     `;
@@ -80,41 +88,40 @@ export class ElectricWavesComponent implements OnInit, AfterViewInit, OnDestroy 
       uniform float u_brightness;
       uniform float u_colorSeparation;
 
-      float pattern(vec2 uv) {
-        float intensity = 0.0;
-        for (float i = 0.0; i < 20.0; i++) {
-          if (i >= u_waveCount) break;
-          uv.x += sin(u_time * (1.0 + i) + uv.y * u_frequency) * u_amplitude;
-          intensity += u_brightness / abs(uv.x);
-        }
-        return intensity;
-      }
-
-      vec3 scene(vec2 uv) {
-        vec3 color = vec3(0.0);
-        vec2 ruv = vec2(uv.y, uv.x);
-        for (float i = 0.0; i < 20.0; i++) {
-          if (i >= u_waveCount) break;
-          int channel = int(mod(i, 3.0));
-          vec2 cuv = ruv + vec2(0.0, i * u_colorSeparation);
-          color[channel] += pattern(cuv);
-        }
-        return color;
-      }
-
       void main() {
-        vec2 uv = (gl_FragCoord.xy - 0.5 * u_resolution)
-                  / min(u_resolution.x, u_resolution.y);
-        vec3 col = scene(uv);
+        vec2 uv = (gl_FragCoord.xy - 0.5 * u_resolution) / min(u_resolution.x, u_resolution.y);
+        
+        vec3 color = vec3(0.0);
+        float time = u_time * 0.5; // Slow down slightly for fluidity
+        
+        // Optimización: Un solo bucle para simular las ondas
+        // Evitamos el bucle anidado que causaba lag
+        for (float i = 0.0; i < 6.0; i++) { // Limitado a 6 máximo para rendimiento
+          if (i >= u_waveCount) break;
+          
+          vec2 p = uv;
+          float offset = i * u_colorSeparation;
+          
+          // Movimiento eléctrico fluido (Horizontal)
+          p.y += sin(time * (1.1 + i) + p.x * u_frequency) * u_amplitude;
+          
+          float wave = u_brightness / abs(p.y);
+          
+          // Distribución de color (R,G,B) basada en el índice de la onda
+          int channel = int(mod(i, 3.0));
+          if (channel == 0) color.r += wave;
+          else if (channel == 1) color.g += wave;
+          else color.b += wave;
+        }
         
         // Intensity mapping to brand colors
-        float intensity = (col.r + col.g + col.b) / 3.0;
+        float intensity = (color.r + color.g + color.b) * 0.333;
         
         vec3 bgColor = vec3(0.949, 0.949, 0.949); // #F2F2F2
         vec3 lineColor = vec3(0.545, 0.0, 0.082); // #8B0015
         
-        // Sharper transition to prevent thick merged lines
-        float t = smoothstep(0.01, 0.08, intensity);
+        // Sharper but smooth transition
+        float t = smoothstep(0.01, 0.1, intensity);
         vec3 finalCol = mix(bgColor, lineColor, t);
         
         gl_FragColor = vec4(finalCol, 1.0);
@@ -155,7 +162,7 @@ export class ElectricWavesComponent implements OnInit, AfterViewInit, OnDestroy 
     const container = this.containerRef.nativeElement;
     const width = container.clientWidth;
     const height = container.clientHeight;
-    this.renderer.setSize(width, height);
+    this.renderer.setSize(width, height, false);
     if (this.material) {
       this.material.uniforms['u_resolution'].value.set(width, height);
     }
