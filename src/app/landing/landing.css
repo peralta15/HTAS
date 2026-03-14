@@ -99,14 +99,13 @@
 
 .hero-description {
     font-size: 1.5rem;
-    /* Increased from 1.25rem */
     line-height: 1.6;
     margin-bottom: 3rem;
     max-width: 800px;
     margin-left: auto;
     margin-right: auto;
     color: rgba(255, 255, 255, 0.9);
-    font-weight: 400;
+    font-weight: 700; /* Bolded for better distinction */
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
@@ -227,7 +226,7 @@ section[id] {
     line-height: 1.8;
     margin-bottom: 1.8rem;
     color: #444;
-    font-weight: 400;
+    font-weight: 600; /* Increased weight for better distinction */
 }
 
 .content-image {
@@ -263,13 +262,11 @@ section[id] {
 
 /* ===== APP PROMO SECTION ===== */
 .app-promo-section {
-    padding: 5rem 5% 2rem;
-    /* Standardized top padding while keeping content readable */
+    padding: 2rem 5% 2rem; /* Reduced top padding from 5rem to 2rem */
     background: radial-gradient(circle at 10% 20%, rgba(176, 0, 30, 0.03) 0%, transparent 50%),
         radial-gradient(circle at 90% 80%, rgba(30, 55, 153, 0.03) 0%, transparent 50%),
         #ffffff;
-    margin-top: -40px;
-    /* Pulls slightly more for integration */
+    margin-top: 0; /* Removed negative margin to avoid overlap issues */
     margin-bottom: 0rem;
     position: relative;
     overflow: hidden;
