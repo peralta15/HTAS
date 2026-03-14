@@ -29,92 +29,75 @@ export class ShaderBackgroundComponent implements AfterViewInit, OnDestroy {
   // Fragment shader source code
   private fsSource = `
     precision highp float;
-    uniform vec2 iResolution;
     uniform float iTime;
+    uniform vec2 iResolution;
 
-    const float overallSpeed = 0.2;
-    const float gridSmoothWidth = 0.015;
-    const float axisWidth = 0.05;
-    const float majorLineWidth = 0.025;
-    const float minorLineWidth = 0.0125;
-    const float majorLineFrequency = 5.0;
-    const float minorLineFrequency = 1.0;
-    const vec4 gridColor = vec4(0.5);
-    const float scale = 2.5;
-    const vec4 lineColor = vec4(0.8, 0.1, 0.1, 1.0); // Vibrant Red
-    const float minLineWidth = 0.01;
-    const float maxLineWidth = 0.2;
-    const float lineSpeed = 1.0 * overallSpeed;
-    const float lineAmplitude = 1.0;
-    const float lineFrequency = 0.2;
-    const float warpSpeed = 0.2 * overallSpeed;
-    const float warpFrequency = 0.5;
-    const float warpAmplitude = 1.0;
-    const float offsetFrequency = 0.5;
-    const float offsetSpeed = 1.33 * overallSpeed;
-    const float minOffsetSpread = 0.6;
-    const float maxOffsetSpread = 2.0;
-    const int linesPerGroup = 16;
+    #define NUM_OCTAVES 3
 
-    #define drawCircle(pos, radius, coord) smoothstep(radius + gridSmoothWidth, radius, length(coord - (pos)))
-    #define drawSmoothLine(pos, halfWidth, t) smoothstep(halfWidth, 0.0, abs(pos - (t)))
-    #define drawCrispLine(pos, halfWidth, t) smoothstep(halfWidth + gridSmoothWidth, halfWidth, abs(pos - (t)))
-    #define drawPeriodicLine(freq, width, t) drawCrispLine(freq / 2.0, width, abs(mod(t, freq) - (freq) / 2.0))
-
-    float drawGridLines(float axis) {
-      return drawCrispLine(0.0, axisWidth, axis)
-            + drawPeriodicLine(majorLineFrequency, majorLineWidth, axis)
-            + drawPeriodicLine(minorLineFrequency, minorLineWidth, axis);
+    float rand(vec2 n) {
+      return fract(sin(dot(n, vec2(12.9898, 4.1414))) * 43758.5453);
     }
 
-    float drawGrid(vec2 space) {
-      return min(1.0, drawGridLines(space.x) + drawGridLines(space.y));
+    float noise(vec2 p) {
+      vec2 ip = floor(p);
+      vec2 u = fract(p);
+      u = u*u*(3.0-2.0*u);
+
+      float res = mix(
+        mix(rand(ip), rand(ip + vec2(1.0, 0.0)), u.x),
+        mix(rand(ip + vec2(0.0, 1.0)), rand(ip + vec2(1.0, 1.0)), u.x), u.y);
+      return res * res;
     }
 
-    float random(float t) {
-      return (cos(t) + cos(t * 1.3 + 1.3) + cos(t * 1.4 + 1.4)) / 3.0;
+    float fbm(vec2 x) {
+      float v = 0.0;
+      float a = 0.3;
+      vec2 shift = vec2(100);
+      mat2 rot = mat2(cos(0.5), sin(0.5), -sin(0.5), cos(0.5));
+      for (int i = 0; i < NUM_OCTAVES; ++i) {
+        v += a * noise(x);
+        x = rot * x * 2.0 + shift;
+        a *= 0.4;
+      }
+      return v;
     }
 
-    float getPlasmaY(float x, float horizontalFade, float offset) {
-      return random(x * lineFrequency + iTime * lineSpeed) * horizontalFade * lineAmplitude + offset;
+    // Fallback for tanh which is not in WebGL 1.0
+    vec4 myTanh(vec4 x) {
+      vec4 e2x = exp(2.0 * x);
+      return (e2x - 1.0) / (e2x + 1.0);
     }
 
     void main() {
-      vec2 fragCoord = gl_FragCoord.xy;
-      vec4 fragColor;
-      vec2 uv = fragCoord.xy / iResolution.xy;
-      vec2 space = (fragCoord - iResolution.xy / 2.0) / iResolution.x * 2.0 * scale;
+      vec2 shake = vec2(sin(iTime * 1.2) * 0.005, cos(iTime * 2.1) * 0.005);
+      vec2 p = ((gl_FragCoord.xy + shake * iResolution.xy) - iResolution.xy * 0.5) / iResolution.y * mat2(6.0, -4.0, 4.0, 6.0);
+      vec2 v;
+      vec4 o = vec4(0.0);
 
-      float horizontalFade = 1.0 - (cos(uv.x * 6.28) * 0.5 + 0.5);
-      float verticalFade = 1.0 - (cos(uv.y * 6.28) * 0.5 + 0.5);
+      float f = 2.0 + fbm(p + vec2(iTime * 5.0, 0.0)) * 0.5;
 
-      space.y += random(space.x * warpFrequency + iTime * warpSpeed) * warpAmplitude * (0.5 + horizontalFade);
-      space.x += random(space.y * warpFrequency + iTime * warpSpeed + 2.0) * warpAmplitude * horizontalFade;
+      for (float i = 0.0; i < 35.0; i++) {
+        v = p + cos(i * i + (iTime + p.x * 0.08) * 0.025 + i * vec2(13.0, 11.0)) * 3.5 + vec2(sin(iTime * 3.0 + i) * 0.003, cos(iTime * 3.5 - i) * 0.003);
+        float tailNoise = fbm(v + vec2(iTime * 0.5, i)) * 0.3 * (1.0 - (i / 35.0));
+        
+        // Brand color #8B0015 (R: 0.545, G: 0.0, B: 0.082)
+        vec4 auroraColors = vec4(0.545, 0.0, 0.082, 1.0);
+        
+        // Subtle variation
+        auroraColors.r += 0.1 * sin(i * 0.2 + iTime * 0.4);
+        auroraColors.b += 0.05 * cos(i * 0.3 + iTime * 0.5);
 
-      float intensity = 0.0;
-      vec4 bgColor = vec4(0.949, 0.949, 0.949, 1.0);
-
-      for(int l = 0; l < linesPerGroup; l++) {
-        float normalizedLineIndex = float(l) / float(linesPerGroup);
-        float offsetTime = iTime * offsetSpeed;
-        float offsetPosition = float(l) + space.x * offsetFrequency;
-        float rand = random(offsetPosition + offsetTime) * 0.5 + 0.5;
-        float halfWidth = mix(minLineWidth, maxLineWidth, rand * horizontalFade) / 2.0;
-        float offset = random(offsetPosition + offsetTime * (1.0 + normalizedLineIndex)) * mix(minOffsetSpread, maxOffsetSpread, horizontalFade);
-        float linePosition = getPlasmaY(space.x, horizontalFade, offset);
-        float lineValue = drawSmoothLine(linePosition, halfWidth, space.y) / 2.0 + drawCrispLine(linePosition, halfWidth * 0.15, space.y);
-
-        float circleX = mod(float(l) + iTime * lineSpeed, 25.0) - 12.0;
-        vec2 circlePosition = vec2(circleX, getPlasmaY(circleX, horizontalFade, offset));
-        float circle = drawCircle(circlePosition, 0.01, space) * 4.0;
-
-        intensity += (lineValue + circle) * rand;
+        vec4 currentContribution = auroraColors * exp(sin(i * i + iTime * 0.8)) / length(max(v, vec2(v.x * f * 0.015, v.y * 1.5)));
+        float thinnessFactor = smoothstep(0.0, 1.0, i / 35.0) * 0.6;
+        o += currentContribution * (1.0 + tailNoise * 0.8) * thinnessFactor;
       }
 
-      fragColor = mix(bgColor, lineColor, clamp(intensity, 0.0, 1.0));
-      fragColor.a = 1.0;
-
-      gl_FragColor = fragColor;
+      o = myTanh(pow(o / 100.0, vec4(1.6)));
+      
+      // Brand background #F2F2F2 (R: 0.949, G: 0.949, B: 0.949)
+      vec4 bgColor = vec4(0.949, 0.949, 0.949, 1.0);
+      
+      gl_FragColor = mix(bgColor, o * 1.5, clamp(length(o.rgb), 0.0, 1.0));
     }
   `;
 
