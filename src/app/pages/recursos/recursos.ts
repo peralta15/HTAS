@@ -77,6 +77,19 @@ export class Recursos implements AfterViewInit, OnDestroy {
   private mouse = { x: 0, y: 0 };
   private animationId!: number;
 
+  // Propiedades para Dotted Surface
+  private dottedGeometry!: THREE.BufferGeometry;
+  private dottedMaterial!: THREE.PointsMaterial;
+  private dots!: THREE.Points;
+  private dotWaveCount = 0;
+  private readonly DOT_CONFIG = {
+    SEPARATION: 4,
+    AMOUNTX: 80,
+    AMOUNTY: 80,
+    COLOR: 0x8B0015,
+    BG_COLOR: 0xF2F2F2
+  };
+
   private readonly CONFIG = {
     slideCount: 3,
     spacingX: 45,
@@ -143,20 +156,31 @@ export class Recursos implements AfterViewInit, OnDestroy {
     if (!this.canvasContainer) return;
     this.scene = new THREE.Scene();
 
-    const aspect = window.innerWidth / window.innerHeight;
+    // Reiniciar scroll para evitar desbalance al recargar
+    this.currentScroll = 0;
+    this.targetScroll = 0;
+    this.currentSlideIndex = 0;
+
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    const aspect = width / height;
     this.camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 1000);
     this.camera.position.set(0, 0, this.CONFIG.camZ);
 
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    this.renderer.setSize(width, height);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
+    // Opcionalmente podemos poner el color de fondo en la escena
+    this.scene.background = new THREE.Color(this.DOT_CONFIG.BG_COLOR);
 
     this.canvasContainer.nativeElement.innerHTML = '';
     this.canvasContainer.nativeElement.appendChild(this.renderer.domElement);
 
-    this.scene.add(new THREE.AmbientLight(0xffffff, 1.5)); // Subimos luz para compensar falta de marco
+    this.scene.add(new THREE.AmbientLight(0xffffff, 1.5));
     this.scene.add(this.galleryGroup);
+
+    this.initDottedSurface();
 
     const textureLoader = new THREE.TextureLoader();
     const planeGeo = new THREE.PlaneGeometry(this.CONFIG.pWidth, this.CONFIG.pHeight);
@@ -192,6 +216,40 @@ export class Recursos implements AfterViewInit, OnDestroy {
 
     this.galleryGroup.rotation.y = this.CONFIG.wallAngleY;
     this.galleryGroup.position.x = 8;
+  }
+
+  private initDottedSurface() {
+    const { AMOUNTX, AMOUNTY, SEPARATION, COLOR } = this.DOT_CONFIG;
+    const positions = new Float32Array(AMOUNTX * AMOUNTY * 3);
+
+    for (let ix = 0; ix < AMOUNTX; ix++) {
+      for (let iy = 0; iy < AMOUNTY; iy++) {
+        const x = ix * SEPARATION - (AMOUNTX * SEPARATION) / 2;
+        const z = iy * SEPARATION - (AMOUNTY * SEPARATION) / 2;
+        const index = (ix * AMOUNTY + iy) * 3;
+        positions[index] = x;
+        positions[index + 1] = 0;
+        positions[index + 2] = z;
+      }
+    }
+
+    this.dottedGeometry = new THREE.BufferGeometry();
+    this.dottedGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+    this.dottedMaterial = new THREE.PointsMaterial({
+      color: COLOR,
+      size: 0.5,
+      transparent: true,
+      opacity: 0.6,
+      sizeAttenuation: true
+    });
+
+    this.dots = new THREE.Points(this.dottedGeometry, this.dottedMaterial);
+    // Ajustamos la posición de la superficie para que esté de fondo y bien distribuida
+    this.dots.position.y = -12;
+    this.dots.position.z = -10;
+    this.dots.rotation.x = Math.PI * 0.02; 
+    this.scene.add(this.dots);
   }
 
   private animate = () => {
@@ -230,6 +288,35 @@ export class Recursos implements AfterViewInit, OnDestroy {
     this.camera.rotation.x = this.mouse.y * 0.05;
     this.camera.rotation.y = -this.mouse.x * 0.05;
 
+    // Animación de Dotted Surface con looping infinito
+    if (this.dots) {
+      const { SEPARATION, AMOUNTX, AMOUNTY } = this.DOT_CONFIG;
+      
+      // Hacer que la malla de puntos siga a la cámara en pasos de rejilla
+      const stepX = Math.round(xMove / SEPARATION);
+      const stepZ = Math.round(-zMove / SEPARATION);
+      
+      this.dots.position.x = stepX * SEPARATION;
+      this.dots.position.z = -10 + stepZ * SEPARATION;
+
+      const positions = this.dottedGeometry.attributes['position'].array as Float32Array;
+
+      let i = 0;
+      for (let ix = 0; ix < AMOUNTX; ix++) {
+        for (let iy = 0; iy < AMOUNTY; iy++) {
+          const index = (ix * AMOUNTY + iy) * 3;
+          // Ajustamos ix e iy según el paso para que la onda sea continua
+          const worldIx = ix + stepX;
+          const worldIy = iy + stepZ;
+          
+          positions[index + 1] = (Math.sin((worldIx + this.dotWaveCount) * 0.3) * 2 +
+            Math.sin((worldIy + this.dotWaveCount) * 0.5) * 2);
+        }
+      }
+      this.dottedGeometry.attributes['position'].needsUpdate = true;
+      this.dotWaveCount += 0.1;
+    }
+
     const rawIndex = Math.round(this.currentScroll / this.CONFIG.spacingX);
     this.currentSlideIndex = ((rawIndex % this.CONFIG.slideCount) + this.CONFIG.slideCount) % this.CONFIG.slideCount;
 
@@ -243,13 +330,24 @@ export class Recursos implements AfterViewInit, OnDestroy {
     this.targetScroll += diff * this.CONFIG.spacingX;
   }
 
-  @HostListener('window:wheel', ['$event'])
+  @HostListener('wheel', ['$event'])
   onWheel(e: WheelEvent) {
     if (!this.isBrowser) return;
-    // Multiplicador bajo (0.05) para evitar que pase muy rápido
+    
+    // Solo actuamos si el scroll es sobre la galería
+    // Evitamos preventDefault para permitir scroll de página si se desea, 
+    // pero capturamos la intención de navegación de la galería.
     this.targetScroll += e.deltaY * 0.05;
+    
     if (this.snapTimer) clearTimeout(this.snapTimer);
     this.snapTimer = setTimeout(() => this.snapToNearest(), this.CONFIG.snapDelay);
+  }
+
+  @HostListener('window:wheel', ['$event'])
+  onWindowWheel(e: WheelEvent) {
+    // Si queremos que el scroll de la ventana NO mueva la galería, 
+    // removemos el listener global o filtramos.
+    // Para mejor UX, quitamos el movimiento de galería si el scroll es fuera del componente.
   }
 
   @HostListener('window:mousemove', ['$event'])
