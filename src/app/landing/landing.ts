@@ -6,11 +6,12 @@ import { Pagos } from "../pages/pagos/pagos";
 import { Contacto } from "../pages/contacto/contacto";
 import { Nosotros } from "../pages/nosotros/nosotros";
 import { Recursos } from "../pages/recursos/recursos";
+import { ElectricWavesComponent } from '../components/ui/electric-waves/electric-waves.component';
 
 @Component({
   selector: 'app-landing',
   standalone: true,
-  imports: [CommonModule, Headermenu, Footer, Pagos, Contacto, Nosotros, Recursos],
+  imports: [CommonModule, Headermenu, Footer, Pagos, Contacto, Nosotros, Recursos, ElectricWavesComponent],
   templateUrl: './landing.html',
   styleUrl: './landing.css',
 })
