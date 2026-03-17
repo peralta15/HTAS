@@ -125,10 +125,12 @@
 
         <!-- Campos adicionales para Doctor -->
         <ng-container *ngIf="registerForm.get('Rol')?.value === 'Doctor'">
-          <div class="container-input">
-            <i class="bi bi-card-text"></i>
-            <input type="text" formControlName="Cedula" placeholder="Cédula Profesional"
-              (keypress)="soloNumeros($event)" maxlength="15">
+          <div class="container-input file-input-wrapper" [class.has-file]="nombreArchivoCedula">
+            <i class="bi bi-file-earmark-pdf"></i>
+            <input type="file" accept="application/pdf" id="fotoCedula" class="file-input-hidden" (change)="onFileSelected($event)" />
+            <label for="fotoCedula" class="file-label">
+              {{ nombreArchivoCedula || 'Cédula en formato PDF (Requerida)' }}
+            </label>
           </div>
 
           <div class="container-input">

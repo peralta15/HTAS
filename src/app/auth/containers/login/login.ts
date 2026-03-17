@@ -50,6 +50,9 @@ export class Login {
   fechaMinima: string = '';
   fechaMaxima: string = '';
 
+  nombreArchivoCedula: string = '';
+  fotoCedulaBase64: string = '';
+
   constructor() {
     this.registerForm = this.fb.group({
       NombreCompleto: ['', [Validators.required, Validators.maxLength(100), soloLetrasValidator()]],
@@ -58,7 +61,7 @@ export class Login {
       Password: ['', [Validators.required, Validators.minLength(6)]],
       Rol: ['', [Validators.required]],
       NSS: [''],
-      Cedula: [''],
+      FotoCedula: [''],
       Especialidad: [''],
       DireccionClinica: [''],
       FechaAsignacion: [''],
@@ -88,7 +91,7 @@ export class Login {
 
   private actualizarValidacionesDinamicas(rol: string) {
     const pacienteFields = ['NSS'];
-    const doctorFields = ['Cedula', 'Especialidad', 'DireccionClinica'];
+    const doctorFields = ['FotoCedula', 'Especialidad', 'DireccionClinica'];
     const acompananteFields = ['FechaAsignacion'];
 
     pacienteFields.forEach(fieldName => {
@@ -153,7 +156,7 @@ export class Login {
         if (f.Rol === 'Paciente') {
           datosUsuario.nss = f.NSS || '';
         } else if (f.Rol === 'Doctor') {
-          datosUsuario.cedula = f.Cedula || '';
+          datosUsuario.fotoCedula = f.FotoCedula || '';
           datosUsuario.especialidad = f.Especialidad || '';
           datosUsuario.direccionClinica = f.DireccionClinica || '';
         } else if (f.Rol === 'Acompañante') {
@@ -368,5 +371,41 @@ export class Login {
   
   irAInicio() {
     this.router.navigate(['/landing']);
+  }
+
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const file = input.files[0];
+      
+      if (file.type !== 'application/pdf') {
+        this.openModal('Formato Inválido', 'Por favor, selecciona tu Cédula en formato PDF.', 'modal-error');
+        input.value = '';
+        return;
+      }
+
+      // Validar tamaño: Firestore limita a 1MB por documento. Dejamos el límite en 800KB para el PDF.
+      if (file.size > 800 * 1024) {
+        this.openModal('Archivo muy pesado', 'El PDF debe pesar menos de 800KB para poder registrarlo.', 'modal-error');
+        input.value = '';
+        return;
+      }
+
+      this.nombreArchivoCedula = file.name;
+      const reader = new FileReader();
+
+      reader.onload = (e: any) => {
+        this.fotoCedulaBase64 = e.target.result;
+        const control = this.registerForm.get('FotoCedula');
+        if (control) {
+          control.setValue(this.fotoCedulaBase64);
+          control.markAsTouched();
+          control.updateValueAndValidity();
+        }
+        this.cdr.detectChanges();
+      };
+
+      reader.readAsDataURL(file);
+    }
   }
 }
