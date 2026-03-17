@@ -1,4 +1,4 @@
-import { Component, HostListener, AfterViewInit, ElementRef, QueryList, ViewChildren, Inject, PLATFORM_ID } from '@angular/core';
+import { Component, HostListener, AfterViewInit, ElementRef, QueryList, ViewChildren, Inject, PLATFORM_ID, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Headermenu } from "../template/headermenu/headermenu";
 import { Footer } from "../template/footer/footer";
@@ -14,6 +14,7 @@ import { ElectricWavesComponent } from '../components/ui/electric-waves/electric
   imports: [CommonModule, Headermenu, Footer, Pagos, Contacto, Nosotros, Recursos, ElectricWavesComponent],
   templateUrl: './landing.html',
   styleUrl: './landing.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class Landing implements AfterViewInit {
   @ViewChildren('animateUp') elementsToAnimate!: QueryList<ElementRef>;

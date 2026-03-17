@@ -91,9 +91,9 @@
               </div>
             </div>
             <div class="screen-track" [style.transform]="screenTransform">
-              <img src="assets/Imagen1.png" alt="App Screen 1" class="app-screen">
-              <img src="assets/Imagen2.png" alt="App Screen 2" class="app-screen">
-              <img src="assets/Imagen4.png" alt="App Screen 3" class="app-screen">
+              <img src="assets/Imagen1.png" alt="App Screen 1" class="app-screen" loading="lazy">
+              <img src="assets/Imagen2.png" alt="App Screen 2" class="app-screen" loading="lazy">
+              <img src="assets/Imagen4.png" alt="App Screen 3" class="app-screen" loading="lazy">
             </div>
           </div>
           <div class="phone-reflections"></div>
@@ -138,7 +138,7 @@
       </div>
 
       <div class="bracelet-center-display">
-        <img src="assets/pulsera.png" class="bracelet-hero-img" alt="Smart Bracelet" #animateUp>
+        <img src="assets/pulsera.png" class="bracelet-hero-img" alt="Smart Bracelet" loading="lazy" #animateUp>
         <div class="bracelet-shadow-ellipse" #animateUp></div>
       </div>
 
@@ -182,19 +182,19 @@
 
         <div class="slide" [class.active]="activeGalleryTab === 1" (click)="setActiveGalleryTab(1)">
           <div class="image-card">
-            <img src="assets/celhtas.jpeg" alt="Monitoreo App" class="gallery-img">
+            <img src="assets/celhtas.jpeg" alt="Monitoreo App" class="gallery-img" loading="lazy">
           </div>
         </div>
 
         <div class="slide" [class.active]="activeGalleryTab === 2" (click)="setActiveGalleryTab(2)">
           <div class="image-card">
-            <img src="assets/pulserahtas2.jpeg" alt="Detalle Pulsera" class="gallery-img">
+            <img src="assets/pulserahtas2.jpeg" alt="Detalle Pulsera" class="gallery-img" loading="lazy">
           </div>
         </div>
 
         <div class="slide" [class.active]="activeGalleryTab === 3" (click)="setActiveGalleryTab(3)">
           <div class="image-card">
-            <img src="assets/laptophtas3.jpeg" alt="Plataforma Web" class="gallery-img">
+            <img src="assets/laptophtas3.jpeg" alt="Plataforma Web" class="gallery-img" loading="lazy">
           </div>
         </div>
 

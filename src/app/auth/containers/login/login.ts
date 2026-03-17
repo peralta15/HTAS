@@ -57,6 +57,7 @@ export class Login {
       Email: ['', [Validators.required, Validators.email]],
       Password: ['', [Validators.required, Validators.minLength(6)]],
       Rol: ['', [Validators.required]],
+      NSS: [''],
       Cedula: [''],
       Especialidad: [''],
       DireccionClinica: [''],
@@ -86,8 +87,20 @@ export class Login {
   }
 
   private actualizarValidacionesDinamicas(rol: string) {
+    const pacienteFields = ['NSS'];
     const doctorFields = ['Cedula', 'Especialidad', 'DireccionClinica'];
     const acompananteFields = ['FechaAsignacion'];
+
+    pacienteFields.forEach(fieldName => {
+      const control = this.registerForm.get(fieldName);
+      if (rol === 'Paciente') {
+        control?.setValidators([Validators.required, Validators.pattern('^[0-9]{11}$')]);
+      } else {
+        control?.clearValidators();
+        control?.setValue('');
+      }
+      control?.updateValueAndValidity();
+    });
 
     doctorFields.forEach(fieldName => {
       const control = this.registerForm.get(fieldName);
@@ -137,7 +150,9 @@ export class Login {
           fechaRegistro: new Date()
         };
 
-        if (f.Rol === 'Doctor') {
+        if (f.Rol === 'Paciente') {
+          datosUsuario.nss = f.NSS || '';
+        } else if (f.Rol === 'Doctor') {
           datosUsuario.cedula = f.Cedula || '';
           datosUsuario.especialidad = f.Especialidad || '';
           datosUsuario.direccionClinica = f.DireccionClinica || '';
