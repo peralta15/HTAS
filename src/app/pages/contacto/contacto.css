@@ -447,3 +447,110 @@ h2 {
 .dot:hover {
     background: rgba(176, 0, 30, 0.5);
 }
+
+/* --- ESTILOS DEL MODAL UNIFICADOS --- */
+.custom-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+    /* Aumentamos el blur para más elegancia */
+    z-index: 100000;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.custom-modal-overlay.show {
+    display: flex !important;
+}
+
+.custom-modal {
+    background: white;
+    width: 100%;
+    max-width: 420px;
+    padding: 40px 30px;
+    border-radius: 24px;
+    text-align: center;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+    position: relative;
+    border-top: 8px solid #8B0015;
+    /* Borde por defecto (Error) */
+    animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Cambio de color si es Éxito */
+.custom-modal.modal-success {
+    border-top-color: #8B0015;
+}
+
+.modal-icon {
+    font-size: 70px;
+    /* Ícono más imponente */
+    margin-bottom: 20px;
+    line-height: 1;
+}
+
+/* Colores de íconos específicos */
+.modal-icon .bi-check-circle-fill {
+    color: #8B0015;
+}
+
+.modal-icon .bi-exclamation-triangle-fill {
+    color: #8B0015;
+}
+
+.custom-modal h3 {
+    font-size: 26px;
+    /* Más grande como en tu captura */
+    margin-bottom: 12px;
+    color: #1a1a1a;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+}
+
+.custom-modal p {
+    font-size: 16px;
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 30px;
+    padding: 0 10px;
+}
+
+.modal-button {
+    width: 100%;
+    max-width: 220px;
+    height: 50px;
+    background-color: #8B0015;
+    /* Botón siempre institucional */
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(139, 0, 21, 0.2);
+}
+
+.modal-button:hover {
+    background-color: #a0001a;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(139, 0, 21, 0.3);
+}
+
+@keyframes modalPop {
+    from {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}

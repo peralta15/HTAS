@@ -1,18 +1,36 @@
 import { Component, AfterViewInit, ViewChildren, QueryList, ElementRef, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { ShaderBackgroundComponent } from '../../components/ui/shader-background/shader-background.component';
+import { HttpClient, HttpClientModule } from '@angular/common/http'; // Importa HttpClientModule
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-contacto',
   standalone: true,
-  imports: [CommonModule, ShaderBackgroundComponent],
+  imports: [CommonModule, ShaderBackgroundComponent, HttpClientModule, FormsModule],
   templateUrl: './contacto.html',
   styleUrl: './contacto.css',
 })
 export class Contacto implements AfterViewInit {
   @ViewChildren('animateUp') elementsToAnimate!: QueryList<ElementRef>;
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) { }
+  datosContacto = {
+    nombre: '',
+    apellidos: '',
+    email: '',
+    telefono: '',
+    mensaje: ''
+  };
+  enviando = false;
+
+  modal = {
+    visible: false,
+    titulo: '',
+    mensaje: '',
+    tipo: 'success' // puede ser 'success' o 'error'
+  };
+
+  constructor(@Inject(PLATFORM_ID) private platformId: Object, private http: HttpClient) { }
 
   ngAfterViewInit() {
     if (isPlatformBrowser(this.platformId)) {
@@ -27,6 +45,54 @@ export class Contacto implements AfterViewInit {
       // 3. Intento al segundo (fallback final)
       setTimeout(() => this.triggerAnimations(), 1000);
     }
+  }
+
+  enviarContacto(event: Event) {
+    event.preventDefault();
+    this.enviando = true;
+
+    this.http.post('http://localhost:3000/api/auth/contacto', this.datosContacto).subscribe({
+      next: () => {
+        this.mostrarModal(
+          '¡Envío Exitoso!',
+          'Tu mensaje ha sido enviado correctamente a nuestro equipo de soporte.',
+          'success'
+        );
+        this.resetForm();
+        this.enviando = false;
+      },
+      error: (err) => {
+        console.error('Error al enviar:', err);
+        this.mostrarModal(
+          'Error de Envío',
+          'No pudimos procesar tu mensaje. Por favor, verifica tu conexión o intenta más tarde.',
+          'error'
+        );
+        this.enviando = false;
+      }
+    });
+  }
+
+  // Funciones para el Modal
+  mostrarModal(titulo: string, mensaje: string, tipo: 'success' | 'error') {
+    this.modal.titulo = titulo;
+    this.modal.mensaje = mensaje;
+    this.modal.tipo = tipo;
+    this.modal.visible = true;
+  }
+
+  cerrarModal() {
+    this.modal.visible = false;
+  }
+
+  private resetForm() {
+    this.datosContacto = {
+      nombre: '',
+      apellidos: '',
+      email: '',
+      telefono: '',
+      mensaje: ''
+    };
   }
 
   private triggerAnimations() {
