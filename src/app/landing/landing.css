@@ -1272,9 +1272,10 @@ section[id] {
 
 /* ===== GALLERY SECTION ===== */
 .gallery-section {
-    padding: 5rem 5%;
-    /* Standardized padding */
-    background-color: #ffffff;
+    padding: 5rem 5% 5rem;
+    /* Reduced bottom padding */
+    background: linear-gradient(172deg, #ffffff 65%, #8B0015 65.2%);
+    /* Pushed red stop even higher */
     margin-bottom: 0rem;
     border-radius: 10px;
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
@@ -1282,6 +1283,8 @@ section[id] {
     margin-left: auto;
     margin-right: auto;
     opacity: 1;
+    position: relative;
+    overflow: hidden;
 }
 
 .filter-pills {
@@ -1389,7 +1392,7 @@ section[id] {
     justify-content: center;
     gap: 12px;
     margin-top: 2rem;
-    margin-bottom: 2.5rem;
+    margin-bottom: 0.5rem;
     position: relative;
     z-index: 20;
 }
@@ -1411,8 +1414,10 @@ section[id] {
 }
 
 .dot.active {
-    background-color: #8B0015;
-    transform: scale(1.2);
+    background-color: #ffffff;
+    /* White dots for better visibility on red background */
+    transform: scale(1.3);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
 }
 
 /* ===== BRACELET SCHEMATIC SECTION ===== */
