@@ -1,4 +1,4 @@
-import { Component, ElementRef, Inject, OnDestroy, OnInit, PLATFORM_ID, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, ElementRef, Inject, OnDestroy, OnInit, PLATFORM_ID, ViewChild, AfterViewInit, NgZone, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import * as THREE from 'three';
 
@@ -14,7 +14,8 @@ import * as THREE from 'three';
       background-color: #f2f2f2;
       overflow: hidden;
     }
-  `]
+  `],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ElectricWavesComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('container') containerRef!: ElementRef;
@@ -36,7 +37,7 @@ export class ElectricWavesComponent implements OnInit, AfterViewInit, OnDestroy 
   private brightness = 0.003;
   private colorSeparation = 0.15;
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+  constructor(@Inject(PLATFORM_ID) private platformId: Object, private ngZone: NgZone) {}
 
   ngOnInit(): void {}
 
@@ -154,7 +155,10 @@ export class ElectricWavesComponent implements OnInit, AfterViewInit, OnDestroy 
       window.addEventListener('resize', this.resizeHandler);
     }
 
-    this.animate();
+    // Run the animation loop outside of Angular to prevent change detection on every frame
+    this.ngZone.runOutsideAngular(() => {
+      this.animate();
+    });
   }
 
   private onResize = () => {

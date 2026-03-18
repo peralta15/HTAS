@@ -1,11 +1,13 @@
-import { Component, ElementRef, OnInit, OnDestroy, ViewChild, AfterViewInit, Inject, PLATFORM_ID } from '@angular/core';
+import { Component, ElementRef, OnInit, OnDestroy, ViewChild, AfterViewInit, Inject, PLATFORM_ID, NgZone, ChangeDetectionStrategy } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-shader-background',
   standalone: true,
+  imports: [],
   templateUrl: './shader-background.component.html',
-  styleUrls: ['./shader-background.component.css']
+  styleUrls: ['./shader-background.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ShaderBackgroundComponent implements AfterViewInit, OnDestroy {
   @ViewChild('canvas', { static: true }) canvasRef!: ElementRef<HTMLCanvasElement>;
@@ -15,7 +17,12 @@ export class ShaderBackgroundComponent implements AfterViewInit, OnDestroy {
   private animationFrameId: number | null = null;
   private startTime: number = 0;
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+  // Cached locations
+  private resolutionLoc: WebGLUniformLocation | null = null;
+  private timeLoc: WebGLUniformLocation | null = null;
+  private vertexPositionLoc: number = -1;
+
+  constructor(@Inject(PLATFORM_ID) private platformId: Object, private ngZone: NgZone) {}
 
   // ... (shaders kept unchanged)
   // Vertex shader source code
@@ -114,9 +121,14 @@ export class ShaderBackgroundComponent implements AfterViewInit, OnDestroy {
       if (!this.program) return;
 
       this.initBuffers(this.gl);
+      this.cacheLocations();
       this.startTime = Date.now();
       this.setupResizeListener();
-      this.render();
+      
+      // Run the animation loop outside of Angular to prevent change detection on every frame
+      this.ngZone.runOutsideAngular(() => {
+        this.render();
+      });
     }
   }
 
@@ -195,6 +207,13 @@ export class ShaderBackgroundComponent implements AfterViewInit, OnDestroy {
     gl.viewport(0, 0, canvas.width, canvas.height);
   }
 
+  private cacheLocations(): void {
+    if (!this.gl || !this.program) return;
+    this.resolutionLoc = this.gl.getUniformLocation(this.program, 'iResolution');
+    this.timeLoc = this.gl.getUniformLocation(this.program, 'iTime');
+    this.vertexPositionLoc = this.gl.getAttribLocation(this.program, 'aVertexPosition');
+  }
+
   private render(): void {
     if (!this.gl || !this.program) return;
 
@@ -206,15 +225,17 @@ export class ShaderBackgroundComponent implements AfterViewInit, OnDestroy {
 
     gl.useProgram(this.program);
 
-    const resolutionLoc = gl.getUniformLocation(this.program, 'iResolution');
-    const timeLoc = gl.getUniformLocation(this.program, 'iTime');
-    const vertexPositionLoc = gl.getAttribLocation(this.program, 'aVertexPosition');
+    if (this.resolutionLoc) {
+      gl.uniform2f(this.resolutionLoc, this.canvasRef.nativeElement.width, this.canvasRef.nativeElement.height);
+    }
+    if (this.timeLoc) {
+      gl.uniform1f(this.timeLoc, currentTime);
+    }
 
-    gl.uniform2f(resolutionLoc, this.canvasRef.nativeElement.width, this.canvasRef.nativeElement.height);
-    gl.uniform1f(timeLoc, currentTime);
-
-    gl.enableVertexAttribArray(vertexPositionLoc);
-    gl.vertexAttribPointer(vertexPositionLoc, 2, gl.FLOAT, false, 0, 0);
+    if (this.vertexPositionLoc !== -1) {
+      gl.enableVertexAttribArray(this.vertexPositionLoc);
+      gl.vertexAttribPointer(this.vertexPositionLoc, 2, gl.FLOAT, false, 0, 0);
+    }
 
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 

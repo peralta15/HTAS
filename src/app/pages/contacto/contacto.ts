@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, ViewChildren, QueryList, ElementRef, Inject, PLATFORM_ID } from '@angular/core';
+import { Component, AfterViewInit, ViewChildren, QueryList, ElementRef, Inject, PLATFORM_ID, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { ShaderBackgroundComponent } from '../../components/ui/shader-background/shader-background.component';
 import { HttpClient, HttpClientModule } from '@angular/common/http'; // Importa HttpClientModule
@@ -10,6 +10,7 @@ import { FormsModule } from '@angular/forms';
   imports: [CommonModule, ShaderBackgroundComponent, HttpClientModule, FormsModule],
   templateUrl: './contacto.html',
   styleUrl: './contacto.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class Contacto implements AfterViewInit {
   @ViewChildren('animateUp') elementsToAnimate!: QueryList<ElementRef>;
@@ -30,20 +31,26 @@ export class Contacto implements AfterViewInit {
     tipo: 'success' // puede ser 'success' o 'error'
   };
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object, private http: HttpClient) { }
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: Object, 
+    private http: HttpClient,
+    private cdr: ChangeDetectorRef
+  ) { }
 
   ngAfterViewInit() {
     if (isPlatformBrowser(this.platformId)) {
-      // Intentamos múltiples veces asegurar que el DOM esté listo y Angular haya poblado el QueryList
+      // Intentamos asegurar que el DOM esté listo y Angular haya poblado el QueryList
+      // Reducimos la cantidad de intentos para mejorar el rendimiento
+      setTimeout(() => {
+        this.triggerAnimations();
+        this.cdr.markForCheck();
+      }, 100);
 
-      // 1. Intento casi inmediato
-      setTimeout(() => this.triggerAnimations(), 100);
-
-      // 2. Intento al medio segundo
-      setTimeout(() => this.triggerAnimations(), 500);
-
-      // 3. Intento al segundo (fallback final)
-      setTimeout(() => this.triggerAnimations(), 1000);
+      // Segundo intento como fallback final
+      setTimeout(() => {
+        this.triggerAnimations();
+        this.cdr.markForCheck();
+      }, 1000);
     }
   }
 
@@ -60,6 +67,7 @@ export class Contacto implements AfterViewInit {
         );
         this.resetForm();
         this.enviando = false;
+        this.cdr.markForCheck();
       },
       error: (err) => {
         console.error('Error al enviar:', err);
@@ -69,6 +77,7 @@ export class Contacto implements AfterViewInit {
           'error'
         );
         this.enviando = false;
+        this.cdr.markForCheck();
       }
     });
   }
@@ -79,10 +88,12 @@ export class Contacto implements AfterViewInit {
     this.modal.mensaje = mensaje;
     this.modal.tipo = tipo;
     this.modal.visible = true;
+    this.cdr.markForCheck();
   }
 
   cerrarModal() {
     this.modal.visible = false;
+    this.cdr.markForCheck();
   }
 
   private resetForm() {

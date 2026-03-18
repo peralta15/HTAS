@@ -1,4 +1,4 @@
-import { Component, HostListener, AfterViewInit, ElementRef, QueryList, ViewChildren, Inject, PLATFORM_ID, ChangeDetectionStrategy } from '@angular/core';
+import { Component, HostListener, AfterViewInit, ElementRef, QueryList, ViewChildren, Inject, PLATFORM_ID, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Headermenu } from "../template/headermenu/headermenu";
 import { Footer } from "../template/footer/footer";
@@ -23,7 +23,7 @@ export class Landing implements AfterViewInit {
   activeGalleryTab = 1;
   activeFeatureIndex = 0;
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) { }
+  constructor(@Inject(PLATFORM_ID) private platformId: Object, private cdr: ChangeDetectorRef) { }
 
   ngAfterViewInit() {
     if (isPlatformBrowser(this.platformId)) {
@@ -75,6 +75,7 @@ export class Landing implements AfterViewInit {
   // --- Lógica de Galería ---
   setActiveGalleryTab(tab: number) {
     this.activeGalleryTab = tab;
+    this.cdr.markForCheck();
   }
 
   get sliderTransform() {
@@ -145,10 +146,12 @@ export class Landing implements AfterViewInit {
 
   setActiveFeature(index: number) {
     this.activeFeatureIndex = index;
+    this.cdr.markForCheck();
   }
 
   setScreenIndex(index: number) {
     this.activeScreenIndex = index;
+    this.cdr.markForCheck();
   }
 
   get screenTransform() {

@@ -79,7 +79,7 @@ h2 {
 .item i,
 .item span {
     color: rgba(255, 255, 255, 0.7);
-    transition: all .5s;
+    transition: color .5s ease;
 }
 
 .item:hover i,
@@ -105,7 +105,7 @@ h2 {
     text-decoration: none;
     font-size: 25px;
     color: rgba(255, 255, 255, 0.5);
-    transition: all .5s;
+    transition: color .5s ease;
 }
 
 .form {
@@ -168,7 +168,7 @@ h2 {
     letter-spacing: 1px;
     color: #888;
     pointer-events: none;
-    transition: all .5s;
+    transition: transform .5s ease, font-size .5s ease, color .5s ease, font-weight .5s ease;
 }
 
 .input-box input:focus~span,
@@ -196,10 +196,9 @@ h2 {
     font-size: .9rem;
     font-weight: 600;
     letter-spacing: 1.5px;
-    border: none;
     cursor: pointer;
     border-radius: 6px;
-    transition: all .5s;
+    transition: background-color .3s ease, transform .2s ease;
 }
 
 .input-box input[type='submit']:hover {
@@ -332,7 +331,7 @@ h2 {
     border: 1px solid rgba(0, 0, 0, 0.05);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
     overflow: hidden;
-    transition: all 0.3s ease;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
 }
 
 .accordion-header {
@@ -341,7 +340,7 @@ h2 {
     align-items: center;
     cursor: pointer;
     background: #fff;
-    transition: background 0.3s ease;
+    transition: background-color 0.3s ease;
 }
 
 .accordion-header:hover {
@@ -374,14 +373,14 @@ h2 {
     font-size: 1.5rem;
     color: #8B0015;
     font-weight: 300;
-    transition: transform 0.4s ease;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 /* Contenido oculto por defecto */
 .accordion-content {
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.5s cubic-bezier(0, 1, 0, 1);
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     background: #fff;
     padding: 0 1.5rem;
 }
@@ -435,7 +434,7 @@ h2 {
     background: rgba(0, 0, 0, 0.1);
     border: 2px solid #8B0015;
     cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: background-color 0.4s ease, transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
 }
 
 .dot.active {
@@ -533,7 +532,7 @@ h2 {
     font-size: 18px;
     font-weight: 700;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
     box-shadow: 0 4px 15px rgba(139, 0, 21, 0.2);
 }
 
