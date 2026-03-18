@@ -1,0 +1,71 @@
+/* Ensure the component behaves like a block element */
+:host {
+    display: block;
+    width: 100%;
+}
+
+/* Container styles inspired by landing.css .content-section */
+.breadcrumb {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: 1rem 2rem;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    margin: 90px auto 1.5rem;
+    /* Top margin to clear fixed header, auto horizontal, bottom margin */
+    max-width: 1400px;
+    /* Consistent max-width */
+    width: 90%;
+    /* Limit width */
+    list-style: none;
+    /* Remove bullets */
+}
+
+/* Link styles */
+.breadcrumb a {
+    text-decoration: none;
+    font-weight: 600;
+    /* Slightly bolder for readability */
+    color: #555;
+    /* Dark grey */
+    transition: all 0.3s ease;
+}
+
+.breadcrumb a:hover {
+    color: #b0001e;
+    /* Requested red color */
+    transform: translateY(-1px);
+}
+
+/* Current page styles */
+.current {
+    font-weight: 700;
+    color: #b0001e;
+    /* Requested red color */
+}
+
+/* Separator styles */
+.separator {
+    margin: 0 0.8rem;
+    color: #ccc;
+    font-weight: 300;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .breadcrumb {
+        width: 95%;
+        padding: 0.8rem 1rem;
+        font-size: 0.9rem;
+        margin-top: 70px;
+        /* Slightly less top margin for mobile header */
+        margin-bottom: 0;
+        /* Reduced bottom margin to minimize whitespace */
+    }
+
+    .separator {
+        margin: 0 0.5rem;
+    }
+}
