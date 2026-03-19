@@ -5,6 +5,8 @@ import { FormsModule } from '@angular/forms';
 import { GoogleService } from '../../../auth/services/google';
 import flatpickr from 'flatpickr';
 import { Spanish } from 'flatpickr/dist/l10n/es.js';
+import { Users } from '../../../auth/services/users';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-acompanantes',
@@ -14,6 +16,7 @@ import { Spanish } from 'flatpickr/dist/l10n/es.js';
 })
 export class Acompanantes implements OnInit {
   private googleService = inject(GoogleService);
+  private usersService = inject(Users);
   private cdr = inject(ChangeDetectorRef);
   private platformId = inject(PLATFORM_ID);
 
@@ -33,17 +36,54 @@ export class Acompanantes implements OnInit {
   isDeleting = false;
 
   async ngOnInit() {
-    await this.cargarUsuarios();
+    if (isPlatformBrowser(this.platformId)) {
+      await this.cargarUsuarios();
+    }
   }
 
-  cargarUsuarios() {
-    this.googleService.getUsuarios().then(users => {
-      // Filtrar solo para que muestre Acompañantes
-      this.usuariosTodo = users.filter(u => (u.rol || u.Rol) === 'Acompañante');
+  async cargarUsuarios() {
+    try {
+      // 1. Obtenemos datos de ambas fuentes
+      const usersFirebase = await this.googleService.getUsuarios();
+      const usersBackend = await firstValueFrom(this.usersService.getUsuariosBackend());
+
+      // 2. Normalizamos Firebase (Aseguramos que tenga los campos que el HTML usa)
+      const firebaseNormalizado = usersFirebase.map(u => ({
+        ...u,
+        id: u.id || u.uid,
+        // Usamos NombreCompleto o nombre (lo que traiga Google)
+        NombreCompleto: u.NombreCompleto || u.nombre || 'Usuario de Google',
+        correo: u.correo || u.email,
+        rol: u.rol || u.Rol || 'Acompañante',
+        fuente: 'Firebase'
+      }));
+
+      // 3. Normalizamos Backend (Mapeamos los campos de tu DB de Postgres)
+      const backendNormalizado = usersBackend.map(u => ({
+        ...u,
+        id: u.idusuario || u.uid_firebase || u.id,
+        // Construimos el nombre completo desde las piezas del backend
+        NombreCompleto: u.NombreCompleto || `${u.nombre || ''} ${u.apPaterno || ''} ${u.apMaterno || ''}`.trim() || 'Usuario Backend',
+        correo: u.correo,
+        rol: u.rol || 'Acompañante',
+        telefono: u.telefono || 'Sin teléfono',
+        fuente: 'Postgres'
+      }));
+
+      // 4. Combinamos y filtramos
+      const listaTotal = [...firebaseNormalizado, ...backendNormalizado];
+
+      // Filtro flexible: acepta 'Acompañante' o 'acompañante'
+      this.usuariosTodo = listaTotal.filter(u =>
+        (u.rol || u.Rol || '').toLowerCase() === 'acompañante'
+      );
+
+      console.log('Usuarios cargados:', this.usuariosTodo); // Para que veas en consola si llegaron datos
       this.cdr.detectChanges();
-    }).catch(error => {
-      console.error('Error al cargar usuarios:', error);
-    });
+
+    } catch (error) {
+      console.error('Error al unificar usuarios:', error);
+    }
   }
 
   get usuariosFiltrados() {
@@ -114,30 +154,65 @@ export class Acompanantes implements OnInit {
 
     this.isSaving = true;
     try {
-      // Reconstruir el nombre completo
+      // 1. Extraemos los datos necesarios
+      const id = this.usuarioSeleccionado.id;
+      const fuente = this.usuarioSeleccionado.fuente;
+
+      // 2. Reconstruimos los nombres desde los campos temporales del modal
       const nombre = (this.usuarioSeleccionado.tempNombre || '').trim();
       const apPaterno = (this.usuarioSeleccionado.tempApellidoPaterno || '').trim();
       const apMaterno = (this.usuarioSeleccionado.tempApellidoMaterno || '').trim();
-
       const nombreCompleto = [nombre, apPaterno, apMaterno].filter(p => p).join(' ');
 
-      this.usuarioSeleccionado.nombre = nombre;
-      this.usuarioSeleccionado.NombreCompleto = nombreCompleto;
+      // 3. Lógica de guardado según la FUENTE
+      if (fuente === 'Firebase') {
+        console.log(`Actualizando ID ${id} en Firebase...`);
 
-      // Limpiar campos temporales antes de guardar en la DB
-      const { id, tempNombre, tempApellidoPaterno, tempApellidoMaterno, ...data } = this.usuarioSeleccionado;
-      await this.googleService.updateUsuario(id, data);
+        // Preparamos el objeto EXACTO que espera Firestore
+        const dataFirebase = {
+          NombreCompleto: nombreCompleto,
+          correo: this.usuarioSeleccionado.correo,
+          rol: this.usuarioSeleccionado.rol,
+          telefono: this.usuarioSeleccionado.telefono
+        };
 
-      // Actualizar localmente
-      const index = this.usuariosTodo.findIndex(u => u.id === id);
-      if (index !== -1) {
-        this.usuariosTodo[index] = { ...this.usuarioSeleccionado };
+        await this.googleService.updateUsuario(id, dataFirebase);
+
+      } else {
+        console.log(`Actualizando ID ${id} en Postgres...`);
+
+        // Preparamos el objeto EXACTO que espera tu API de Node.js
+        const datosPostgres = {
+          nombre: nombre,
+          apPaterno: apPaterno,
+          apMaterno: apMaterno,
+          correo: this.usuarioSeleccionado.correo,
+          telefono: this.usuarioSeleccionado.telefono,
+          activo: true
+        };
+
+        await firstValueFrom(this.usersService.updateUsuario(id, datosPostgres));
       }
 
+      // 4. Sincronizamos la vista local (lo que ves en la tabla)
+      const index = this.usuariosTodo.findIndex(u => u.id === id);
+      if (index !== -1) {
+        this.usuariosTodo[index] = {
+          ...this.usuarioSeleccionado,
+          NombreCompleto: nombreCompleto,
+          nombre: nombre,
+          apPaterno: apPaterno,
+          apMaterno: apMaterno
+        };
+      }
+
+      console.log(`¡Cambios guardados con éxito en ${fuente}!`);
       this.cerrarModal();
+      this.cdr.detectChanges();
+
     } catch (error) {
-      console.error('Error al guardar cambios:', error);
-      alert('Error al guardar los cambios. Por favor, intenta de nuevo.');
+      console.error(`Error al guardar en ${this.usuarioSeleccionado.fuente}:`, error);
+      alert(`No se pudieron guardar los cambios en ${this.usuarioSeleccionado.fuente}. Revisa la consola.`);
     } finally {
       this.isSaving = false;
       this.cdr.detectChanges();
@@ -147,22 +222,38 @@ export class Acompanantes implements OnInit {
   async confirmarEliminar() {
     if (!this.usuarioSeleccionado) return;
 
+    this.isDeleting = true;
     const idAEliminar = this.usuarioSeleccionado.id;
 
-    // Actualización Optimista: Quitamos de la lista y cerramos modal al instante
+    // Actualización Optimista: Quitamos de la lista visual al instante para mejor UX
+    // Guardamos una copia por si hay que revertir
+    const usuariosCopia = [...this.usuariosTodo];
     this.usuariosTodo = this.usuariosTodo.filter(u => u.id !== idAEliminar);
-    this.usuarioSeleccionado = null;
-    this.cerrarModal();
     this.cdr.detectChanges();
 
     try {
-      await this.googleService.deleteUsuario(idAEliminar);
-      console.log('Usuario eliminado de la base de datos');
+      // 1. Ejecutar eliminaciones permanentes en paralelo
+      console.log(`Eliminando permanentemente usuario ${idAEliminar} de Firebase y Postgres...`);
+
+      await Promise.all([
+        // Eliminación en Firebase
+        this.googleService.deleteUsuario(idAEliminar),
+
+        // Eliminación en Postgres
+        firstValueFrom(this.usersService.deleteUsuario(idAEliminar))
+      ]);
+
+      console.log('Usuario eliminado permanentemente de ambas plataformas.');
+      this.cerrarModal();
     } catch (error) {
-      console.error('Error al eliminar en segundo plano:', error);
-      // Opcional: Podrías alertar que hubo un problema técnico aunque visualmente se borró
+      console.error('Error crítico al eliminar en Firebase o Postgres:', error);
+      alert('Hubo un error al intentar eliminar el usuario permanentemente. La operación puede haber fallado en una plataforma.');
+
+      // Revertir la actualización optimista si falló
+      this.usuariosTodo = usuariosCopia;
     } finally {
       this.isDeleting = false;
+      this.usuarioSeleccionado = null;
       this.cdr.detectChanges();
     }
   }

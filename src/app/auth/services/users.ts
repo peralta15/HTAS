@@ -4,6 +4,7 @@ import { environment } from '../../../environments/environment';
 import { isPlatformBrowser } from '@angular/common';
 import { tap } from 'rxjs/operators';
 import emailjs from '@emailjs/browser';
+import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class Users {
@@ -84,5 +85,17 @@ export class Users {
     } catch (error) {
       console.error('Error al enviar el PIN con EmailJS:', error);
     }
+  }
+
+  getUsuariosBackend(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/all-users`);
+  }
+
+  updateUsuario(id: string | number, datos: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/update-user/${id}`, datos);
+  }
+
+  deleteUsuario(id: string | number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/delete-user/${id}`);
   }
 }

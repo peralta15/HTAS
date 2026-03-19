@@ -21,6 +21,7 @@ import { Users } from '../../services/users';
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
+
 export class Login {
   private googleService = inject(GoogleService);
   private auth = inject(Auth);
