@@ -1191,10 +1191,9 @@ section[id] {
     }
 
     .app-promo-section {
-        padding: 10rem 5% 4rem;
-        /* Increased padding to clear hero peaks */
+        padding: 2rem 5% 0; /* No bottom padding */
         text-align: center;
-        margin-top: -80px;
+        margin-top: -60px;
     }
 
     .promo-actions {
@@ -1203,11 +1202,10 @@ section[id] {
 
     .phone-mockup-wrapper {
         min-width: 100%;
-        padding: 40px 20px;
+        padding: 20px 20px 0; /* Reduced top/bottom padding */
         display: flex;
         flex-direction: column;
-        /* Stack labels and phone */
-        gap: 40px;
+        gap: 20px;
     }
 
     .feature-label-box {
@@ -2048,7 +2046,7 @@ section[id] {
 @media (max-width: 992px) {
     .bracelet-schematic-section {
         min-height: auto;
-        padding: 4rem 5%;
+        padding: 2rem 5%; /* Reduced top/bottom padding */
     }
 
     .schematic-container {
@@ -2151,16 +2149,16 @@ section[id] {
     }
 
     .app-promo-section {
-        padding: 10rem 5% 4rem;
+        padding: 2rem 5% 0;
         margin-top: -60px;
     }
 
     .content-section,
     .interactive-section,
     .gallery-section {
-        padding: 6rem 5% 3rem;
-        margin-top: -40px;
-        margin-bottom: 1rem;
+        padding: 3rem 5% 2rem;
+        margin-top: 0;
+        margin-bottom: 0;
         border-radius: 0;
     }
 
@@ -2253,8 +2251,8 @@ section[id] {
     .content-section,
     .interactive-section,
     .gallery-section {
-        padding: 5rem 5% 2.5rem;
-        margin-top: -40px;
+        padding: 2.5rem 5% 2rem;
+        margin-top: 0;
     }
 
     .content-text h2 {
