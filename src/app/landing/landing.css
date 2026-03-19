@@ -87,6 +87,7 @@ app-electric-waves {
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
+    will-change: transform, opacity;
 }
 
 .hero-subtitle {
@@ -96,6 +97,7 @@ app-electric-waves {
     color: rgba(255, 255, 255, 0.9);
     text-transform: uppercase;
     letter-spacing: 4px;
+    will-change: transform, opacity;
 }
 
 .hero-description {
@@ -109,6 +111,7 @@ app-electric-waves {
     font-weight: 700;
     /* Bolded for better distinction */
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    will-change: transform, opacity;
 }
 
 .hero-cta-group {

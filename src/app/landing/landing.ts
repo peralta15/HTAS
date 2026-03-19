@@ -25,50 +25,77 @@ export class Landing implements AfterViewInit {
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object, private cdr: ChangeDetectorRef) { }
 
+  private observer?: IntersectionObserver;
+
   ngAfterViewInit() {
     if (isPlatformBrowser(this.platformId)) {
-      // Usamos un pequeño delay para asegurar que el DOM esté listo tras la recarga
-      setTimeout(() => {
-        this.initScrollAnimations();
-        this.initCard3DAnimations();
-      }, 100);
+      this.initScrollAnimations();
+    }
+  }
+
+  ngOnDestroy() {
+    if (this.observer) {
+      this.observer.disconnect();
     }
   }
 
   /**
-   * Animación Reversible (Subir/Bajar)
-   * Al recargar, los elementos visibles se disparan automáticamente.
+   * Animación Reversible (Subir/Bajar) con IntersectionObserver
+   * Los elementos se animan solo cuando entran en el viewport.
    */
   private initScrollAnimations() {
-    if (!this.elementsToAnimate) return;
-    this.elementsToAnimate.forEach((el, index) => {
-      el.nativeElement.animate([
-        { opacity: 0, transform: 'translateY(40px)' },
-        { opacity: 1, transform: 'translateY(0)' }
-      ], {
-        duration: 800,
-        delay: index * 40,
-        easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-        fill: 'both'
-      });
-    });
-  }
+    if (!this.elementsToAnimate && !this.infoCards) return;
 
-  /**
-   * Animación 3D Reversible para Cards
-   */
-  private initCard3DAnimations() {
-    if (!this.infoCards) return;
-    this.infoCards.forEach((card, index) => {
-      card.nativeElement.animate([
-        { transform: 'perspective(1000px) rotateX(30deg) scale(0.9)', opacity: 0 },
-        { transform: 'perspective(1000px) rotateX(0deg) scale(1)', opacity: 1 }
-      ], {
-        duration: 900,
-        delay: (this.elementsToAnimate?.length || 0) * 40 + (index * 80),
-        easing: 'ease-out',
-        fill: 'both'
+    const options = {
+      root: null,
+      rootMargin: '0px',
+      threshold: 0.1
+    };
+
+    this.observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const target = entry.target as HTMLElement;
+          
+          // Animación para elementos normales
+          if (target.getAttribute('animate-type') === 'up') {
+            target.animate([
+              { opacity: 0, transform: 'translateY(40px)' },
+              { opacity: 1, transform: 'translateY(0)' }
+            ], {
+              duration: 800,
+              easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+              fill: 'both'
+            });
+          } 
+          // Animación para cards 3D
+          else if (target.getAttribute('animate-type') === '3d') {
+            target.animate([
+              { transform: 'perspective(1000px) rotateX(30deg) scale(0.9)', opacity: 0 },
+              { transform: 'perspective(1000px) rotateX(0deg) scale(1)', opacity: 1 }
+            ], {
+              duration: 900,
+              easing: 'ease-out',
+              fill: 'both'
+            });
+          }
+
+          // Dejar de observar una vez animado
+          this.observer?.unobserve(target);
+        }
       });
+    }, options);
+
+    // Observar elementos normales
+    this.elementsToAnimate?.forEach((el) => {
+      el.nativeElement.setAttribute('animate-type', 'up');
+      this.observer?.observe(el.nativeElement);
+    });
+
+    // Observar cards 3D
+    this.infoCards?.forEach((card) => {
+      card.nativeElement.setAttribute('animate-type', '3d');
+      this.observer?.observe(card.nativeElement);
     });
   }
 

@@ -47,19 +47,21 @@ export class ElectricWavesComponent implements OnInit, AfterViewInit, OnDestroy 
     }
   }
 
+  private isVisible = true;
+  private visibilityObserver?: IntersectionObserver;
+
   private initThree(): void {
     const container = this.containerRef.nativeElement;
 
     // Renderer
     try {
       this.renderer = new THREE.WebGLRenderer({ 
-        antialias: true,
+        antialias: false, // Turn off antialias for better performance on shaders
         powerPreference: 'high-performance',
         alpha: false
       });
-      // Cap pixel ratio to 1.5 to improve performance on high-DPI screens
-      const pixelRatio = Math.min(window.devicePixelRatio, 1.5);
-      this.renderer.setPixelRatio(pixelRatio);
+      // Cap pixel ratio to 1.0 to improve performance on high-DPI screens
+      this.renderer.setPixelRatio(1.0);
       container.appendChild(this.renderer.domElement);
     } catch (err) {
       console.error('WebGL not supported', err);
@@ -93,36 +95,29 @@ export class ElectricWavesComponent implements OnInit, AfterViewInit, OnDestroy 
         vec2 uv = (gl_FragCoord.xy - 0.5 * u_resolution) / min(u_resolution.x, u_resolution.y);
         
         vec3 color = vec3(0.0);
-        float time = u_time * 0.5; // Slow down slightly for fluidity
+        float time = u_time * 0.5;
         
-        // Optimización: Un solo bucle para simular las ondas
-        // Evitamos el bucle anidado que causaba lag
-        for (float i = 0.0; i < 6.0; i++) { // Limitado a 6 máximo para rendimiento
+        // Optimización: Reducimos el número de iteraciones si es posible
+        for (float i = 0.0; i < 4.0; i++) { 
           if (i >= u_waveCount) break;
           
           vec2 p = uv;
           float offset = i * u_colorSeparation;
           
-          // Movimiento eléctrico fluido (Horizontal)
           p.y += sin(time * (1.1 + i) + p.x * u_frequency) * u_amplitude;
-          
           float wave = u_brightness / abs(p.y);
           
-          // Distribución de color (R,G,B) basada en el índice de la onda
           int channel = int(mod(i, 3.0));
           if (channel == 0) color.r += wave;
           else if (channel == 1) color.g += wave;
           else color.b += wave;
         }
         
-        // Intensity mapping to brand colors
         float intensity = (color.r + color.g + color.b) * 0.333;
-        
         vec3 bgColor = vec3(0.949, 0.949, 0.949); // #F2F2F2
         vec3 lineColor = vec3(0.545, 0.0, 0.082); // #8B0015
         
-        // Sharper but smooth transition
-        float t = smoothstep(0.01, 0.1, intensity);
+        float t = smoothstep(0.01, 0.15, intensity);
         vec3 finalCol = mix(bgColor, lineColor, t);
         
         gl_FragColor = vec4(finalCol, 1.0);
@@ -155,7 +150,13 @@ export class ElectricWavesComponent implements OnInit, AfterViewInit, OnDestroy 
       window.addEventListener('resize', this.resizeHandler);
     }
 
-    // Run the animation loop outside of Angular to prevent change detection on every frame
+    // IntersectionObserver to pause when off-screen
+    this.visibilityObserver = new IntersectionObserver(([entry]) => {
+      this.isVisible = entry.isIntersecting;
+    }, { threshold: 0.1 });
+    this.visibilityObserver.observe(container);
+
+    // Run the animation loop outside of Angular
     this.ngZone.runOutsideAngular(() => {
       this.animate();
     });
@@ -174,7 +175,9 @@ export class ElectricWavesComponent implements OnInit, AfterViewInit, OnDestroy 
 
   private animate = () => {
     this.animationFrameId = requestAnimationFrame(this.animate);
-    if (this.renderer && this.scene && this.camera && this.material) {
+    
+    // Only render if visible
+    if (this.isVisible && this.renderer && this.scene && this.camera && this.material) {
       this.material.uniforms['u_time'].value = this.clock.getElapsedTime();
       this.renderer.render(this.scene, this.camera);
     }
@@ -187,6 +190,9 @@ export class ElectricWavesComponent implements OnInit, AfterViewInit, OnDestroy 
       }
       if (this.resizeHandler) {
         window.removeEventListener('resize', this.resizeHandler);
+      }
+      if (this.visibilityObserver) {
+        this.visibilityObserver.disconnect();
       }
       
       this.geometry?.dispose();
