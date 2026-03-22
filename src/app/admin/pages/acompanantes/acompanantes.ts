@@ -43,46 +43,42 @@ export class Acompanantes implements OnInit {
 
   async cargarUsuarios() {
     try {
-      // 1. Obtenemos datos de ambas fuentes
       const usersFirebase = await this.googleService.getUsuarios();
       const usersBackend = await firstValueFrom(this.usersService.getUsuariosBackend());
 
-      // 2. Normalizamos Firebase (Aseguramos que tenga los campos que el HTML usa)
       const firebaseNormalizado = usersFirebase.map(u => ({
         ...u,
         id: u.id || u.uid,
-        // Usamos NombreCompleto o nombre (lo que traiga Google)
         NombreCompleto: u.NombreCompleto || u.nombre || 'Usuario de Google',
-        correo: u.correo || u.email,
-        rol: u.rol || u.Rol || 'Acompañante',
         fuente: 'Firebase'
       }));
 
-      // 3. Normalizamos Backend (Mapeamos los campos de tu DB de Postgres)
-      const backendNormalizado = usersBackend.map(u => ({
-        ...u,
-        id: u.idusuario || u.uid_firebase || u.id,
-        // Construimos el nombre completo desde las piezas del backend
-        NombreCompleto: u.NombreCompleto || `${u.nombre || ''} ${u.apPaterno || ''} ${u.apMaterno || ''}`.trim() || 'Usuario Backend',
-        correo: u.correo,
-        rol: u.rol || 'Acompañante',
-        telefono: u.telefono || 'Sin teléfono',
-        fuente: 'Postgres'
-      }));
+      const backendNormalizado = usersBackend.map(u => {
 
-      // 4. Combinamos y filtramos
-      const listaTotal = [...firebaseNormalizado, ...backendNormalizado];
+        let fechaFormateada = "";
+        if (u.fechaAsignacion || u.fecha_asignacion) {
+          const f = u.fechaAsignacion || u.fecha_asignacion;
+          fechaFormateada = f.toString().split('T')[0]; // Corta en la 'T' de la zona horaria
+        } return {
+          ...u,
+          id: u.idusuario || u.id,
+          // Usamos los campos exactos que viste en consola
+          NombreCompleto: u.NombreCompleto || `${u.nombre || ''} ${u.apPaterno || u.appaterno || ''} ${u.apMaterno || u.apmaterno || ''}`.trim(),
+          fechaAsignacion: fechaFormateada,
+          fuente: 'Postgres'
+        };
+      });
 
-      // Filtro flexible: acepta 'Acompañante' o 'acompañante'
-      this.usuariosTodo = listaTotal.filter(u =>
+      // REASIGNACIÓN TOTAL (Esto dispara la detección de cambios de Angular)
+      this.usuariosTodo = [...firebaseNormalizado, ...backendNormalizado].filter(u =>
         (u.rol || u.Rol || '').toLowerCase() === 'acompañante'
       );
 
-      console.log('Usuarios cargados:', this.usuariosTodo); // Para que veas en consola si llegaron datos
-      this.cdr.detectChanges();
+      console.log('Lista actualizada en memoria:', this.usuariosTodo);
+      this.cdr.detectChanges(); // Forzamos el renderizado
 
     } catch (error) {
-      console.error('Error al unificar usuarios:', error);
+      console.error('Error al cargar:', error);
     }
   }
 
@@ -153,48 +149,46 @@ export class Acompanantes implements OnInit {
     if (!this.usuarioSeleccionado) return;
 
     this.isSaving = true;
-    try {
-      // 1. Extraemos los datos necesarios
-      const id = this.usuarioSeleccionado.id;
-      const fuente = this.usuarioSeleccionado.fuente;
+    // Declaramos fuente aquí arriba para que funcione en el catch y en toda la función
+    const fuenteActual = this.usuarioSeleccionado.fuente;
+    const id = this.usuarioSeleccionado.id;
 
-      // 2. Reconstruimos los nombres desde los campos temporales del modal
+    try {
+      // 1. Reconstruir nombres
       const nombre = (this.usuarioSeleccionado.tempNombre || '').trim();
       const apPaterno = (this.usuarioSeleccionado.tempApellidoPaterno || '').trim();
       const apMaterno = (this.usuarioSeleccionado.tempApellidoMaterno || '').trim();
       const nombreCompleto = [nombre, apPaterno, apMaterno].filter(p => p).join(' ');
 
-      // 3. Lógica de guardado según la FUENTE
-      if (fuente === 'Firebase') {
-        console.log(`Actualizando ID ${id} en Firebase...`);
-
-        // Preparamos el objeto EXACTO que espera Firestore
+      if (fuenteActual === 'Firebase') {
         const dataFirebase = {
           NombreCompleto: nombreCompleto,
           correo: this.usuarioSeleccionado.correo,
           rol: this.usuarioSeleccionado.rol,
           telefono: this.usuarioSeleccionado.telefono
         };
-
         await this.googleService.updateUsuario(id, dataFirebase);
-
       } else {
-        console.log(`Actualizando ID ${id} en Postgres...`);
-
-        // Preparamos el objeto EXACTO que espera tu API de Node.js
+        // 2. IMPORTANTE: Enviamos los nombres de campos que Postgres suele pedir
+        // Incluimos variaciones por si el backend es estricto
         const datosPostgres = {
           nombre: nombre,
           apPaterno: apPaterno,
           apMaterno: apMaterno,
+          appaterno: apPaterno, // Algunos backends lo esperan todo en minúsculas
+          apmaterno: apMaterno,
           correo: this.usuarioSeleccionado.correo,
           telefono: this.usuarioSeleccionado.telefono,
+          fechaAsignacion: this.usuarioSeleccionado.fechaAsignacion,
+          rol: this.usuarioSeleccionado.rol || 'Acompañante',
           activo: true
         };
 
+        console.log('Enviando actualización a Postgres...', datosPostgres);
         await firstValueFrom(this.usersService.updateUsuario(id, datosPostgres));
       }
 
-      // 4. Sincronizamos la vista local (lo que ves en la tabla)
+      // 3. Sincronizar localmente (Para respuesta inmediata)
       const index = this.usuariosTodo.findIndex(u => u.id === id);
       if (index !== -1) {
         this.usuariosTodo[index] = {
@@ -206,13 +200,15 @@ export class Acompanantes implements OnInit {
         };
       }
 
-      console.log(`¡Cambios guardados con éxito en ${fuente}!`);
-      this.cerrarModal();
-      this.cdr.detectChanges();
+      console.log(`¡Cambios guardados con éxito en ${fuenteActual}!`);
 
-    } catch (error) {
-      console.error(`Error al guardar en ${this.usuarioSeleccionado.fuente}:`, error);
-      alert(`No se pudieron guardar los cambios en ${this.usuarioSeleccionado.fuente}. Revisa la consola.`);
+      // 4. EL PASO CLAVE: Refrescar los usuarios desde la DB para asegurar persistencia
+      this.cerrarModal();
+      await this.cargarUsuarios();
+
+    } catch (error: any) {
+      console.error(`Error al actualizar en ${fuenteActual}:`, error);
+      alert(`Error al guardar: ${error.message || error}`);
     } finally {
       this.isSaving = false;
       this.cdr.detectChanges();
@@ -223,34 +219,29 @@ export class Acompanantes implements OnInit {
     if (!this.usuarioSeleccionado) return;
 
     this.isDeleting = true;
-    const idAEliminar = this.usuarioSeleccionado.id;
+    const id = this.usuarioSeleccionado.id;
+    const fuente = this.usuarioSeleccionado.fuente;
 
-    // Actualización Optimista: Quitamos de la lista visual al instante para mejor UX
-    // Guardamos una copia por si hay que revertir
+    // Guardar copia para revertir si falla
     const usuariosCopia = [...this.usuariosTodo];
-    this.usuariosTodo = this.usuariosTodo.filter(u => u.id !== idAEliminar);
+    this.usuariosTodo = this.usuariosTodo.filter(u => u.id !== id);
     this.cdr.detectChanges();
 
     try {
-      // 1. Ejecutar eliminaciones permanentes en paralelo
-      console.log(`Eliminando permanentemente usuario ${idAEliminar} de Firebase y Postgres...`);
+      // ELIMINACIÓN SEGÚN LA FUENTE (Esto evita el error de Firebase)
+      if (fuente === 'Firebase') {
+        await this.googleService.deleteUsuario(id);
+      } else {
+        // Llama a .delete(`${apiUrl}/delete-user/${id}`)
+        await firstValueFrom(this.usersService.deleteUsuario(id));
+      }
 
-      await Promise.all([
-        // Eliminación en Firebase
-        this.googleService.deleteUsuario(idAEliminar),
-
-        // Eliminación en Postgres
-        firstValueFrom(this.usersService.deleteUsuario(idAEliminar))
-      ]);
-
-      console.log('Usuario eliminado permanentemente de ambas plataformas.');
+      console.log(`Usuario eliminado de ${fuente}`);
       this.cerrarModal();
     } catch (error) {
-      console.error('Error crítico al eliminar en Firebase o Postgres:', error);
-      alert('Hubo un error al intentar eliminar el usuario permanentemente. La operación puede haber fallado en una plataforma.');
-
-      // Revertir la actualización optimista si falló
-      this.usuariosTodo = usuariosCopia;
+      console.error('Error al eliminar:', error);
+      alert('No se pudo eliminar el registro. Reintentando sincronización...');
+      this.usuariosTodo = usuariosCopia; // Revertimos la lista si falló
     } finally {
       this.isDeleting = false;
       this.usuarioSeleccionado = null;
@@ -281,8 +272,10 @@ export class Acompanantes implements OnInit {
           disableMobile: true,
           onChange: (selectedDates: any, dateStr: string) => {
             if (this.usuarioSeleccionado) {
+              // Forzamos la asignación al objeto que se va a guardar
               this.usuarioSeleccionado.fechaAsignacion = dateStr;
-              this.cdr.detectChanges();
+              console.log('Fecha capturada en el objeto:', this.usuarioSeleccionado.fechaAsignacion);
+              this.cdr.detectChanges(); // Obligamos a Angular a ver el cambio
             }
           }
         };
