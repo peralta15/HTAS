@@ -54,7 +54,7 @@ export class Login {
   nombreArchivoCedula: string = '';
   fotoCedulaBase64: string = '';
 
-  constructor(private users: Users, // <--- Agrega esto
+  constructor(public users: Users, // <--- Agrega esto
     private fb: FormBuilder,) {
     this.registerForm = this.fb.group({
       NombreCompleto: ['', [Validators.required, Validators.maxLength(100), soloLetrasValidator()]],
@@ -269,14 +269,20 @@ export class Login {
       error: (err) => {
         this.ngZone.run(() => {
           this.loading = false;
-          const mensajeError = err.error?.error || 'Correo o contraseña incorrectos.';
-          this.openModal('Error de Acceso', mensajeError, 'modal-error');
+          // Si el error es 423, el servicio ya activó el bloqueo, así que solo avisamos
+          if (err.status === 423) {
+            this.openModal('Cuenta Bloqueada', `Demasiados intentos. Espera un momento.`, 'modal-error');
+          } else {
+            const mensajeError = err.error?.error || 'Correo o contraseña incorrectos.';
+            this.openModal('Error de Acceso', mensajeError, 'modal-error');
+          }
         });
       }
     });
   }
 
   async verificarPin() {
+    if (this.users.estaBloqueado()) return;
     this.loading = true;
 
     // Envíamos el UID temporal y el PIN que el usuario escribió en el input
@@ -294,11 +300,21 @@ export class Login {
       },
       error: (err) => {
         this.loading = false;
-        // Ahora el error 404 ya no saldrá, saldrá "PIN incorrecto" (400)
-        const mensaje = err.error?.error || 'Error al validar el PIN.';
-        this.openModal('Error de Verificación', mensaje, 'modal-error');
+        if (err.status === 423) {
+          this.openModal('Bloqueo de Seguridad', 'Has fallado demasiadas veces. Espera 3 minutos.', 'modal-error');
+        } else {
+          const mensaje = err.error?.error || 'PIN incorrecto.';
+          this.openModal('Error', mensaje, 'modal-error');
+        }
       }
     });
+  }
+
+  get tiempoBloqueo(): string {
+    const total = this.users.segundosRestantes();
+    const min = Math.floor(total / 60);
+    const seg = total % 60;
+    return `${min}:${seg < 10 ? '0' : ''}${seg}`;
   }
 
   async reenviarPin() {

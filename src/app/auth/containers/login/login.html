@@ -44,13 +44,21 @@
         </div>
 
         <div *ngIf="esperandoPin" class="pin-verification-container">
-          <div class="container-input">
+
+          <div *ngIf="users.estaBloqueado()" class="alert-lock">
+            <i class="bi bi-clock-history"></i>
+            <span>Intenta de nuevo en: <strong>{{ tiempoBloqueo }}</strong></span>
+          </div>
+
+          <div class="container-input" [class.disabled-input]="users.estaBloqueado()">
             <i class="bi bi-key-fill"></i>
             <input type="text" [(ngModel)]="pinIngresado" placeholder="Introduce tu PIN de 6 dígitos" maxlength="6"
-              (keypress)="soloNumeros($event)">
+              [class.disabled-input]="users.estaBloqueado()" (keypress)="soloNumeros($event)">
           </div>
-          <button type="button" class="button google-style" (click)="verificarPin()">
-            <i class="bi bi-shield-check"></i> Verificar y Entrar
+          <button type="button" class="button google-style" (click)="verificarPin()"
+            [disabled]="loading || users.estaBloqueado() || pinIngresado.length < 6">
+            <i class="bi bi-shield-check"></i> {{ users.estaBloqueado() ? 'Bloqueado temporalmente' : 'Verificar y
+            Entrar' }}
           </button>
           <p class="resend-pin-text" *ngIf="esperandoPin">
             ¿No recibiste el código?
@@ -127,7 +135,8 @@
         <ng-container *ngIf="registerForm.get('Rol')?.value === 'Doctor'">
           <div class="container-input file-input-wrapper" [class.has-file]="nombreArchivoCedula">
             <i class="bi bi-file-earmark-pdf"></i>
-            <input type="file" accept="application/pdf" id="fotoCedula" class="file-input-hidden" (change)="onFileSelected($event)" />
+            <input type="file" accept="application/pdf" id="fotoCedula" class="file-input-hidden"
+              (change)="onFileSelected($event)" />
             <label for="fotoCedula" class="file-label">
               {{ nombreArchivoCedula || 'Cédula en formato PDF (Requerida)' }}
             </label>

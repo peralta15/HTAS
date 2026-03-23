@@ -1,16 +1,19 @@
-import { Injectable, inject, PLATFORM_ID } from '@angular/core';
+import { Injectable, inject, PLATFORM_ID, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { isPlatformBrowser } from '@angular/common';
-import { tap } from 'rxjs/operators';
+import { tap, catchError } from 'rxjs/operators';
 import emailjs from '@emailjs/browser';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class Users {
   private platformId = inject(PLATFORM_ID);
   private http = inject(HttpClient);
   private apiUrl = `${environment.authApi}`; // http://localhost:3000/api/auth
+
+  estaBloqueado = signal<boolean>(false);
+  segundosRestantes = signal<number>(0);
 
   constructor() {
     if (isPlatformBrowser(this.platformId)) {
@@ -45,13 +48,42 @@ export class Users {
             res.pin
           );
         }
+      }),
+      catchError(err => {
+        // Si al intentar loguear el backend dice que estamos bloqueados (423)
+        if (err.status === 423) {
+          this.activarContadorVisual(err.error.segundosRestantes);
+        }
+        return throwError(() => err);
       })
     );
   }
 
   // VERIFICAR PIN EN POSTGRESQL
   verificarPin(uid: string, pin: string) {
-    return this.http.post(`${this.apiUrl}/verify-pin`, { uid, pin });
+    return this.http.post(`${this.apiUrl}/verify-pin`, { uid, pin }).pipe(
+      catchError(err => {
+        if (err.status === 423) {
+          this.activarContadorVisual(err.error.segundosRestantes);
+        }
+        return throwError(() => err);
+      })
+    );
+  }
+
+  // Lógica interna para el contador visual
+  private activarContadorVisual(segundos: number) {
+    this.estaBloqueado.set(true);
+    this.segundosRestantes.set(segundos);
+
+    const intervalo = setInterval(() => {
+      this.segundosRestantes.update(s => s - 1);
+
+      if (this.segundosRestantes() <= 0) {
+        this.estaBloqueado.set(false);
+        clearInterval(intervalo);
+      }
+    }, 1000);
   }
 
   // REENVIAR PIN (Solicitado manualmente)

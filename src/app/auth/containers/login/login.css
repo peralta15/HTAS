@@ -153,10 +153,13 @@
   align-items: center;
   transition: transform 0.5s ease-in;
   position: relative;
-  overflow: hidden; /* Ocultamos el scroll */
+  overflow: hidden;
+  /* Ocultamos el scroll */
   padding: 40px 0;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE y Edge */
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE y Edge */
 }
 
 .login-form-content {
@@ -244,8 +247,8 @@
   cursor: pointer;
 }
 
-.container-form > div > span,
-.container-form form > span {
+.container-form>div>span,
+.container-form form>span {
   font-size: 14px;
   margin-bottom: 20px;
   display: block;
@@ -686,7 +689,7 @@
 /* Estilos para el nuevo botón de Google */
 .social-networks {
   width: 320px;
-  margin: 15px 0 10px; 
+  margin: 15px 0 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -988,7 +991,7 @@
   margin-bottom: 5px;
 }
 
-.sign-up.doctor-active > span {
+.sign-up.doctor-active>span {
   display: inline-block;
   line-height: normal;
   margin: 0 0 10px 0;
@@ -1225,4 +1228,46 @@ input[type="date"] {
 
 .file-input-wrapper.has-file i {
   color: #8B0015;
+}
+
+.alert-lock {
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9rem;
+  border: 1px solid #ffcdd2;
+  animation: shake 0.5s ease-in-out;
+}
+
+.disabled-input {
+  opacity: 0.6;
+  background-color: #f5f5f5 !important;
+  pointer-events: none;
+}
+
+@keyframes shake {
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-5px);
+  }
+
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+.resend-pin-text a.disabled {
+  color: #ccc;
+  cursor: not-allowed;
+  text-decoration: none;
 }
