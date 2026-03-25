@@ -35,7 +35,12 @@
         <span class="name" *ngIf="dashboard?.caregiverName">{{ dashboard?.caregiverName }}</span>
         <span class="status active" aria-hidden="false" aria-label="Sesión activa">Sesión activa</span>
       </div>
-      <button class="logout" (click)="logout()" aria-label="Cerrar sesión">Cerrar sesión</button>
+      <button class="logout" (click)="toggleSessions()" aria-label="Ver sesiones">
+        Sesiones
+      </button>
+      <button class="logout" (click)="logout()" aria-label="Cerrar sesión">
+        Cerrar sesión
+      </button>
     </div>
   </header>
 
@@ -161,4 +166,42 @@
     <small>Información clínica sensible — manejo conforme a políticas de privacidad.</small>
     <small class="version">v1.0.0</small>
   </footer>
+</section>
+
+<section class="sessions-panel" *ngIf="showSessions">
+  <div class="sessions-card">
+    <div class="sessions-header">
+      <h2>Sesiones activas</h2>
+      <button class="close-btn" (click)="toggleSessions()">✕</button>
+    </div>
+
+    <div *ngIf="sessionsLoading">Cargando sesiones…</div>
+    <div *ngIf="sessionsError" class="sessions-error">{{ sessionsError }}</div>
+
+    <div *ngIf="!sessionsLoading && sessions.length === 0">
+      No hay sesiones activas registradas.
+    </div>
+
+    <ul class="sessions-list" *ngIf="sessions.length > 0">
+      <li *ngFor="let s of sessions">
+        <div>
+          <div class="session-device">{{ s.userAgent || 'Dispositivo' }}</div>
+          <div class="session-meta">
+            <span>{{ s.ip || 'IP desconocida' }}</span>
+            <span>{{ s.createdAt | date:'dd/MM HH:mm' }}</span>
+            <span *ngIf="s.suspicious" class="tag-suspicious">Sospechosa</span>
+          </div>
+        </div>
+        <button class="btn-session" (click)="closeSession(s)">Cerrar</button>
+      </li>
+    </ul>
+
+    <button
+      class="btn-session-all"
+      *ngIf="sessions.length > 0"
+      (click)="closeAllSessions()"
+    >
+      Cerrar todas las sesiones
+    </button>
+  </div>
 </section>

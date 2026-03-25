@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { User } from '../models/user.model';
+import { User } from '../models/user.model';  // ← IMPORTAR DEL MODELO
 
 @Component({
   selector: 'app-user-modal',
@@ -40,7 +40,6 @@ export class UserModalComponent {
     }
   }
 
-  // Métodos para manejar arrays
   onChronicConditionsChange(event: Event): void {
     const value = (event.target as HTMLTextAreaElement).value;
     if (this.user?.medicalProfile) {
@@ -65,7 +64,6 @@ export class UserModalComponent {
     }
   }
 
-  // Métodos para obtener strings
   getChronicConditionsString(): string {
     return this.user?.medicalProfile?.chronicConditions?.join(', ') || '';
   }

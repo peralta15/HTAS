@@ -6,6 +6,7 @@ import { Subject, takeUntil } from 'rxjs';
 // Servicios
 import { DashboardService, CaregiverDashboardResponse, AlertItem } from '../services/dashboard';
 import { WebsocketService, PressureUpdate, AlertUpdate, AdherenceUpdate } from '../services/websocket';
+import { AuthService, ActiveSession } from '../services/auth.service';
 
 // Componentes
 import { Charts } from '../components/charts/charts.component';
@@ -30,6 +31,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
   dashboard: CaregiverDashboardResponse | null = null;
   websocketConnected = false;
 
+  sessions: ActiveSession[] = [];
+  sessionsLoading = false;
+  sessionsError: string | null = null;
+  showSessions = false;
+
   private destroy$ = new Subject<void>();
   private patientId: string | null = null;
 
@@ -37,7 +43,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private dashboardService: DashboardService,
-    private websocket: WebsocketService
+    private websocket: WebsocketService,
+    private auth: AuthService
   ) {}
 
   // ============= GETTERS =============
@@ -79,6 +86,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
     // Cargar datos iniciales
     this.loadDashboard(this.patientId);
 
+    // Cargar sesiones activas
+    this.loadSessions();
+
     // Configurar WebSocket
     this.setupWebSocket();
   }
@@ -115,6 +125,21 @@ export class DashboardComponent implements OnInit, OnDestroy {
     if (this.patientId) {
       this.loadDashboard(this.patientId);
     }
+  }
+
+  loadSessions(): void {
+    this.sessionsLoading = true;
+    this.sessionsError = null;
+    this.auth.getActiveSessions().subscribe({
+      next: (sessions) => {
+        this.sessions = sessions;
+        this.sessionsLoading = false;
+      },
+      error: () => {
+        this.sessionsLoading = false;
+        this.sessionsError = 'No se pudieron cargar las sesiones activas';
+      }
+    });
   }
 
   // ============= WEBSOCKET =============
@@ -325,9 +350,46 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   logout(): void {
     this.websocket.disconnect();
-    this.router.navigate(['/login']).then(() => {
-      sessionStorage.clear();
-      localStorage.removeItem('auth');
+    this.auth.logout().subscribe({
+      next: () => {
+        this.router.navigate(['/login']);
+      },
+      error: () => {
+        // Si falla logout, igual limpiamos sesión del frontend y redirigimos
+        this.router.navigate(['/login']);
+      }
+    });
+  }
+
+  toggleSessions(): void {
+    this.showSessions = !this.showSessions;
+    if (this.showSessions && this.sessions.length === 0 && !this.sessionsLoading) {
+      this.loadSessions();
+    }
+  }
+
+  closeSession(session: ActiveSession): void {
+    this.auth.closeSession(session.id).subscribe({
+      next: () => {
+        this.sessions = this.sessions.filter(s => s.id !== session.id);
+      },
+      error: () => {
+        this.sessionsError = 'No se pudo cerrar la sesión seleccionada';
+      }
+    });
+  }
+
+  closeAllSessions(): void {
+    if (!window.confirm('¿Cerrar todas las sesiones activas?')) {
+      return;
+    }
+    this.auth.closeAllSessions().subscribe({
+      next: () => {
+        this.sessions = [];
+      },
+      error: () => {
+        this.sessionsError = 'No se pudieron cerrar todas las sesiones';
+      }
     });
   }
 

@@ -1,93 +1,137 @@
 <div class="usuarios-container">
-  <!-- Header de la sección -->
-  <div class="usuarios-header">
-    <div>
-      <h1 class="usuarios-title">Usuarios</h1>
-      <div class="breadcrumb">
-        <span>Admin</span>
-        <span class="separator">/</span>
-        <span class="active">Usuarios</span>
-      </div>
+    <!-- Header con título y acciones -->
+    <div class="usuarios-header">
+        <div class="title-section">
+            <h1 class="usuarios-title">Usuarios</h1>
+            <div class="breadcrumb">
+                <span>Admin</span>
+                <span class="separator">/</span>
+                <span class="active">Usuarios</span>
+            </div>
+        </div>
+
+        <div class="header-actions">
+            <!-- Barra de búsqueda -->
+            <div class="search-bar">
+                <span class="search-icon">🔍</span>
+                <input 
+                    type="text" 
+                    class="search-input"
+                    placeholder="Buscar por nombre, email o rol..."
+                    [(ngModel)]="searchTerm"
+                    (ngModelChange)="filterUsers()">
+            </div>
+
+            <!-- Botón Nuevo Usuario (GRANDE Y FUNCIONAL) -->
+            <button class="btn-nuevo" (click)="abrirNuevoUsuario()" [disabled]="loading">
+                <span class="btn-icon">+</span>
+                <span class="btn-text">Nuevo Usuario</span>
+            </button>
+        </div>
     </div>
 
-    <!-- Barra de búsqueda -->
-    <div class="search-bar">
-      <span class="search-icon">🔍</span>
-      <input 
-        type="text" 
-        class="search-input"
-        placeholder="Buscar usuarios..."
-        [(ngModel)]="searchTerm"
-        (ngModelChange)="filterUsers()">
+    <!-- Mensaje de error (si existe) -->
+    <div *ngIf="error" class="error-message">
+        <span class="error-icon">⚠️</span>
+        <span class="error-text">{{ error }}</span>
     </div>
-  </div>
 
-  <!-- Tabla de usuarios -->
-  <div class="table-container">
-    <table class="users-table">
-      <thead>
-        <tr>
-          <th>Nombre completo</th>
-          <th>Email</th>
-          <th>Rol</th>
-          <th>Estado</th>
-          <th>Acompañante</th>
-          <th>Dispositivo</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let user of filteredUsuarios; trackBy: trackById">
-          <td class="user-name">{{ user.fullName }}</td>
-          <td>{{ user.email }}</td>
-          <td>
-            <span class="role-badge" [ngClass]="getRoleClass(user.role)">
-              {{ getRoleText(user.role) }}
-            </span>
-          </td>
-          <td>
-            <span class="status-badge" [ngClass]="getStatusClass(user.isActive)">
-              {{ getStatusText(user.isActive) }}
-            </span>
-          </td>
-          <td>
-            <span class="caregiver-badge" [ngClass]="getCaregiverClass(user.hasCaregiver)">
-              {{ getCaregiverText(user.hasCaregiver) }}
-            </span>
-          </td>
-          <td>
-            <span class="device-badge" *ngIf="user.device; else noDevice">
-              {{ user.device }}
-            </span>
-            <ng-template #noDevice>
-              <span class="no-device">—</span>
-            </ng-template>
-          </td>
-          <td class="actions">
-            <button class="action-btn view" (click)="openModal(user, 'view')" title="Ver">
-              👁️
-            </button>
-            <button class="action-btn edit" (click)="openModal(user, 'edit')" title="Editar">
-              ✏️
-            </button>
-          </td>
-        </tr>
-        <tr *ngIf="filteredUsuarios.length === 0">
-          <td colspan="7" class="no-results">
-            No se encontraron usuarios
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+    <!-- Loader (mientras carga) -->
+    <div *ngIf="loading" class="loading-container">
+        <div class="spinner"></div>
+        <p>Cargando usuarios...</p>
+    </div>
+
+    <!-- Tabla de usuarios (solo si no está cargando y no hay error) -->
+    <div class="table-container" *ngIf="!loading && !error">
+        <table class="users-table">
+            <thead>
+                <tr>
+                    <th>Nombre completo</th>
+                    <th>Email</th>
+                    <th>Rol</th>
+                    <th>Estado</th>
+                    <th>Acompañante</th>
+                    <th>Dispositivo</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Iterar sobre usuarios filtrados -->
+                <tr *ngFor="let user of filteredUsuarios; trackBy: trackById">
+                    <td class="user-name">
+                        <span class="name-text">{{ user.fullName || 'Sin nombre' }}</span>
+                    </td>
+                    <td>{{ user.email || 'Sin email' }}</td>
+                    <td>
+                        <span class="role-badge" [ngClass]="getRoleClass(user.role)">
+                            {{ user.roleText }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="status-badge" [ngClass]="getStatusClass(user.isActive)">
+                            {{ getStatusText(user.isActive) }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="caregiver-badge" [ngClass]="getCaregiverClass(user.hasCaregiver)">
+                            {{ getCaregiverText(user.hasCaregiver) }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="device-badge" *ngIf="user.device; else noDevice">
+                            {{ user.device }}
+                        </span>
+                        <ng-template #noDevice>
+                            <span class="no-device">—</span>
+                        </ng-template>
+                    </td>
+                    <td class="actions">
+                        <button class="action-btn view" (click)="openModal(user, 'view')" title="Ver detalles">
+                            <span class="btn-icon">👁️</span>
+                        </button>
+                        <button class="action-btn edit" (click)="openModal(user, 'edit')" title="Editar usuario">
+                            <span class="btn-icon">✏️</span>
+                        </button>
+                        <button
+                            class="action-btn delete"
+                            title="Eliminar usuario"
+                            (click)="deleteUser(user)"
+                            [disabled]="deletingIds.has(user.id)"
+                        >
+                            <span class="btn-icon">🗑️</span>
+                        </button>
+                    </td>
+                </tr>
+                
+                <!-- Mensaje cuando no hay resultados de búsqueda -->
+                <tr *ngIf="filteredUsuarios.length === 0">
+                    <td colspan="7" class="no-results">
+                        <div class="no-results-content">
+                            <span class="no-results-icon">🔍</span>
+                            <p>No se encontraron usuarios</p>
+                            <p class="no-results-suggestion">Intenta con otra búsqueda o crea un nuevo usuario</p>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 
-<!-- Modal -->
+<!-- Modal para ver/editar usuario -->
 <app-user-modal
-  *ngIf="showModal"
-  [user]="selectedUser"
-  [mode]="modalMode"
-  (close)="closeModal()"
-  (save)="saveUser()"
-  (userChange)="selectedUser = $event">
+    *ngIf="showModal"
+    [user]="selectedUser"
+    [mode]="modalMode"
+    (close)="onModalClose()"
+    (save)="saveUser()"
+    (userChange)="selectedUser = $event">
 </app-user-modal>
+
+<!-- Modal para nuevo usuario -->
+<app-nuevo-usuario-modal
+    *ngIf="showNuevoModal"
+    (close)="onModalClose()"
+    (userCreated)="onUserCreated()">
+</app-nuevo-usuario-modal>

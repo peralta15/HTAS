@@ -1,23 +1,11 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-
-// IMPORTACIONES CORRECTAS
-import { SidebarComponent } from './components/sidebar/sidebar.component';
-import { HeaderComponent } from './components/header/header.component';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [
-    CommonModule,
-    RouterModule,
-    SidebarComponent,
-    HeaderComponent
-  ],
-  templateUrl: './app.html',
+  imports: [RouterOutlet],
+  template: '<router-outlet></router-outlet>',
   styleUrls: ['./app.css']
 })
-export class AppComponent {
-  title = 'HTAS - Dashboard del Cuidador';
-}
+export class AppComponent {}

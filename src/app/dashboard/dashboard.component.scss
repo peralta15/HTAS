@@ -255,4 +255,96 @@ $transition: 300ms cubic-bezier(.4,0,.2,1);
       grid-template-columns: 1fr;
     }
   }
+
+  .sessions-panel {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 40;
+
+    .sessions-card {
+      background: #ffffff;
+      border-radius: $radius-lg;
+      padding: $space-4;
+      width: 100%;
+      max-width: 520px;
+      box-shadow: 0 24px 60px rgba(15, 23, 42, 0.35);
+    }
+
+    .sessions-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: $space-3;
+
+      h2 {
+        margin: 0;
+        font-size: 18px;
+      }
+
+      .close-btn {
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        font-size: 18px;
+      }
+    }
+
+    .sessions-error {
+      color: $red;
+      margin-bottom: $space-2;
+    }
+
+    .sessions-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 $space-3;
+
+      li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: $space-2 0;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.3);
+      }
+
+      .session-device {
+        font-weight: 600;
+        color: #111827;
+      }
+
+      .session-meta {
+        display: flex;
+        gap: $space-1;
+        font-size: 12px;
+        color: $grey;
+      }
+
+      .tag-suspicious {
+        padding: 2px 6px;
+        border-radius: 999px;
+        background: rgba(220, 38, 38, 0.1);
+        color: $red;
+      }
+    }
+
+    .btn-session,
+    .btn-session-all {
+      border-radius: 999px;
+      border: none;
+      padding: 6px 12px;
+      cursor: pointer;
+      background: $blue;
+      color: #ffffff;
+      font-size: 13px;
+    }
+
+    .btn-session-all {
+      width: 100%;
+      margin-top: $space-2;
+    }
+  }
 }
