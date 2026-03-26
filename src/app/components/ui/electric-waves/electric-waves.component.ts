@@ -47,7 +47,7 @@ export class ElectricWavesComponent implements OnInit, AfterViewInit, OnDestroy 
     }
   }
 
-  private isVisible = true;
+  private isVisible = false;
   private visibilityObserver?: IntersectionObserver;
 
   private initThree(): void {
@@ -152,7 +152,15 @@ export class ElectricWavesComponent implements OnInit, AfterViewInit, OnDestroy 
 
     // IntersectionObserver to pause when off-screen
     this.visibilityObserver = new IntersectionObserver(([entry]) => {
+      const wasVisible = this.isVisible;
       this.isVisible = entry.isIntersecting;
+      
+      // If it became visible and loop was stopped, restart it
+      if (this.isVisible && !wasVisible && !this.animationFrameId) {
+        this.ngZone.runOutsideAngular(() => {
+          this.animate();
+        });
+      }
     }, { threshold: 0.1 });
     this.visibilityObserver.observe(container);
 
@@ -174,10 +182,15 @@ export class ElectricWavesComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   private animate = () => {
+    // Only render and request next frame if visible
+    if (!this.isVisible) {
+      this.animationFrameId = undefined;
+      return;
+    }
+
     this.animationFrameId = requestAnimationFrame(this.animate);
     
-    // Only render if visible
-    if (this.isVisible && this.renderer && this.scene && this.camera && this.material) {
+    if (this.renderer && this.scene && this.camera && this.material) {
       this.material.uniforms['u_time'].value = this.clock.getElapsedTime();
       this.renderer.render(this.scene, this.camera);
     }

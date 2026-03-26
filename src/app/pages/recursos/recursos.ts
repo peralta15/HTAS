@@ -75,7 +75,9 @@ export class Recursos implements AfterViewInit, OnDestroy {
   private targetScroll = 0;
   private snapTimer: any;
   private mouse = { x: 0, y: 0 };
-  private animationId!: number;
+  private animationId: number | null = null;
+  private isVisible: boolean = false;
+  private visibilityObserver: IntersectionObserver | null = null;
 
   // Propiedades para Dotted Surface
   private dottedGeometry!: THREE.BufferGeometry;
@@ -112,44 +114,75 @@ export class Recursos implements AfterViewInit, OnDestroy {
     if (this.isBrowser) {
       setTimeout(() => {
         this.initThree();
-        this.animate();
+        this.initVisibilityObserver();
         this.onResize();
-        this.initScrollAnimations();
-        this.initCard3DAnimations();
       }, 100);
     }
   }
 
-  /* --- ANIMACIONES DE SCROLL (DOM) --- */
-  private initScrollAnimations() {
-    if (!this.elementsToAnimate) return;
-    this.elementsToAnimate.forEach((el, index) => {
-      el.nativeElement.animate([
+  private initVisibilityObserver() {
+    if (!this.canvasContainer) return;
+    this.visibilityObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const target = entry.target as HTMLElement;
+        
+        // Handle Three.js canvas visibility
+        if (target === this.canvasContainer.nativeElement) {
+          const wasVisible = this.isVisible;
+          this.isVisible = entry.isIntersecting;
+          
+          if (this.isVisible && !wasVisible && !this.animationId) {
+            this.animate();
+          }
+        } 
+        // Handle DOM elements visibility
+        else if (entry.isIntersecting) {
+          this.runSingleAnimation(target);
+          this.visibilityObserver?.unobserve(target);
+        }
+      });
+    }, { threshold: 0.1 });
+    
+    // Observe canvas
+    this.visibilityObserver.observe(this.canvasContainer.nativeElement);
+
+    // Observe scroll elements
+    this.elementsToAnimate?.forEach(el => {
+      el.nativeElement.setAttribute('data-animate', 'up');
+      this.visibilityObserver?.observe(el.nativeElement);
+    });
+
+    this.infoCards?.forEach(el => {
+      el.nativeElement.setAttribute('data-animate', '3d');
+      this.visibilityObserver?.observe(el.nativeElement);
+    });
+  }
+
+  private runSingleAnimation(target: HTMLElement) {
+    const type = target.getAttribute('data-animate');
+
+    if (type === 'up') {
+      target.animate([
         { opacity: 0, transform: 'translateY(60px)' },
         { opacity: 1, transform: 'translateY(0)' }
       ], {
         duration: 800,
-        delay: index * 40,
         easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
         fill: 'both'
       });
-    });
-  }
-
-  private initCard3DAnimations() {
-    if (!this.infoCards) return;
-    this.infoCards.forEach((card, index) => {
-      card.nativeElement.animate([
+    } else if (type === '3d') {
+      target.animate([
         { transform: 'perspective(1000px) rotateX(25deg) scale(0.9)', opacity: 0 },
         { transform: 'perspective(1000px) rotateX(0deg) scale(1)', opacity: 1 }
       ], {
         duration: 900,
-        delay: (this.elementsToAnimate?.length || 0) * 40 + (index * 80),
         easing: 'ease-out',
         fill: 'both'
       });
-    });
+    }
   }
+
+  /* --- LÓGICA THREE.JS (SIN CUADROS) --- */
 
   /* --- LÓGICA THREE.JS (SIN CUADROS) --- */
   private initThree() {
@@ -253,6 +286,10 @@ export class Recursos implements AfterViewInit, OnDestroy {
   }
 
   private animate = () => {
+    if (!this.isVisible) {
+      this.animationId = null;
+      return;
+    }
     this.animationId = requestAnimationFrame(this.animate);
     this.currentScroll += (this.targetScroll - this.currentScroll) * this.CONFIG.lerpSpeed;
 
@@ -373,6 +410,7 @@ export class Recursos implements AfterViewInit, OnDestroy {
   ngOnDestroy() {
     if (this.isBrowser) {
       if (this.animationId) cancelAnimationFrame(this.animationId);
+      if (this.visibilityObserver) this.visibilityObserver.disconnect();
       if (this.renderer) {
         this.renderer.dispose();
         this.renderer.forceContextLoss();

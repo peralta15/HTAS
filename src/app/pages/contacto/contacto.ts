@@ -14,6 +14,7 @@ import { FormsModule } from '@angular/forms';
 })
 export class Contacto implements AfterViewInit {
   @ViewChildren('animateUp') elementsToAnimate!: QueryList<ElementRef>;
+  private observer?: IntersectionObserver;
 
   datosContacto = {
     nombre: '',
@@ -39,19 +40,38 @@ export class Contacto implements AfterViewInit {
 
   ngAfterViewInit() {
     if (isPlatformBrowser(this.platformId)) {
-      // Intentamos asegurar que el DOM esté listo y Angular haya poblado el QueryList
-      // Reducimos la cantidad de intentos para mejorar el rendimiento
-      setTimeout(() => {
-        this.triggerAnimations();
-        this.cdr.markForCheck();
-      }, 100);
-
-      // Segundo intento como fallback final
-      setTimeout(() => {
-        this.triggerAnimations();
-        this.cdr.markForCheck();
-      }, 1000);
+      this.initIntersectionObserver();
     }
+  }
+
+  ngOnDestroy() {
+    if (this.observer) {
+      this.observer.disconnect();
+    }
+  }
+
+  private initIntersectionObserver() {
+    if (!this.elementsToAnimate) return;
+
+    const options = {
+      root: null,
+      rootMargin: '0px',
+      threshold: 0.1
+    };
+
+    this.observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const target = entry.target as HTMLElement;
+          this.runSingleAnimation(target);
+          this.observer?.unobserve(target);
+        }
+      });
+    }, options);
+
+    this.elementsToAnimate.forEach(el => {
+      this.observer?.observe(el.nativeElement);
+    });
   }
 
   enviarContacto(event: Event) {
@@ -106,35 +126,17 @@ export class Contacto implements AfterViewInit {
     };
   }
 
-  private triggerAnimations() {
-    // Usamos el QueryList de Angular
-    if (this.elementsToAnimate && this.elementsToAnimate.length > 0) {
-      this.runAnimation(this.elementsToAnimate.toArray().map(el => el.nativeElement));
-      return;
-    }
+  private runSingleAnimation(el: HTMLElement) {
+    if (el.dataset['animated'] === 'true') return;
+    el.dataset['animated'] = 'true';
 
-    // Fallback: Si Angular no pobló el QueryList, buscamos directamente en el DOM
-    const items = document.querySelectorAll('.animate-entrance');
-    if (items.length > 0) {
-      this.runAnimation(Array.from(items));
-    }
-  }
-
-  private runAnimation(elements: any[]) {
-    elements.forEach((el, index) => {
-      // Evitar re-animar si ya se disparó
-      if (el.dataset['animated'] === 'true') return;
-      el.dataset['animated'] = 'true';
-
-      el.animate([
-        { opacity: 0, transform: 'translateY(60px)' },
-        { opacity: 1, transform: 'translateY(0)' }
-      ], {
-        duration: 800,
-        delay: index * 40,
-        easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-        fill: 'both'
-      });
+    el.animate([
+      { opacity: 0, transform: 'translateY(60px)' },
+      { opacity: 1, transform: 'translateY(0)' }
+    ], {
+      duration: 800,
+      easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+      fill: 'both'
     });
   }
 }

@@ -11,55 +11,64 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 export class Pagos implements AfterViewInit {
   @ViewChildren('animateUp') elementsToAnimate!: QueryList<ElementRef>;
 
+  private observer?: IntersectionObserver;
+
   constructor(@Inject(PLATFORM_ID) private platformId: Object) { }
 
   ngAfterViewInit() {
     if (isPlatformBrowser(this.platformId)) {
-      // Usamos un pequeño delay de 100ms para asegurar que el DOM esté listo tras la recarga
-      setTimeout(() => {
-        this.initScrollAnimations();
-      }, 100);
+      this.initIntersectionObserver();
     }
   }
 
-  private initScrollAnimations() {
-    if (!this.elementsToAnimate || this.elementsToAnimate.length === 0) {
-      // Fallback rápido si ViewChildren no ha poblado el QueryList
-      const items = document.querySelectorAll('.animate-entrance');
-      if (items.length > 0) {
-        this.runAnimation(Array.from(items));
-      }
-      return;
+  ngOnDestroy() {
+    if (this.observer) {
+      this.observer.disconnect();
     }
-
-    this.runAnimation(this.elementsToAnimate.toArray().map(el => el.nativeElement));
   }
 
-  private runAnimation(elements: any[]) {
-    elements.forEach((el, index) => {
-      // Evitar re-animar si ya se disparó
-      if (el.dataset['animated'] === 'true') return;
-      el.dataset['animated'] = 'true';
+  private initIntersectionObserver() {
+    if (!this.elementsToAnimate) return;
 
-      const anim = el.animate([
-        { opacity: 0, transform: 'translateY(40px)' },
-        { opacity: 1, transform: 'translateY(0)' }
-      ], {
-        duration: 500, // Faster duration
-        delay: index * 20, // Faster staggered delay
-        easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-        fill: 'forwards'
-      });
+    const options = {
+      root: null,
+      rootMargin: '0px',
+      threshold: 0.1
+    };
 
-      // After the entrance animation, we want to let the CSS floating animation take over.
-      // We set the opacity to 1 so 'fill: forwards' isn't needed long term if it conflicts.
-      anim.onfinish = () => {
-        el.style.opacity = '1';
-        // We remove the animation fill-forwards transform to let CSS transform work
-        if (el.classList.contains('feature-label-box')) {
-          el.style.transform = '';
+    this.observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const target = entry.target as HTMLElement;
+          this.runSingleAnimation(target);
+          this.observer?.unobserve(target);
         }
-      };
+      });
+    }, options);
+
+    this.elementsToAnimate.forEach(el => {
+      this.observer?.observe(el.nativeElement);
     });
+  }
+
+  private runSingleAnimation(el: HTMLElement) {
+    if (el.dataset['animated'] === 'true') return;
+    el.dataset['animated'] = 'true';
+
+    const anim = el.animate([
+      { opacity: 0, transform: 'translateY(40px)' },
+      { opacity: 1, transform: 'translateY(0)' }
+    ], {
+      duration: 500,
+      easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+      fill: 'forwards'
+    });
+
+    anim.onfinish = () => {
+      el.style.opacity = '1';
+      if (el.classList.contains('feature-label-box')) {
+        el.style.transform = '';
+      }
+    };
   }
 }

@@ -22,12 +22,12 @@
                 <span class="notif-badge">8</span>
             </a>
 
-            <ng-container *ngIf="user$ | async as user; else noUser">
+            <!--<ng-container *ngIf="user$ | async as user; else noUser">
                 <a routerLink="/perfil" class="user-pill d-flex align-items-center">
                     <img [src]="userPhoto" class="user-img" [alt]="userName">
                     <span class="user-name-text">{{ userName }}</span>
                 </a>
-            </ng-container>
+            </ng-container>-->
 
             <ng-template #noUser>
                 <div class="user-pill d-flex align-items-center">

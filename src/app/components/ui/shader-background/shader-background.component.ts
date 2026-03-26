@@ -16,6 +16,8 @@ export class ShaderBackgroundComponent implements AfterViewInit, OnDestroy {
   private program: WebGLProgram | null = null;
   private animationFrameId: number | null = null;
   private startTime: number = 0;
+  private isVisible: boolean = false;
+  private visibilityObserver: IntersectionObserver | null = null;
 
   // Cached locations
   private resolutionLoc: WebGLUniformLocation | null = null;
@@ -83,9 +85,9 @@ export class ShaderBackgroundComponent implements AfterViewInit, OnDestroy {
 
       float f = 2.0 + fbm(p + vec2(iTime * 5.0, 0.0)) * 0.5;
 
-      for (float i = 0.0; i < 35.0; i++) {
+      for (float i = 0.0; i < 16.0; i++) {
         v = p + cos(i * i + (iTime + p.x * 0.08) * 0.025 + i * vec2(13.0, 11.0)) * 3.5 + vec2(sin(iTime * 3.0 + i) * 0.003, cos(iTime * 3.5 - i) * 0.003);
-        float tailNoise = fbm(v + vec2(iTime * 0.5, i)) * 0.3 * (1.0 - (i / 35.0));
+        float tailNoise = fbm(v + vec2(iTime * 0.5, i)) * 0.3 * (1.0 - (i / 16.0));
         
         // Brand color #8B0015 (R: 0.545, G: 0.0, B: 0.082)
         vec4 auroraColors = vec4(0.545, 0.0, 0.082, 1.0);
@@ -95,7 +97,7 @@ export class ShaderBackgroundComponent implements AfterViewInit, OnDestroy {
         auroraColors.b += 0.05 * cos(i * 0.3 + iTime * 0.5);
 
         vec4 currentContribution = auroraColors * exp(sin(i * i + iTime * 0.8)) / length(max(v, vec2(v.x * f * 0.015, v.y * 1.5)));
-        float thinnessFactor = smoothstep(0.0, 1.0, i / 35.0) * 0.6;
+        float thinnessFactor = smoothstep(0.0, 1.0, i / 16.0) * 0.6;
         o += currentContribution * (1.0 + tailNoise * 0.8) * thinnessFactor;
       }
 
@@ -124,18 +126,33 @@ export class ShaderBackgroundComponent implements AfterViewInit, OnDestroy {
       this.cacheLocations();
       this.startTime = Date.now();
       this.setupResizeListener();
-      
-      // Run the animation loop outside of Angular to prevent change detection on every frame
-      this.ngZone.runOutsideAngular(() => {
-        this.render();
-      });
+      this.initVisibilityObserver();
     }
+  }
+
+  private initVisibilityObserver(): void {
+    const canvas = this.canvasRef.nativeElement;
+    this.visibilityObserver = new IntersectionObserver(([entry]) => {
+      const wasVisible = this.isVisible;
+      this.isVisible = entry.isIntersecting;
+      
+      if (this.isVisible && !wasVisible && !this.animationFrameId) {
+        this.ngZone.runOutsideAngular(() => {
+          this.render();
+        });
+      }
+    }, { threshold: 0.1 });
+    
+    this.visibilityObserver.observe(canvas);
   }
 
   ngOnDestroy(): void {
     if (isPlatformBrowser(this.platformId)) {
       if (this.animationFrameId) {
         cancelAnimationFrame(this.animationFrameId);
+      }
+      if (this.visibilityObserver) {
+        this.visibilityObserver.disconnect();
       }
       window.removeEventListener('resize', this.resizeCanvas.bind(this));
     }
@@ -215,7 +232,10 @@ export class ShaderBackgroundComponent implements AfterViewInit, OnDestroy {
   }
 
   private render(): void {
-    if (!this.gl || !this.program) return;
+    if (!this.gl || !this.program || !this.isVisible) {
+      this.animationFrameId = null;
+      return;
+    }
 
     const gl = this.gl;
     const currentTime = (Date.now() - this.startTime) / 1000;
