@@ -1,7 +1,8 @@
 <div class="pricing-container">
     <div class="pricing-header animate-entrance" #animateUp>
         <h1 class="pricing-title">Invierte en tu Salud Cardiovascular</h1>
-        <p class="pricing-subtitle">Elige el plan que mejor se adapte a tus necesidades. Desde monitoreo básico hasta atención integral con IA.</p>
+        <p class="pricing-subtitle">Elige el plan que mejor se adapte a tus necesidades. Desde monitoreo básico hasta
+            atención integral con IA.</p>
     </div>
 
     <div class="pricing-grid">
@@ -16,7 +17,7 @@
                     <span class="price-period">gratis para siempre</span>
                 </div>
 
-                <button class="cta-button secondary">Empezar Gratis</button>
+                <button class="cta-button secondary" (click)="empezarGratis()">Empezar Gratis</button>
 
                 <ul class="feature-list">
                     <li><i class="bi bi-check2"></i> Registro manual de presión</li>
@@ -34,11 +35,11 @@
                 <p class="plan-description">Atención integral y monitoreo avanzado para tu salud cardiovascular.</p>
 
                 <div class="price-container">
-                    <span class="price-amount">205 MXN</span>
+                    <span class="price-amount">265 MXN</span>
                     <span class="price-period">al mes/facturado anualmente</span>
                 </div>
 
-                <button class="cta-button">Comprar Ahora</button>
+                <button class="cta-button" (click)="contratarPlanFull()">Comprar Ahora</button>
 
                 <ul class="feature-list">
                     <li><i class="bi bi-check2"></i> Monitoreo de presión en tiempo real</li>
@@ -50,4 +51,4 @@
             </div>
         </div>
     </div>
-</div>
+</div>

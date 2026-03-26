@@ -16,6 +16,7 @@ import { Acompanantes } from './admin/pages/acompanantes/acompanantes';
 import { Pacientes } from './admin/pages/pacientes/pacientes';
 import { Medicos } from './admin/pages/medicos/medicos';
 import { Notificaciones } from './admin/template/notificaciones/notificaciones';
+import { Success } from './pages/success/success';
 
 export const routes: Routes = [
   {
@@ -50,6 +51,10 @@ export const routes: Routes = [
   {
     path: 'contactos',
     component: Contacto,
+  },
+  {
+    path: 'success',
+    component: Success,
   },
   {
     path: 'pagos',

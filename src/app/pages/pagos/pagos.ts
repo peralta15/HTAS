@@ -1,5 +1,6 @@
 import { Component, AfterViewInit, ViewChildren, QueryList, ElementRef, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { Stripe } from '../../auth/services/stripe';
 
 @Component({
   selector: 'app-pagos',
@@ -13,7 +14,30 @@ export class Pagos implements AfterViewInit {
 
   private observer?: IntersectionObserver;
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) { }
+  constructor(@Inject(PLATFORM_ID) private platformId: Object,
+    private stripeService: Stripe) { }
+
+  async empezarGratis() {
+    // Generamos el ID de invitado igual que en el plan Full
+    const guestId = 'guest_' + Date.now();
+
+    console.log('Iniciando proceso de Plan Básico para invitado:', guestId);
+
+    // Llamamos al mismo servicio pero con el plan 'BASIC'
+    await this.stripeService.redirectToCheckout('BASIC', guestId);
+  }
+
+  // Función para el Plan HTAS Full (Stripe)
+  async contratarPlanFull() {
+    // Generamos un ID temporal para que el backend no reciba un valor vacío
+    // Usamos un timestamp para que sea único: "invitado_171145..."
+    const guestId = 'guest_' + Date.now();
+
+    console.log('Iniciando pago como invitado:', guestId);
+
+    // Llamamos al servicio pasando este ID temporal
+    await this.stripeService.redirectToCheckout('PRO', guestId);
+  }
 
   ngAfterViewInit() {
     if (isPlatformBrowser(this.platformId)) {
