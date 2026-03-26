@@ -72,7 +72,7 @@ h2 {
 
 .item {
     display: flex;
-    cursor: pointer;
+    cursor: default;
     gap: 30px;
 }
 

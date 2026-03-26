@@ -25,7 +25,7 @@ body {
     width: 100%;
     left: 0;
     top: 0;
-    z-index: 9999 !important;
+    z-index: 10000 !important;
 }
 
 .gallery-wrapper {
@@ -471,8 +471,8 @@ h1 {
 }
 
 .info-section.section-expanded {
-    z-index: 2000;
-    /* Elevado, pero siempre menor que el header (9999) */
+    z-index: 900;
+    /* Elevado, pero siempre menor que el header (10000) */
 }
 
 .main-wrapper {
