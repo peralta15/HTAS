@@ -160,6 +160,44 @@
     background: linear-gradient(135deg, #8B0015, #b0001e);
     color: #fff;
     box-shadow: 0 10px 20px rgba(176, 0, 30, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 64px;
+}
+
+.cta-button.secondary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 64px;
+}
+
+.cta-button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.spinner {
+    width: 24px;
+    height: 24px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 0.8s linear infinite;
+}
+
+.secondary .spinner {
+    border: 3px solid rgba(0, 0, 0, 0.1);
+    border-top-color: #333;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .max .cta-button:hover {

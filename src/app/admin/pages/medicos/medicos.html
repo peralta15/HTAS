@@ -86,7 +86,7 @@
                                         <div class="detail-icon"><i class="bi bi-shield-lock"></i></div>
                                         <div class="detail-data">
                                             <label>Rol de Usuario</label>
-                                            <span>Médico</span>
+                                            <span>Doctor</span>
                                         </div>
                                     </div>
                                     <div class="detail-card-item">
@@ -145,7 +145,7 @@
                 <label>Apellido Materno</label>
                 <input type="text" [(ngModel)]="usuarioSeleccionado.tempApellidoMaterno">
             </div>
-            <div class="form-group">
+            <div class="form-group full-width-group">
                 <label>Correo Electrónico</label>
                 <input type="email" [(ngModel)]="usuarioSeleccionado.correo">
             </div>
@@ -185,7 +185,8 @@
             <button class="btn-cancel" (click)="cerrarModal()" [disabled]="isDeleting">Cancelar</button>
             <button class="btn-delete-confirm" (click)="confirmarEliminar()" [disabled]="isDeleting"
                 style="background: #e81123; color: white; border: none; padding: 12px 25px; border-radius: 10px; font-weight: 600;">
-                {{ isDeleting ? 'Eliminando...' : 'Sí, Eliminar' }}
+                <i class="bi bi-trash3-fill"></i>
+                {{ isDeleting ? 'Eliminando...' : 'Eliminar Permanentemente' }}
             </button>
         </div>
     </div>

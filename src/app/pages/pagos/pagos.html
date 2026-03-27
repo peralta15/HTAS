@@ -17,7 +17,10 @@
                     <span class="price-period">gratis para siempre</span>
                 </div>
 
-                <button class="cta-button secondary" (click)="empezarGratis()">Empezar Gratis</button>
+                <button class="cta-button secondary" (click)="empezarGratis()" [disabled]="loadingBasic || loadingPro">
+                    <span *ngIf="!loadingBasic">Empezar Gratis</span>
+                    <span *ngIf="loadingBasic" class="spinner"></span>
+                </button>
 
                 <ul class="feature-list">
                     <li><i class="bi bi-check2"></i> Registro manual de presión</li>
@@ -39,7 +42,10 @@
                     <span class="price-period">al mes/facturado anualmente</span>
                 </div>
 
-                <button class="cta-button" (click)="contratarPlanFull()">Comprar Ahora</button>
+                <button class="cta-button" (click)="contratarPlanFull()" [disabled]="loadingBasic || loadingPro">
+                    <span *ngIf="!loadingPro">Comprar Ahora</span>
+                    <span *ngIf="loadingPro" class="spinner"></span>
+                </button>
 
                 <ul class="feature-list">
                     <li><i class="bi bi-check2"></i> Monitoreo de presión en tiempo real</li>

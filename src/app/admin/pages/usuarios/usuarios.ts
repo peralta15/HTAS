@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { Menu } from "../../template/menu/menu";
 import { FormsModule } from '@angular/forms';
 import { GoogleService } from '../../../auth/services/google';
+import { Users } from '../../../auth/services/users';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-usuarios',
@@ -13,6 +15,7 @@ import { GoogleService } from '../../../auth/services/google';
 })
 export class Usuarios implements OnInit {
   private googleService = inject(GoogleService);
+  private usersService = inject(Users);
   private cdr = inject(ChangeDetectorRef);
 
   usuariosTodo: any[] = [];
@@ -29,12 +32,56 @@ export class Usuarios implements OnInit {
     await this.cargarUsuarios();
   }
 
-  cargarUsuarios() {
-    this.googleService.getUsuarios().then(users => {
-      this.usuariosTodo = users;
+  // usuarios.ts
+
+  async cargarUsuarios() {
+    try {
+      // 1. Ejecutamos ambas peticiones en paralelo.
+      // Usamos firstValueFrom para "esperar" el valor del Observable de HttpClient.
+      const [resFirebase, resPostgres] = await Promise.all([
+        this.googleService.getUsuarios(),
+        firstValueFrom(this.usersService.getUsuariosBackend())
+      ]);
+
+      // 2. Unificamos y normalizamos los datos
+      // resPostgres ahora ya es un arreglo y no un Observable
+      this.usuariosTodo = [
+        ...this.normalizarUsuarios(resFirebase, 'Firebase'),
+        ...this.normalizarUsuarios(resPostgres, 'Postgres')
+      ];
+
       this.cdr.detectChanges();
-    }).catch(error => {
-      console.error('Error al cargar usuarios:', error);
+    } catch (error) {
+      console.error('Error al unificar usuarios de Firebase y Postgres:', error);
+    }
+  }
+
+  private normalizarUsuarios(users: any[], origen: string) {
+    if (!users) return [];
+
+    return users.map((u, index) => {
+      const idUnico = u.idusuario || u.uid || u.id || u.ID_Usuario || `${origen}-${index}`;
+
+      // 1. Extraemos el nombre base
+      const soloNombre = u.nombre || u.Nombre || '';
+
+      // 2. Extraemos apellidos (AGREGAMOS apPaterno y apMaterno que vienen de tu SQL)
+      const apellidoP = u.apPaterno || u.apellido_paterno || u.ApellidoPaterno || '';
+      const apellidoM = u.apMaterno || u.apellido_materno || u.ApellidoMaterno || '';
+
+      // 3. Unificamos
+      // Si viene de Firebase (NombreCompleto), lo respetamos, si no, unimos piezas
+      const nombreFinal = u.NombreCompleto
+        ? u.NombreCompleto
+        : `${soloNombre} ${apellidoP} ${apellidoM}`.trim() || 'Sin nombre';
+
+      return {
+        ...u,
+        id: idUnico,
+        nombre: nombreFinal, // <--- Este es el campo que usaremos en el HTML
+        correo: u.correo || u.Correo || u.email || 'Sin correo',
+        fuente: origen
+      };
     });
   }
 

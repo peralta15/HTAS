@@ -315,28 +315,40 @@
     font-weight: 500;
 }
 
-/* Pagination Bar (Unificada) */
 .pagination-container {
-    padding: 24px 30px;
+    padding: 20px 30px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: white;
+    background: #ffffff;
     border-top: 1px solid #f0f3f6;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
     color: #64748b;
-    font-size: 0.9rem;
+    /* Gris azulado suave para el texto "Mostrando..." */
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+/* El texto "Mostrando X de X médicos" */
+.pagination-container b,
+.pagination-container strong {
+    color: #1e293b;
+    /* Resaltamos los números en azul oscuro */
+    font-weight: 700;
 }
 
 .pagination-buttons {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 12px;
 }
 
+/* Botones de flechas (Siguiente/Anterior) */
 .btn-pag {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
     border: 1px solid #e2e8f0;
     background: white;
     color: #64748b;
@@ -344,26 +356,37 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
 }
 
 .btn-pag:hover:not(:disabled) {
-    background: #f1f5f9;
-    border-color: #cbd5e1;
-    color: #334155;
+    background: #ffffff;
+    border-color: #b0001e;
+    color: #b0001e;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(176, 0, 30, 0.1);
 }
 
 .btn-pag:disabled {
     opacity: 0.4;
     cursor: not-allowed;
+    background: #f8fafc;
 }
 
+/* El recuadro del número de página actual */
 .page-number {
-    font-weight: 700;
-    background: #f8faff;
+    font-weight: 800;
+    background: #fff5f6;
+    /* Fondo rojizo muy sutil */
     color: #b0001e;
-    padding: 5px 12px;
-    border-radius: 8px;
+    /* Texto en el guinda de tu marca */
+    padding: 6px 14px;
+    border-radius: 10px;
+    border: 1px solid #ffebeb;
+    min-width: 40px;
+    text-align: center;
+    font-size: 0.9rem;
 }
 
 /* Modal Styling */
@@ -419,6 +442,21 @@
 .form-group input:focus {
     border-color: #b0001e;
     box-shadow: 0 0 0 3px rgba(176, 0, 30, 0.1);
+}
+
+/* Asegura que los campos largos ocupen todo el ancho del modal */
+.full-width-group {
+    grid-column: span 3;
+    /* Hace que el grupo ocupe las 3 columnas del grid */
+}
+
+/* Estilo específico para inputs de solo lectura (como el correo) */
+.form-group input[readonly] {
+    background-color: #f8fafc;
+    color: #64748b;
+    cursor: default;
+    border-style: dashed;
+    /* Un toque visual para indicar que no se edita */
 }
 
 /* Botones Modal */

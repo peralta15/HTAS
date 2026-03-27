@@ -430,3 +430,15 @@
     padding: 5px 12px;
     border-radius: 8px;
 }
+
+/* Agregamos el selector para [data-rol="Doctor"] */
+.badge-premium[data-rol="Médico"],
+.badge-premium[data-rol="Doctor"] {
+    background: #e0f2fe;
+    color: #0369a1;
+}
+
+.badge-premium[data-rol="Médico"] .dot-indicator,
+.badge-premium[data-rol="Doctor"] .dot-indicator {
+    background: #0369a1;
+}
