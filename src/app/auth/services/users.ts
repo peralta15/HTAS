@@ -5,12 +5,16 @@ import { isPlatformBrowser } from '@angular/common';
 import { tap, catchError } from 'rxjs/operators';
 import emailjs from '@emailjs/browser';
 import { Observable, throwError } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class Users {
   private platformId = inject(PLATFORM_ID);
   private http = inject(HttpClient);
   private apiUrl = `${environment.authApi}`; // http://localhost:3000/api/auth
+
+  private currentUserSubject = new BehaviorSubject<any>(null);
+  public currentUser$ = this.currentUserSubject.asObservable();
 
   estaBloqueado = signal<boolean>(false);
   segundosRestantes = signal<number>(0);
@@ -40,8 +44,12 @@ export class Users {
   login(credenciales: { correo: string, contrasenia: string }) {
     return this.http.post(`${this.apiUrl}/login`, credenciales).pipe(
       tap((res: any) => {
+        this.currentUserSubject.next(res);
+        // Guardamos en el navegador para que no se borre al refrescar (F5)
+        localStorage.setItem('user_htas', JSON.stringify(res));
         // Si el login es exitoso pero no está verificado, reenviamos el PIN
         if (res.pinVerificado === false) {
+          this.establecerSesion(res);
           this.enviarEmailPin(
             credenciales.correo,
             res.nombre || 'Usuario',
@@ -57,6 +65,32 @@ export class Users {
         return throwError(() => err);
       })
     );
+  }
+
+  establecerSesion(res: any) {
+    const usuarioProcesado = {
+      uid: res.uid,
+      nombre: res.nombre,
+      rol: res.rol,
+      // Generamos la foto basada en el nombre de Postgres
+      photoURL: `https://ui-avatars.com/api/?name=${encodeURIComponent(res.nombre)}&background=b0001e&color=fff&bold=true`
+    };
+
+    this.currentUserSubject.next(usuarioProcesado);
+    localStorage.setItem('user_htas', JSON.stringify(usuarioProcesado));
+  }
+
+  // Función para cargar sesión al abrir la página
+  cargarSesionPersistente() {
+    const saved = localStorage.getItem('user_htas');
+    if (saved) {
+      this.currentUserSubject.next(JSON.parse(saved));
+    }
+  }
+
+  limpiarSesion() {
+    localStorage.removeItem('user_htas');
+    this.currentUserSubject.next(null);
   }
 
   // VERIFICAR PIN EN POSTGRESQL
@@ -117,6 +151,21 @@ export class Users {
     } catch (error) {
       console.error('Error al enviar el PIN con EmailJS:', error);
     }
+  }
+
+  // --- GESTIÓN DE CITAS ---
+
+  crearCita(datosCita: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/agendar-cita`, datosCita);
+  }
+
+  // Ahora filtramos por el correo del usuario logueado
+  getMisCitas(email: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/mis-citas/${email}`);
+  }
+
+  actualizarEstadoCita(idCita: number, datos: { estado: string, notasDoctor?: string }): Observable<any> {
+    return this.http.put(`${this.apiUrl}/actualizar-cita/${idCita}`, datos);
   }
 
   getUsuariosBackend(): Observable<any[]> {

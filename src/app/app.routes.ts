@@ -17,6 +17,7 @@ import { Pacientes } from './admin/pages/pacientes/pacientes';
 import { Medicos } from './admin/pages/medicos/medicos';
 import { Notificaciones } from './admin/template/notificaciones/notificaciones';
 import { Success } from './pages/success/success';
+import { Citas } from './admin/pages/citas/citas';
 
 export const routes: Routes = [
   {
@@ -83,6 +84,10 @@ export const routes: Routes = [
   {
     path: 'acompanantes',
     component: Acompanantes
+  },
+  {
+    path: 'citas',
+    component: Citas
   },
   {
     path: 'perfil',

@@ -1,9 +1,10 @@
-import { Component, inject, OnInit, OnDestroy } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { Subscription, Observable } from 'rxjs';
-// AJUSTA ESTA RUTA SEGÚN TU ESTRUCTURA (ej. ../../../services/google)
+import { RouterModule, Router } from '@angular/router';
+import { Subscription, Observable, combineLatest, of } from 'rxjs';
+import { startWith } from 'rxjs/operators';
 import { GoogleService } from '../../../auth/services/google';
+import { Users } from '../../../auth/services/users';
 
 @Component({
   selector: 'app-menu',
@@ -13,92 +14,91 @@ import { GoogleService } from '../../../auth/services/google';
   styleUrl: './menu.css',
 })
 export class Menu implements OnInit, OnDestroy {
-  // Inyección del servicio de autenticación
   private googleService = inject(GoogleService);
-  private userSub?: Subscription;
+  private usersService = inject(Users);
+  private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
 
-  // Propiedades para la interfaz
+  private authSub?: Subscription;
+
   isCollapsed = false;
   showSearch = false;
 
-  // ESTO CORRIGE EL ERROR DEL HTML: Declaración del observable para el pipe async
   public user$: Observable<any> = this.googleService.user$;
-
-  // Variables para mostrar datos procesados
   userName: string = 'Usuario';
   userPhoto: string = '';
 
-  // Estructura del menú lateral
   navItems = [
+    { category: 'General', items: [{ route: '/inicio', icon: 'bi-speedometer2', label: 'Dashboard' }] },
     {
-      category: 'General', items: [
-        { route: '/inicio', icon: 'bi-speedometer2', label: 'Dashboard' }
-      ]
-    },
-    {
-      category: 'Administración', items: [
+      category: 'Administración',
+      items: [
         { route: '/usuarios', icon: 'bi-people', label: 'Usuarios' },
         { route: '/medicos', icon: 'bi-person-badge', label: 'Médicos' },
         { route: '/pacientes', icon: 'bi-person-heart', label: 'Pacientes' },
         { route: '/acompanantes', icon: 'bi-person-fill-add', label: 'Acompañantes' }
       ]
     },
-    {
-      category: 'Seguimiento', items: [
-        { route: '/tratamientos', icon: 'bi-clipboard-pulse', label: 'Tratamientos' },
-        { route: '/dispositivos', icon: 'bi-phone', label: 'Dispositivos' }
-      ]
-    },
-    {
-      category: 'Cuenta', items: [
-        { route: '/config', icon: 'bi-gear', label: 'Configuración' },
-        { route: '/login', icon: 'bi-box-arrow-right', label: 'Cerrar Sesión' }
-      ]
-    }
+    { category: 'Seguimiento', items: [{ route: '/citas', icon: 'bi-calendar-check', label: 'Citas' }] },
+    { category: 'Cuenta', items: [{ route: '/config', icon: 'bi-gear', label: 'Configuración' }, { route: '/login', icon: 'bi-box-arrow-right', label: 'Cerrar Sesión' }] }
   ];
 
   ngOnInit() {
-    // Nos suscribimos para procesar el nombre y la foto cuando cambie el usuario
-    this.userSub = this.user$.subscribe({
-      next: (user) => {
-        if (user) {
-          // Buscamos el nombre en los posibles campos de tu base de datos
-          this.userName = user.nombre || user.NombreCompleto || user.displayName || 'Usuario';
+    const uService = this.usersService as any;
+    // Detectar si estamos en el navegador
+    const isBrowser = typeof window !== 'undefined';
 
-          // Si tiene foto en Google la usa, si no, genera un avatar con la inicial
-          if (user.photoURL) {
-            this.userPhoto = user.photoURL;
-          } else {
-            this.userPhoto = `https://ui-avatars.com/api/?name=${encodeURIComponent(this.userName)}&background=b0001e&color=fff&bold=true`;
-          }
-        }
+    if (isBrowser && uService.cargarSesionPersistente) {
+      uService.cargarSesionPersistente();
+    }
+
+    this.authSub = combineLatest([
+      this.googleService.user$.pipe(startWith(null)),
+      (uService.currentUser$ || of(null)).pipe(startWith(null))
+    ]).subscribe((res: any[]) => {
+      const gUser = res[0];
+
+      // PROTECCIÓN: Solo intentar leer localStorage si es el navegador
+      let pUser = res[1];
+      if (!pUser && isBrowser) {
+        const saved = localStorage.getItem('user_htas');
+        pUser = saved ? JSON.parse(saved) : null;
       }
+
+      if (pUser) {
+        this.userName = pUser.nombre || pUser.NombreCompleto || 'Usuario';
+        this.userPhoto = pUser.photoURL || this.generarAvatar(this.userName);
+      } else if (gUser) {
+        this.userName = gUser.nombre || gUser.displayName || 'Usuario';
+        this.userPhoto = gUser.photoURL || this.generarAvatar(this.userName);
+      } else {
+        this.userName = 'Invitado';
+        this.userPhoto = this.generarAvatar('Invitado');
+      }
+
+      // Evita el error NG0100 usando un pequeño delay
+      setTimeout(() => {
+        this.cdr.detectChanges();
+      }, 0);
     });
   }
 
+  private generarAvatar(nombre: string): string {
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(nombre)}&background=b0001e&color=fff&bold=true`;
+  }
+
   ngOnDestroy() {
-    // Evitamos fugas de memoria al destruir el componente
-    if (this.userSub) {
-      this.userSub.unsubscribe();
-    }
+    this.authSub?.unsubscribe();
   }
 
-  // Funciones de control de la UI
-  toggleSidebar() {
-    this.isCollapsed = !this.isCollapsed;
-  }
-
-  toggleSearch() {
-    this.showSearch = !this.showSearch;
-  }
-
-  onSearch(value: string) {
-    if (value.trim()) {
-      console.log('Buscando:', value);
-    }
-  }
+  toggleSidebar() { this.isCollapsed = !this.isCollapsed; }
+  toggleSearch() { this.showSearch = !this.showSearch; }
+  onSearch(v: string) { if (v.trim()) console.log('Buscando:', v); }
 
   logout() {
     this.googleService.logout();
+    const service = this.usersService as any;
+    if (service.limpiarSesion) service.limpiarSesion();
+    this.router.navigate(['/login']);
   }
 }
