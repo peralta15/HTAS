@@ -61,7 +61,7 @@ export class GoogleService {
     };
 
     try {
-      await emailjs.send('service_tqqxijq', 'template_8gjdtqx', templateParams);
+      await emailjs.send('service_tqqxijq', 'template_a59hcr9', templateParams);
       console.log(`PIN enviado exitosamente a: ${email}`);
     } catch (error) {
       console.error('Error al enviar el PIN con EmailJS:', error);
