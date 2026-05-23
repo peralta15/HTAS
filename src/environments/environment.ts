@@ -7,5 +7,6 @@ export const environment = {
     usersApi: 'http://localhost:3000/api/users',
 
     stripePublicKey: 'pk_test_51TF59VK1qKH77YTduyJn44BruhEDaWGDisu6ry0DtNKZwiTnFGyMysighKG4gecGIdX4TSFc66sike4gZoJ1xCXA008uHnREBG',
-    checkoutApi: 'http://localhost:3000/api/auth/create-checkout-session'
+    checkoutApi: 'http://localhost:3000/api/auth/create-checkout-session',
+    recaptchaSiteKey: '6LdV0u8sAAAAAGK4Rkxxa98_h0eb2lUng2dv7RZa'
 };

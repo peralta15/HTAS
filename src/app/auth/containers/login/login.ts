@@ -9,6 +9,8 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import flatpickr from 'flatpickr';
 import { Spanish } from 'flatpickr/dist/l10n/es.js';
 import { Users } from '../../services/users';
+import { RecaptchaModule, RecaptchaFormsModule } from 'ng-recaptcha';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-login',
@@ -16,7 +18,9 @@ import { Users } from '../../services/users';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    FormsModule
+    FormsModule,
+    RecaptchaModule,
+    RecaptchaFormsModule,
   ],
   templateUrl: './login.html',
   styleUrl: './login.css',
@@ -54,6 +58,11 @@ export class Login {
   nombreArchivoCedula: string = '';
   fotoCedulaBase64: string = '';
 
+  captchaTokenLogin: string | null = null;
+  captchaTokenRegister: string | null = null;
+
+  recaptchaSiteKey = environment.recaptchaSiteKey;
+
   constructor(public users: Users, // <--- Agrega esto
     private fb: FormBuilder,) {
     this.registerForm = this.fb.group({
@@ -66,13 +75,15 @@ export class Login {
       FotoCedula: [''],
       Especialidad: [''],
       DireccionClinica: [''],
-      FechaAsignacion: [''],
-      Activo: [true]
+      FechaNacimiento: [''],
+      Activo: [true],
+      recaptcha: ['', Validators.required],
     });
 
     this.loginForm = this.fb.group({
       Email: ['', [Validators.required, Validators.email]],
-      Password: ['', [Validators.required, Validators.minLength(6)]]
+      Password: ['', [Validators.required, Validators.minLength(6)]],
+      recaptcha: ['', Validators.required]
     });
 
     this.registerForm.get('Rol')?.valueChanges.subscribe(rol => {
@@ -82,19 +93,33 @@ export class Login {
     this.configurarLimitesFecha();
   }
 
+  onCaptchaLoginResolved(token: string | null) {
+    this.captchaTokenLogin = token;
+    this.loginForm.get('recaptcha')?.setValue(token);
+  }
+
+  onCaptchaRegisterResolved(token: string | null) {
+    this.captchaTokenRegister = token;
+    this.registerForm.get('recaptcha')?.setValue(token);
+  }
+
   private configurarLimitesFecha() {
     const hoy = new Date();
-    this.fechaMinima = hoy.toISOString().split('T')[0];
-    // Límite de 3 meses para la fecha máxima
-    const maxFecha = new Date(hoy.getFullYear(), hoy.getMonth() + 3, 0);
-    this.fechaMaxima = maxFecha.toISOString().split('T')[0];
-    this.registerForm.patchValue({ FechaAsignacion: this.fechaMinima });
+    // Para nacimiento, permitimos que la fecha máxima sea el día de hoy
+    this.fechaMaxima = hoy.toISOString().split('T')[0];
+
+    // Establecemos una fecha mínima razonable (ej. hace 100 años)
+    const minFecha = new Date(hoy.getFullYear() - 100, hoy.getMonth(), hoy.getDate());
+    this.fechaMinima = minFecha.toISOString().split('T')[0];
+
+    // Opcional: inicializar vacío o con una fecha estimada
+    this.registerForm.patchValue({ FechaNacimiento: '' });
   }
 
   private actualizarValidacionesDinamicas(rol: string) {
     const pacienteFields = ['NSS'];
     const doctorFields = ['FotoCedula', 'Especialidad', 'DireccionClinica'];
-    const acompananteFields = ['FechaAsignacion'];
+    const acompananteFields = ['FechaNacimiento'];
 
     pacienteFields.forEach(fieldName => {
       const control = this.registerForm.get(fieldName);
@@ -131,6 +156,11 @@ export class Login {
   }
 
   async onSubmitSignUp() {
+    if (!this.captchaTokenRegister) {
+      this.openModal('Verificación requerida', 'Por favor completa el reCAPTCHA.', 'modal-error');
+      return;
+    }
+
     if (this.registerForm.valid) {
       this.loading = true;
       this.cdr.detectChanges();
@@ -152,12 +182,14 @@ export class Login {
         contrasenia: f.Password,
         rol: f.Rol,
         telefono: f.Telefono,
+        recaptchaToken: this.captchaTokenRegister,
         datosExtra: {
           // Campos específicos según el rol
           cedula: f.FotoCedula,
           especialidad: f.Especialidad,
           direccion: f.DireccionClinica,
           nss: f.NSS,
+          fechaNacimiento: f.FechaNacimiento,
           idPacienteAsociado: f.IdPacienteAsociado || null
         }
       };
@@ -166,16 +198,36 @@ export class Login {
       // Nota: Asegúrate de haber inyectado 'authService' en el constructor
       this.users.registrar(datosParaBackend).subscribe({
         next: (res: any) => {
-          this.ngZone.run(() => {
-            this.loading = false;
-            this.openModal(
-              '¡Registro Exitoso!',
-              'Usuario guardado correctamente. Revisa tu correo para tu PIN.',
-              'modal-success'
-            );
-            // Opcional: limpiar formulario o redirigir
-            this.isToggled = false;
-            this.cdr.detectChanges();
+          // Autologuear al usuario inmediatamente después del registro
+          this.users.login({ correo: f.Email, contrasenia: f.Password }).subscribe({
+            next: (loginRes: any) => {
+              this.ngZone.run(() => {
+                this.loading = false;
+                this.usuarioUidTemporal = loginRes.uid;
+                this.pinCorrectoBD = loginRes.pin;
+                this.esperandoPin = true;
+                this.isToggled = false;
+
+                this.openModal(
+                  '¡Registro Exitoso!',
+                  'Usuario guardado correctamente. Revisa tu correo para tu PIN.',
+                  'modal-success'
+                );
+                this.cdr.detectChanges();
+              });
+            },
+            error: () => {
+              this.ngZone.run(() => {
+                this.loading = false;
+                this.isToggled = false;
+                this.openModal(
+                  '¡Registro Exitoso!',
+                  'Usuario guardado. Por favor inicia sesión.',
+                  'modal-success'
+                );
+                this.cdr.detectChanges();
+              });
+            }
           });
         },
         error: (err) => {
@@ -230,6 +282,12 @@ export class Login {
   }
 
   async onLoginWithEmailPassword() {
+
+    if (!this.captchaTokenLogin) {
+      this.openModal('Verificación requerida', 'Por favor completa el reCAPTCHA.', 'modal-error');
+      return;
+    }
+
     if (this.loginForm.invalid) {
       this.openModal('Formulario Incompleto', 'Por favor ingresa un correo y contraseña válidos.', 'modal-error');
       return;
@@ -239,7 +297,7 @@ export class Login {
     this.cdr.detectChanges();
 
     const { Email, Password } = this.loginForm.value;
-    const credenciales = { correo: Email, contrasenia: Password };
+    const credenciales = { correo: Email, contrasenia: Password, recaptchaToken: this.captchaTokenLogin };
 
     this.users.login(credenciales).subscribe({
       next: (res: any) => {
@@ -253,14 +311,10 @@ export class Login {
             if (res.token) localStorage.setItem('token', res.token);
             this.router.navigate(['/inicio']);
           } else {
-            // Si falta verificar PIN, preparamos la vista y MANDAMOS EL CORREO
+            // Si falta verificar PIN, preparamos la vista (El servicio ya mandó el correo)
             this.usuarioUidTemporal = res.uid;
             this.pinCorrectoBD = res.pin;
             this.esperandoPin = true;
-
-            // Llamamos a la función que dispara EmailJS
-            // Pasamos res.nombre y res.pin que vienen de tu base de datos
-            this.users.solicitarNuevoPin(res.uid).subscribe();
 
             this.cdr.detectChanges();
           }
@@ -289,14 +343,12 @@ export class Login {
     this.users.verificarPin(this.usuarioUidTemporal, this.pinIngresado).subscribe({
       next: (res: any) => {
         this.loading = false;
-        this.openModal('¡Verificado!', 'Identidad confirmada. Bienvenido a HTAS.', 'modal-success');
 
         // Si tu backend devuelve un token después de verificar el PIN:
         if (res.accessToken) localStorage.setItem('token', res.accessToken);
 
-        setTimeout(() => {
-          this.ngZone.run(() => this.router.navigate(['/inicio']));
-        }, 1500);
+        // Navegar inmediatamente para que se sienta fluido y rápido
+        this.ngZone.run(() => this.router.navigate(['/inicio']));
       },
       error: (err) => {
         this.loading = false;
@@ -374,12 +426,11 @@ export class Login {
           locale: Spanish,
           dateFormat: "Y-m-d",
           minDate: "today",
-          maxDate: fechaMaxima,
           appendTo: document.body,
           static: false,
           disableMobile: true, // Esto quita el calendario "feo" del celular
           onChange: (selectedDates: any, dateStr: string) => {
-            const control = this.registerForm.get('FechaAsignacion');
+            const control = this.registerForm.get('FechaNacimiento');
             if (control) {
               control.setValue(dateStr);
               control.markAsDirty();

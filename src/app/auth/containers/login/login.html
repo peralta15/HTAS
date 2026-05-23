@@ -28,6 +28,9 @@
             <i class="bi bi-lock"></i>
             <input type="password" formControlName="Password" placeholder="Contraseña">
           </div>
+          <re-captcha formControlName="recaptcha" [formGroup]="loginForm" [siteKey]="recaptchaSiteKey"
+            (resolved)="onCaptchaLoginResolved($event)">
+          </re-captcha>
           <button type="button" class="button google-style" (click)="onLoginWithEmailPassword()"
             [disabled]="loading || loginForm.invalid">
             <i class="bi bi-box-arrow-in-right"></i>
@@ -144,8 +147,8 @@
 
           <div class="container-input">
             <i class="bi bi-clipboard-data"></i>
-            <input type="text" formControlName="Especialidad" placeholder="Especialidad" (keypress)="onKeyPress($event)"
-              maxlength="60">
+            <input type="text" formControlName="Especialidad" placeholder="Especialidad"
+              (keypress)="soloNumeros($event)" maxlength="25">
           </div>
 
           <div class="container-input">
@@ -159,6 +162,10 @@
           <input type="text" id="fechaInput" formControlName="FechaAsignacion" placeholder="Seleccione fecha"
             class="input-clean" (focus)="inicializarCalendario()" readonly>
         </div>
+
+        <re-captcha formControlName="recaptcha" [formGroup]="registerForm" [siteKey]="recaptchaSiteKey"
+          (resolved)="onCaptchaRegisterResolved($event)">
+        </re-captcha>
 
         <button type="submit" class="button google-style" [disabled]="registerForm.invalid || loading">
           <i class="bi bi-person-plus-fill"></i>
