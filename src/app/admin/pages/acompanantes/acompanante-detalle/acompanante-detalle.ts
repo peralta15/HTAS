@@ -39,7 +39,6 @@ export class AcompananteDetalle implements OnInit, AfterViewInit {
     if (state && state.usuario) {
       this.usuarioSeleccionado = { ...state.usuario };
 
-      // Limpiamos formatos ISO raros provenientes del GET de Postgres
       if (this.usuarioSeleccionado.fechaNacimiento) {
         this.usuarioSeleccionado.fechaNacimiento = this.limpiarFecha(this.usuarioSeleccionado.fechaNacimiento);
       }
@@ -52,7 +51,6 @@ export class AcompananteDetalle implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    // Inicializar el calendario en cuanto el DOM esté listo de forma automática
     this.inicializarCalendario();
   }
 
@@ -100,8 +98,6 @@ export class AcompananteDetalle implements OnInit, AfterViewInit {
       }
 
       await firstValueFrom(this.usersService.updateUsuario(id, payload));
-
-      // MENSAJE REMOVIDO: Regresa directo sin interrumpir con la alerta nativa
       this.volver();
 
     } catch (error: any) {
@@ -116,15 +112,34 @@ export class AcompananteDetalle implements OnInit, AfterViewInit {
   inicializarCalendario() {
     if (isPlatformBrowser(this.platformId)) {
       setTimeout(() => {
-        const hoy = new Date();
-        const fechaMaxima = new Date(hoy.getFullYear(), hoy.getMonth() + 2, hoy.getDate());
+        // --- 1. CONFIGURACIÓN PARA FECHA DE NACIMIENTO ---
+        const configNacimiento: any = {
+          locale: Spanish,
+          dateFormat: "Y-m-d",
+          defaultDate: this.usuarioSeleccionado?.fechaNacimiento || null,
+          maxDate: "today", // No pueden haber nacido en el futuro
+          appendTo: document.body,
+          static: false,
+          disableMobile: true,
+          onChange: (selectedDates: any, dateStr: string) => {
+            if (this.usuarioSeleccionado) {
+              this.usuarioSeleccionado.fechaNacimiento = dateStr;
+              this.cdr.detectChanges();
+            }
+          }
+        };
+        flatpickr('#fechaNacimientoInput', configNacimiento);
 
-        const config: any = {
+        // --- 2. CONFIGURACIÓN PARA FECHA DE ASIGNACIÓN ---
+        const hoy = new Date();
+        const fechaMaximaAsignacion = new Date(hoy.getFullYear(), hoy.getMonth() + 2, hoy.getDate());
+
+        const configAsignacion: any = {
           locale: Spanish,
           dateFormat: "Y-m-d",
           defaultDate: this.usuarioSeleccionado?.fechaAsignacion || "today",
           minDate: "today",
-          maxDate: fechaMaxima,
+          maxDate: fechaMaximaAsignacion,
           appendTo: document.body,
           static: false,
           disableMobile: true,
@@ -135,8 +150,8 @@ export class AcompananteDetalle implements OnInit, AfterViewInit {
             }
           }
         };
+        flatpickr('#fechaInput', configAsignacion);
 
-        flatpickr('#fechaInput', config);
       }, 50);
     }
   }

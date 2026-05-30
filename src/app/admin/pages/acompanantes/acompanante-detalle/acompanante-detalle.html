@@ -56,8 +56,8 @@
 
                 <div class="form-group">
                     <label>Fecha de Nacimiento</label>
-                    <input type="date" required [(ngModel)]="usuarioSeleccionado.fechaNacimiento"
-                        class="form-control-premium">
+                    <input type="text" id="fechaNacimientoInput" [(ngModel)]="usuarioSeleccionado.fechaNacimiento"
+                        placeholder="Seleccione fecha de nacimiento" class="form-control-premium" readonly>
                 </div>
 
                 <div class="form-group">
