@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { GoogleService } from '../../../auth/services/google';
 import { Users } from '../../../auth/services/users';
 import { firstValueFrom } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-pacientes',
@@ -18,6 +19,7 @@ export class Pacientes implements OnInit {
   private usersService = inject(Users);
   private cdr = inject(ChangeDetectorRef);
   private platformId = inject(PLATFORM_ID);
+  private router = inject(Router);
 
   usuariosTodo: any[] = [];
   searchTerm: string = '';
@@ -29,9 +31,7 @@ export class Pacientes implements OnInit {
 
   // Selección y Modal
   usuarioSeleccionado: any = null;
-  mostrarModalEdit = false;
   mostrarModalDelete = false;
-  isSaving = false;
   isDeleting = false;
 
   async ngOnInit() {
@@ -149,55 +149,14 @@ export class Pacientes implements OnInit {
     this.expandedId = this.expandedId === id ? null : id;
   }
 
-  abrirEditar() { this.mostrarModalEdit = true; }
-  abrirEliminar() { this.mostrarModalDelete = true; }
-
-  async guardarCambios() {
-    if (!this.usuarioSeleccionado) return;
-    this.isSaving = true;
-    const fuenteActual = this.usuarioSeleccionado.fuente;
-    const id = this.usuarioSeleccionado.id;
-
-    try {
-      const nombre = (this.usuarioSeleccionado.tempNombre || '').trim();
-      const apPaterno = (this.usuarioSeleccionado.tempApellidoPaterno || '').trim();
-      const apMaterno = (this.usuarioSeleccionado.tempApellidoMaterno || '').trim();
-      const nombreCompleto = [nombre, apPaterno, apMaterno].filter(p => p).join(' ');
-
-      if (fuenteActual === 'Firebase') {
-        const dataFirebase = {
-          NombreCompleto: nombreCompleto,
-          correo: this.usuarioSeleccionado.correo,
-          rol: this.usuarioSeleccionado.rol,
-          telefono: this.usuarioSeleccionado.telefono
-        };
-        await this.googleService.updateUsuario(id, dataFirebase);
-      } else {
-        const datosPostgres = {
-          nombre: nombre,
-          apPaterno: apPaterno,
-          apMaterno: apMaterno,
-          appaterno: apPaterno, // <--- Agrega estas dos líneas por seguridad
-          apmaterno: apMaterno,
-          correo: this.usuarioSeleccionado.correo,
-          telefono: this.usuarioSeleccionado.telefono,
-          nss: this.usuarioSeleccionado.nss,
-          rol: 'Paciente',
-          activo: this.usuarioSeleccionado.activo ?? true
-        };
-        await firstValueFrom(this.usersService.updateUsuario(id, datosPostgres));
-      }
-
-      this.cerrarModal();
-      await this.cargarUsuarios(); // Recarga limpia
-    } catch (error: any) {
-      console.error('Error al actualizar:', error);
-      alert(`Error al guardar: ${error.message}`);
-    } finally {
-      this.isSaving = false;
-      this.cdr.detectChanges();
+  abrirEditar() { 
+    if (this.usuarioSeleccionado) {
+      const id = this.usuarioSeleccionado.idusuario || this.usuarioSeleccionado.id;
+      this.router.navigate(['/pacientes/editar', id], { state: { usuario: this.usuarioSeleccionado } });
     }
   }
+  
+  abrirEliminar() { this.mostrarModalDelete = true; }
 
   async confirmarEliminar() {
     if (!this.usuarioSeleccionado) return;
@@ -223,9 +182,7 @@ export class Pacientes implements OnInit {
   }
 
   cerrarModal() {
-    this.mostrarModalEdit = false;
     this.mostrarModalDelete = false;
-    this.isSaving = false;
     this.isDeleting = false;
   }
 }

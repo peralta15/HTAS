@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { GoogleService } from '../../../auth/services/google';
 import { Users } from '../../../auth/services/users';
 import { firstValueFrom } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-medicos',
@@ -18,6 +19,7 @@ export class Medicos implements OnInit {
   private usersService = inject(Users);
   private cdr = inject(ChangeDetectorRef);
   private platformId = inject(PLATFORM_ID);
+  private router = inject(Router);
 
   usuariosTodo: any[] = [];
   searchTerm: string = '';
@@ -29,9 +31,7 @@ export class Medicos implements OnInit {
 
   // Selección y Modal
   usuarioSeleccionado: any = null;
-  mostrarModalEdit = false;
   mostrarModalDelete = false;
-  isSaving = false;
   isDeleting = false;
 
   async ngOnInit() {
@@ -113,66 +113,21 @@ export class Medicos implements OnInit {
     }
   }
 
-  async guardarCambios() {
-    if (!this.usuarioSeleccionado) return;
-    this.isSaving = true;
-
-    try {
-      // 1. Preparamos los nombres separados y el completo
-      const nombre = (this.usuarioSeleccionado.tempNombre || '').trim();
-      const apPaterno = (this.usuarioSeleccionado.tempApellidoPaterno || '').trim();
-      const apMaterno = (this.usuarioSeleccionado.tempApellidoMaterno || '').trim();
-      const nombreCompleto = [nombre, apPaterno, apMaterno].filter(p => p).join(' ');
-
-      // 2. Construimos el objeto EXACTO que espera tu API
-      const datosActualizados = {
-        nombre: nombre,
-        apPaterno: apPaterno,
-        apMaterno: apMaterno,
-        NombreCompleto: nombreCompleto,
-        correo: this.usuarioSeleccionado.correo || this.usuarioSeleccionado.Correo,
-        telefono: this.usuarioSeleccionado.telefono || 'Sin teléfono',
-        especialidad: this.usuarioSeleccionado.especialidad || 'General',
-        direccionClinica: this.usuarioSeleccionado.direccionClinica || 'No registrada',
-        rol: this.usuarioSeleccionado.rol || 'Médico'
-      };
-
-      // 3. Identificamos el ID correcto (Postgres suele usar idusuario)
-      const idFinal = this.usuarioSeleccionado.idusuario || this.usuarioSeleccionado.id;
-
-      console.log('Enviando actualización para ID:', idFinal, datosActualizados);
-
-      if (this.usuarioSeleccionado.fuente === 'Firebase') {
-        await this.googleService.updateUsuario(idFinal, datosActualizados);
-      } else {
-        // Usamos firstValueFrom para asegurar que la suscripción de Angular se complete
-        await firstValueFrom(this.usersService.updateUsuario(idFinal, datosActualizados));
-      }
-
-      // 4. Limpieza y recarga inmediata
-      this.cerrarModal();
-      await this.cargarUsuarios(); // Refrescamos la tabla para ver los cambios
-
-      console.log('Cambios guardados exitosamente');
-
-    } catch (error) {
-      console.error('Error detallado al guardar:', error);
-      alert('No se pudieron guardar los cambios. Revisa la consola.');
-    } finally {
-      this.isSaving = false;
-      this.cdr.detectChanges();
-    }
-  }
-
   toggleExpand(id: string, event: Event) {
     event.stopPropagation();
     this.expandedId = this.expandedId === id ? null : id;
   }
 
-  abrirEditar() { this.mostrarModalEdit = true; }
+  abrirEditar() { 
+    if (this.usuarioSeleccionado) {
+      const id = this.usuarioSeleccionado.idusuario || this.usuarioSeleccionado.id;
+      this.router.navigate(['/medicos/editar', id], { state: { usuario: this.usuarioSeleccionado } });
+    }
+  }
+  
   abrirEliminar() { this.mostrarModalDelete = true; }
+  
   cerrarModal() {
-    this.mostrarModalEdit = false;
     this.mostrarModalDelete = false;
     this.usuarioSeleccionado = null;
   }

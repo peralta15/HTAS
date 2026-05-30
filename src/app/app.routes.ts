@@ -13,8 +13,11 @@ import { Inicio } from './admin/pages/inicio/inicio';
 import { Usuarios } from './admin/pages/usuarios/usuarios';
 import { Perfil } from './admin/template/perfil/perfil';
 import { Acompanantes } from './admin/pages/acompanantes/acompanantes';
+import { AcompananteDetalle } from './admin/pages/acompanantes/acompanante-detalle/acompanante-detalle';
 import { Pacientes } from './admin/pages/pacientes/pacientes';
+import { PacienteDetalle } from './admin/pages/pacientes/paciente-detalle/paciente-detalle';
 import { Medicos } from './admin/pages/medicos/medicos';
+import { MedicoDetalle } from './admin/pages/medicos/medico-detalle/medico-detalle';
 import { Notificaciones } from './admin/template/notificaciones/notificaciones';
 import { Success } from './pages/success/success';
 import { Citas } from './admin/pages/citas/citas';
@@ -78,12 +81,24 @@ export const routes: Routes = [
     component: Medicos
   },
   {
+    path: 'medicos/editar/:id',
+    component: MedicoDetalle
+  },
+  {
     path: 'pacientes',
     component: Pacientes
   },
   {
+    path: 'pacientes/editar/:id',
+    component: PacienteDetalle
+  },
+  {
     path: 'acompanantes',
     component: Acompanantes
+  },
+  {
+    path: 'acompanantes/editar/:id',
+    component: AcompananteDetalle
   },
   {
     path: 'citas',

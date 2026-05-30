@@ -7,6 +7,7 @@ import flatpickr from 'flatpickr';
 import { Spanish } from 'flatpickr/dist/l10n/es.js';
 import { Users } from '../../../auth/services/users';
 import { firstValueFrom } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-acompanantes',
@@ -19,6 +20,7 @@ export class Acompanantes implements OnInit {
   private usersService = inject(Users);
   private cdr = inject(ChangeDetectorRef);
   private platformId = inject(PLATFORM_ID);
+  private router = inject(Router);
 
   usuariosTodo: any[] = [];
   searchTerm: string = '';
@@ -30,9 +32,7 @@ export class Acompanantes implements OnInit {
 
   // Selección y Modal
   usuarioSeleccionado: any = null;
-  mostrarModalEdit = false;
   mostrarModalDelete = false;
-  isSaving = false;
   isDeleting = false;
 
   async ngOnInit() {
@@ -138,81 +138,14 @@ export class Acompanantes implements OnInit {
   }
 
   abrirEditar() {
-    this.mostrarModalEdit = true;
+    if (this.usuarioSeleccionado) {
+      const id = this.usuarioSeleccionado.idusuario || this.usuarioSeleccionado.id;
+      this.router.navigate(['/acompanantes/editar', id], { state: { usuario: this.usuarioSeleccionado } });
+    }
   }
 
   abrirEliminar() {
     this.mostrarModalDelete = true;
-  }
-
-  async guardarCambios() {
-    if (!this.usuarioSeleccionado) return;
-
-    this.isSaving = true;
-    // Declaramos fuente aquí arriba para que funcione en el catch y en toda la función
-    const fuenteActual = this.usuarioSeleccionado.fuente;
-    const id = this.usuarioSeleccionado.id;
-
-    try {
-      // 1. Reconstruir nombres
-      const nombre = (this.usuarioSeleccionado.tempNombre || '').trim();
-      const apPaterno = (this.usuarioSeleccionado.tempApellidoPaterno || '').trim();
-      const apMaterno = (this.usuarioSeleccionado.tempApellidoMaterno || '').trim();
-      const nombreCompleto = [nombre, apPaterno, apMaterno].filter(p => p).join(' ');
-
-      if (fuenteActual === 'Firebase') {
-        const dataFirebase = {
-          NombreCompleto: nombreCompleto,
-          correo: this.usuarioSeleccionado.correo,
-          rol: this.usuarioSeleccionado.rol,
-          telefono: this.usuarioSeleccionado.telefono
-        };
-        await this.googleService.updateUsuario(id, dataFirebase);
-      } else {
-        // 2. IMPORTANTE: Enviamos los nombres de campos que Postgres suele pedir
-        // Incluimos variaciones por si el backend es estricto
-        const datosPostgres = {
-          nombre: nombre,
-          apPaterno: apPaterno,
-          apMaterno: apMaterno,
-          appaterno: apPaterno, // Algunos backends lo esperan todo en minúsculas
-          apmaterno: apMaterno,
-          correo: this.usuarioSeleccionado.correo,
-          telefono: this.usuarioSeleccionado.telefono,
-          fechaAsignacion: this.usuarioSeleccionado.fechaAsignacion,
-          rol: this.usuarioSeleccionado.rol || 'Acompañante',
-          activo: true
-        };
-
-        console.log('Enviando actualización a Postgres...', datosPostgres);
-        await firstValueFrom(this.usersService.updateUsuario(id, datosPostgres));
-      }
-
-      // 3. Sincronizar localmente (Para respuesta inmediata)
-      const index = this.usuariosTodo.findIndex(u => u.id === id);
-      if (index !== -1) {
-        this.usuariosTodo[index] = {
-          ...this.usuarioSeleccionado,
-          NombreCompleto: nombreCompleto,
-          nombre: nombre,
-          apPaterno: apPaterno,
-          apMaterno: apMaterno
-        };
-      }
-
-      console.log(`¡Cambios guardados con éxito en ${fuenteActual}!`);
-
-      // 4. EL PASO CLAVE: Refrescar los usuarios desde la DB para asegurar persistencia
-      this.cerrarModal();
-      await this.cargarUsuarios();
-
-    } catch (error: any) {
-      console.error(`Error al actualizar en ${fuenteActual}:`, error);
-      alert(`Error al guardar: ${error.message || error}`);
-    } finally {
-      this.isSaving = false;
-      this.cdr.detectChanges();
-    }
   }
 
   async confirmarEliminar() {
@@ -250,44 +183,7 @@ export class Acompanantes implements OnInit {
   }
 
   cerrarModal() {
-    this.mostrarModalEdit = false;
     this.mostrarModalDelete = false;
-    this.isSaving = false;
     this.isDeleting = false;
-  }
-
-  inicializarCalendario() {
-    if (isPlatformBrowser(this.platformId)) {
-      setTimeout(() => {
-        const hoy = new Date();
-        const fechaMaxima = new Date(hoy.getFullYear(), hoy.getMonth() + 2, hoy.getDate());
-
-        const config: any = {
-          locale: Spanish,
-          dateFormat: "Y-m-d",
-          minDate: "today",
-          maxDate: fechaMaxima,
-          appendTo: document.body,
-          static: false,
-          disableMobile: true,
-          onChange: (selectedDates: any, dateStr: string) => {
-            if (this.usuarioSeleccionado) {
-              // Forzamos la asignación al objeto que se va a guardar
-              this.usuarioSeleccionado.fechaAsignacion = dateStr;
-              console.log('Fecha capturada en el objeto:', this.usuarioSeleccionado.fechaAsignacion);
-              this.cdr.detectChanges(); // Obligamos a Angular a ver el cambio
-            }
-          }
-        };
-
-        const fp = flatpickr('#fechaInput', config);
-        if (fp) {
-          const instance = Array.isArray(fp) ? fp[0] : fp;
-          if (instance && typeof instance.open === 'function') {
-            instance.open();
-          }
-        }
-      }, 50);
-    }
   }
 }
