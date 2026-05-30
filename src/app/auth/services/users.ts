@@ -179,4 +179,26 @@ export class Users {
   deleteUsuario(id: string | number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/delete-user/${id}`);
   }
+
+  // Métodos para el Médico (Doctor)
+  getRegistrosUsuarios(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/all-users`);
+  }
+
+  getAlertasMedicas(): Observable<any[]> {
+    // Endpoint en tu backend que consolida citas, tratamientos y dispositivos del médico
+    return this.http.get<any[]>(`${this.apiUrl}/notificaciones-medico`);
+  }
+
+  // Métodos para el Paciente
+  getNotificacionesPaciente(email: string): Observable<any[]> {
+    // Endpoint en tu backend que consolida el historial/alertas del paciente usando su email
+    return this.http.get<any[]>(`${this.apiUrl}/notificaciones-paciente/${email}`);
+  }
+
+  // Métodos para el Acompañante
+  getNotificacionesAcompanante(idUsuario: string | number): Observable<any[]> {
+    // Endpoint en tu backend que trae las alertas de tomas y asignaciones del acompañante por su ID
+    return this.http.get<any[]>(`${this.apiUrl}/notificaciones-acompanante/${idUsuario}`);
+  }
 }
