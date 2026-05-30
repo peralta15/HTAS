@@ -252,13 +252,11 @@ const authController = {
         const segundos = Math.ceil(
           (new Date(usuario.bloqueadohasta) - ahora) / 1000,
         );
-        return res
-          .status(423)
-          .json({
-            error: "Bloqueado",
-            bloqueado: true,
-            segundosRestantes: segundos,
-          });
+        return res.status(423).json({
+          error: "Bloqueado",
+          bloqueado: true,
+          segundosRestantes: segundos,
+        });
       }
 
       if (usuario.pinverificacion === pin) {
@@ -278,13 +276,11 @@ const authController = {
             "UPDATE USUARIOS SET IntentosFallidos = $1, BloqueadoHasta = $2 WHERE IdUsuario = $3",
             [nuevosIntentos, tiempoBloqueo, uid],
           );
-          return res
-            .status(423)
-            .json({
-              error: "Demasiados intentos. Bloqueado por 3 min.",
-              bloqueado: true,
-              segundosRestantes: 180,
-            });
+          return res.status(423).json({
+            error: "Demasiados intentos. Bloqueado por 3 min.",
+            bloqueado: true,
+            segundosRestantes: 180,
+          });
         } else {
           await db.query(
             "UPDATE USUARIOS SET IntentosFallidos = $1 WHERE IdUsuario = $2",
@@ -323,12 +319,12 @@ const authController = {
   },
 
   googleLogin: async (req, res) => {
-    const { nombre, apPaterno, apMaterno, correo } = req.body;
+    const { nombre, apPaterno, apMaterno, correo, genero } = req.body;
 
     try {
       // 1. Verificar si ya existe en la base de datos
       const result = await db.query(
-        "SELECT idusuario, nombre, pinverificacion, pinverificado, rol FROM USUARIOS WHERE Correo = $1",
+        "SELECT idusuario, nombre, pinverificacion, pinverificado, rol, genero FROM USUARIOS WHERE Correo = $1",
         [correo],
       );
 
@@ -583,12 +579,6 @@ const authController = {
       antecedentesFamiliares,
     } = req.body;
 
-    // LIMPIEZA DE FECHA
-    const fechaLimpia =
-      fechaAsignacion && fechaAsignacion.trim() !== ""
-        ? fechaAsignacion
-        : new Date().toISOString().split("T")[0];
-
     try {
       await db.query("BEGIN");
 
@@ -651,24 +641,31 @@ const authController = {
         rolNormalizado === "acompañante" ||
         rolNormalizado === "acompanante"
       ) {
-        if (!fechaNacimiento) {
+        if (!fechaNacimiento || !fechaAsignacion) {
           await db.query("ROLLBACK");
-          return res
-            .status(400)
-            .json({
-              error: "La fecha de nacimiento es requerida para acompañantes.",
-            });
+          return res.status(400).json({
+            error:
+              "Tanto la fecha de nacimiento como la de asignación son obligatorias.",
+          });
         }
+
+        // Cortamos el string por si Angular lo envía con formato ISO completo (ej: 1995-12-01T06:00:00.000Z)
+        const fnLimpia = fechaNacimiento.includes("T")
+          ? fechaNacimiento.split("T")[0]
+          : fechaNacimiento;
+        const faLimpia = fechaAsignacion.includes("T")
+          ? fechaAsignacion.split("T")[0]
+          : fechaAsignacion;
 
         await db.query(
           `INSERT INTO ACOMPANANTES (IdUsuario, FechaNacimiento, FechaAsignacion)
-                VALUES ($1, $2, $3)
-                ON CONFLICT (IdUsuario)
-                DO UPDATE SET 
-                FechaNacimiento = $2,
-                FechaAsignacion = $3,
-                updated_at = CURRENT_TIMESTAMP`,
-          [id, fechaNacimiento, fechaAsigLimpia],
+     VALUES ($1, $2, $3)
+     ON CONFLICT (IdUsuario)
+     DO UPDATE SET 
+        FechaNacimiento = EXCLUDED.FechaNacimiento,
+        FechaAsignacion = EXCLUDED.FechaAsignacion,
+        updated_at = CURRENT_TIMESTAMP`,
+          [id, fnLimpia, faLimpia], // <-- Aquí usamos las variables que sí existen y están limpias
         );
       }
 
@@ -715,12 +712,10 @@ const authController = {
       res.json({ message: "Usuario eliminado correctamente" });
     } catch (error) {
       console.error("Error al eliminar:", error);
-      res
-        .status(500)
-        .json({
-          error:
-            "Error al eliminar el usuario. Verifique si tiene registros asociados.",
-        });
+      res.status(500).json({
+        error:
+          "Error al eliminar el usuario. Verifique si tiene registros asociados.",
+      });
     }
   },
 
