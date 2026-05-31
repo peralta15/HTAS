@@ -483,3 +483,44 @@
         opacity: 1;
     }
 }
+
+/* Añade o actualiza estos fragmentos en el archivo paciente-detalle.css */
+
+/* Corrección de color de enfoque global del proyecto */
+.form-control-premium:focus {
+    outline: none;
+    border-color: #b0001e;
+    box-shadow: 0 0 0 3px rgba(176, 0, 30, 0.1);
+    background: white;
+}
+
+.input-picker-wrapper:focus-within .icon-embed {
+    color: #b0001e;
+}
+
+/* Clases de Soporte para la botonera Premium del Modal */
+.modal-footer-premium {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    border-top: 1px solid #e2e8f0;
+    padding: 1rem 2rem 1.5rem;
+    background: #f8fafc;
+}
+
+.btn-cancel-premium {
+    padding: 0.75rem 1.5rem;
+    background: white;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-cancel-premium:hover {
+    background: #f1f5f9;
+    color: #1e293b;
+}

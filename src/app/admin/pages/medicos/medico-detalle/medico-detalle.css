@@ -151,13 +151,16 @@
 }
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 @media (max-width: 1024px) {
     .form-grid {
         grid-template-columns: repeat(2, 1fr);
     }
+
     .form-group[style="grid-column: span 3;"] {
         grid-column: span 2 !important;
     }
@@ -167,16 +170,89 @@
     .form-grid {
         grid-template-columns: 1fr;
     }
+
     .form-group[style="grid-column: span 3;"] {
         grid-column: span 1 !important;
     }
+
     .main-content {
         margin-left: 0;
         padding: 1rem;
     }
+
     .header-section {
         flex-direction: column;
         align-items: flex-start;
         gap: 1rem;
+    }
+}
+
+/* ==========================================================================
+   Ajustes de Enfoque Institucional
+   ========================================================================== */
+.form-control-premium:focus {
+    outline: none;
+    border-color: #b0001e;
+    box-shadow: 0 0 0 3px rgba(176, 0, 30, 0.1);
+    background: white;
+}
+
+/* ==========================================================================
+   8. COMPONENTE TOAST DE NOTIFICACIÓN PREMIUM FLOTANTE
+   ========================================================================== */
+.toast-premium-container {
+    position: fixed;
+    top: 25px;
+    right: 25px;
+    z-index: 10005;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    max-width: 400px;
+    animation: slideInRight 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    color: white;
+}
+
+.toast-premium-container.success {
+    background: #10b981;
+    border-left: 6px solid #047857;
+}
+
+.toast-premium-container.error {
+    background: #ef4444;
+    border-left: 6px solid #b91c1c;
+}
+
+.toast-premium-container.warning {
+    background: #f59e0b;
+    border-left: 6px solid #b45309;
+}
+
+.toast-content {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.icon-toast {
+    font-size: 1.3rem;
+}
+
+.toast-message {
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(120%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
     }
 }

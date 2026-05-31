@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, ChangeDetectorRef, PLATFORM_ID, AfterViewInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef, PLATFORM_ID, AfterViewInit } from '@angular/core';
 import { CommonModule, Location, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -16,7 +16,7 @@ import { Spanish } from 'flatpickr/dist/l10n/es.js';
   templateUrl: './acompanante-detalle.html',
   styleUrls: ['./acompanante-detalle.css']
 })
-export class AcompananteDetalle implements OnInit, AfterViewInit {
+export class AcompananteDetalle implements OnInit, AfterViewInit, OnDestroy {
   private router = inject(Router);
   private location = inject(Location);
   private googleService = inject(GoogleService);
@@ -26,6 +26,12 @@ export class AcompananteDetalle implements OnInit, AfterViewInit {
 
   usuarioSeleccionado: any = null;
   isSaving = false;
+
+  // Sistema de Notificaciones Premium Toast
+  mostrarToast = false;
+  mensajeToast = '';
+  tipoToast: 'success' | 'error' | 'warning' = 'success';
+  private toastTimeout: any = null;
 
   ngOnInit() {
     let state: any = null;
@@ -54,6 +60,12 @@ export class AcompananteDetalle implements OnInit, AfterViewInit {
     this.inicializarCalendario();
   }
 
+  ngOnDestroy() {
+    if (this.toastTimeout) {
+      clearTimeout(this.toastTimeout);
+    }
+  }
+
   limpiarFecha(fecha: any): string {
     if (!fecha) return '';
     if (typeof fecha === 'string') {
@@ -66,24 +78,57 @@ export class AcompananteDetalle implements OnInit, AfterViewInit {
     this.location.back();
   }
 
+  // Controlador central para disparar alertas dinámicas
+  lanzarNotificacion(mensaje: string, tipo: 'success' | 'error' | 'warning' = 'success') {
+    this.mensajeToast = mensaje;
+    this.tipoToast = tipo;
+    this.mostrarToast = true;
+    this.cdr.detectChanges();
+
+    if (this.toastTimeout) clearTimeout(this.toastTimeout);
+
+    this.toastTimeout = setTimeout(() => {
+      this.mostrarToast = false;
+      this.cdr.detectChanges();
+    }, 4000);
+  }
+
   async guardarCambios() {
     if (!this.usuarioSeleccionado) return;
 
     const id = this.usuarioSeleccionado.idusuario || this.usuarioSeleccionado.id || this.usuarioSeleccionado.uid;
     if (!id) {
-      alert("Error: No se encontró el ID del usuario. Vuelva a la lista e intente de nuevo.");
+      this.lanzarNotificacion("Error: No se encontró el identificador único del usuario.", "error");
+      return;
+    }
+
+    const nombre = (this.usuarioSeleccionado.nombre || '').trim();
+    const apPaterno = (this.usuarioSeleccionado.apPaterno || '').trim();
+    const apMaterno = (this.usuarioSeleccionado.apMaterno || '').trim();
+    const correo = (this.usuarioSeleccionado.correo || '').trim();
+    const telefono = (this.usuarioSeleccionado.telefono || '').trim();
+
+    // Validaciones de estructura de datos en Front-end
+    if (!nombre || !apPaterno || !apMaterno || !correo || !telefono) {
+      this.lanzarNotificacion("Todos los campos personales básicos son obligatorios.", "warning");
+      return;
+    }
+
+    if (!this.usuarioSeleccionado.fechaNacimiento || !this.usuarioSeleccionado.fechaAsignacion) {
+      this.lanzarNotificacion("La fecha de nacimiento y asignación son obligatorias.", "warning");
       return;
     }
 
     this.isSaving = true;
+    this.cdr.detectChanges();
 
     try {
       const payload = {
-        nombre: (this.usuarioSeleccionado.nombre || '').trim(),
-        apPaterno: (this.usuarioSeleccionado.apPaterno || '').trim(),
-        apMaterno: (this.usuarioSeleccionado.apMaterno || '').trim(),
-        correo: (this.usuarioSeleccionado.correo || '').trim(),
-        telefono: (this.usuarioSeleccionado.telefono || '').trim(),
+        nombre: nombre,
+        apPaterno: apPaterno,
+        apMaterno: apMaterno,
+        correo: correo,
+        telefono: telefono,
         genero: this.usuarioSeleccionado.genero,
         activo: this.usuarioSeleccionado.activo,
         rol: this.usuarioSeleccionado.rol || 'Acompañante',
@@ -91,18 +136,18 @@ export class AcompananteDetalle implements OnInit, AfterViewInit {
         fechaAsignacion: this.usuarioSeleccionado.fechaAsignacion
       };
 
-      if (!payload.fechaNacimiento || !payload.fechaAsignacion) {
-        alert("Error: La fecha de nacimiento y la fecha de asignación son campos obligatorios.");
-        this.isSaving = false;
-        return;
-      }
-
       await firstValueFrom(this.usersService.updateUsuario(id, payload));
-      this.volver();
+
+      this.lanzarNotificacion("¡Éxito! La información del acompañante ha sido actualizada.", "success");
+
+      setTimeout(() => {
+        this.router.navigate(['/acompanantes']);
+      }, 2000);
 
     } catch (error: any) {
       console.error("Error al guardar cambios:", error);
-      alert("Hubo un error al guardar los cambios: " + (error.error?.error || error.message));
+      const msgErr = error.error?.error || error.message || "Error interno del servidor";
+      this.lanzarNotificacion(`No se pudo guardar: ${msgErr}`, "error");
     } finally {
       this.isSaving = false;
       this.cdr.detectChanges();
@@ -117,7 +162,7 @@ export class AcompananteDetalle implements OnInit, AfterViewInit {
           locale: Spanish,
           dateFormat: "Y-m-d",
           defaultDate: this.usuarioSeleccionado?.fechaNacimiento || null,
-          maxDate: "today", // No pueden haber nacido en el futuro
+          maxDate: "today",
           appendTo: document.body,
           static: false,
           disableMobile: true,

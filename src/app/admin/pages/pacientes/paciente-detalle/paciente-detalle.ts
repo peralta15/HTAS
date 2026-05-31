@@ -173,8 +173,8 @@ export class PacienteDetalle implements OnInit, OnDestroy {
   }
 
   async registrarCita() {
-    if (!this.nuevaCita.fechaCita || !this.nuevaCita.horaCita) {
-      this.lanzarNotificacion("Por favor seleccione la fecha y hora de la cita.", "warning");
+    if (!this.nuevaCita.fechaCita || !this.nuevaCita.horaCita || !this.nuevaCita.motivo.trim()) {
+      this.lanzarNotificacion("Por favor rellene los campos obligatorios para agendar la cita.", "warning");
       return;
     }
 
@@ -193,7 +193,7 @@ export class PacienteDetalle implements OnInit, OnDestroy {
         fechaCita: this.nuevaCita.fechaCita,
         horaCita: this.nuevaCita.horaCita.length === 5 ? `${this.nuevaCita.horaCita}:00` : this.nuevaCita.horaCita,
         motivo: this.nuevaCita.motivo.trim(),
-        sintomas: this.nuevaCita.sintomas.trim(),
+        sintomas: this.nuevaCita.sintomas.trim() || 'Sin síntomas',
         modalidad: this.nuevaCita.modalidad,
         estado: 'Programada'
       };
@@ -201,11 +201,11 @@ export class PacienteDetalle implements OnInit, OnDestroy {
       await firstValueFrom(this.usersService.crearCita(payloadCita));
 
       this.cerrarModalCita();
-      this.lanzarNotificacion("Cita médica asignada y registrada correctamente.", "success");
+      this.lanzarNotificacion("¡Cita asignada! Se registró la cita médica correctamente.", "success");
 
     } catch (error: any) {
       console.error("Error al registrar la cita:", error);
-      this.lanzarNotificacion("Hubo un error al registrar la cita: " + (error.error?.error || error.message), "error");
+      this.lanzarNotificacion("Hubo un error al registrar la cita médica.", "error");
     } finally {
       this.isSavingCita = false;
       this.cdr.detectChanges();
@@ -214,13 +214,20 @@ export class PacienteDetalle implements OnInit, OnDestroy {
 
   async guardarCambios() {
     if (!this.usuarioSeleccionado) return;
+
+    const nombre = (this.usuarioSeleccionado.nombre || '').trim();
+    const apPaterno = (this.usuarioSeleccionado.tempApellidoPaterno || '').trim();
+
+    if (!nombre || !apPaterno || !this.usuarioSeleccionado.correo) {
+      this.lanzarNotificacion("El nombre, apellido paterno y correo son obligatorios.", "warning");
+      return;
+    }
+
     this.isSaving = true;
     const fuenteActual = this.usuarioSeleccionado.fuente;
     const id = this.usuarioSeleccionado.id;
 
     try {
-      const nombre = (this.usuarioSeleccionado.nombre || '').trim();
-      const apPaterno = (this.usuarioSeleccionado.tempApellidoPaterno || '').trim();
       const apMaterno = (this.usuarioSeleccionado.tempApellidoMaterno || '').trim();
       const nombreCompleto = [nombre, apPaterno, apMaterno].filter(p => p).join(' ');
 
@@ -248,15 +255,15 @@ export class PacienteDetalle implements OnInit, OnDestroy {
         await firstValueFrom(this.usersService.updateUsuario(id, datosPostgres));
       }
 
-      this.lanzarNotificacion("Datos del paciente actualizados con éxito.", "success");
+      this.lanzarNotificacion("¡Éxito! Los datos del paciente se actualizaron correctamente.", "success");
 
       setTimeout(() => {
         this.router.navigate(['/pacientes']);
-      }, 1500);
+      }, 2000);
 
     } catch (error: any) {
       console.error('Error al actualizar:', error);
-      this.lanzarNotificacion(`Error al guardar los cambios: ${error.message}`, "error");
+      this.lanzarNotificacion("No se pudieron guardar los cambios en el servidor.", "error");
     } finally {
       this.isSaving = false;
       this.cdr.detectChanges();

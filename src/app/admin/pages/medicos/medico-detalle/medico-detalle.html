@@ -1,5 +1,16 @@
 <app-menu #sidebar></app-menu>
 
+@if (mostrarToast) {
+<div class="toast-premium-container" [ngClass]="tipoToast">
+    <div class="toast-content">
+        @if (tipoToast === 'success') { <i class="bi bi-check-circle-fill icon-toast"></i> }
+        @if (tipoToast === 'error') { <i class="bi bi-exclamation-triangle-fill icon-toast"></i> }
+        @if (tipoToast === 'warning') { <i class="bi bi-exclamation-circle-fill icon-toast"></i> }
+        <span class="toast-message">{{ mensajeToast }}</span>
+    </div>
+</div>
+}
+
 <main class="main-content" [class.menu-collapsed]="sidebar.isCollapsed">
     @if (usuarioSeleccionado) {
     <div class="container-fluid">
@@ -25,11 +36,13 @@
                 </div>
                 <div class="form-group">
                     <label>Apellido Paterno</label>
-                    <input type="text" [(ngModel)]="usuarioSeleccionado.tempApellidoPaterno" class="form-control-premium">
+                    <input type="text" [(ngModel)]="usuarioSeleccionado.tempApellidoPaterno"
+                        class="form-control-premium">
                 </div>
                 <div class="form-group">
                     <label>Apellido Materno</label>
-                    <input type="text" [(ngModel)]="usuarioSeleccionado.tempApellidoMaterno" class="form-control-premium">
+                    <input type="text" [(ngModel)]="usuarioSeleccionado.tempApellidoMaterno"
+                        class="form-control-premium">
                 </div>
                 <div class="form-group">
                     <label>Correo Electrónico</label>

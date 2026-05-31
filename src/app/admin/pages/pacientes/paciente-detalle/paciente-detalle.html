@@ -1,6 +1,5 @@
 <app-menu #sidebar></app-menu>
 
-<!-- COMPONENTE TOAST DE NOTIFICACIÓN PREMIUM (ELIMINA LOS ALERTS NATIVOS) -->
 @if (mostrarToast) {
 <div class="toast-premium-container" [ngClass]="tipoToast">
     <div class="toast-content">
@@ -86,7 +85,6 @@
     </div>
     }
 
-    <!-- MODAL PREMIUM PARA AGENDAR LA CITA -->
     @if (mostrarModalCita) {
     <div class="modal-overlay">
         <div class="modal-premium-card">
@@ -102,7 +100,6 @@
                 </p>
 
                 <div class="form-grid-modal">
-                    <!-- Campo de Fecha con Flatpickr -->
                     <div class="form-group">
                         <label>Fecha de la Cita</label>
                         <div class="input-picker-wrapper">
@@ -112,7 +109,6 @@
                         </div>
                     </div>
 
-                    <!-- Campo de Hora con Flatpickr -->
                     <div class="form-group">
                         <label>Hora de la Cita</label>
                         <div class="input-picker-wrapper">
@@ -145,8 +141,9 @@
                 </div>
             </div>
 
-            <div class="modal-footer">
-                <button type="button" class="btn-cancel" (click)="cerrarModalCita()">Cancelar</button>
+            <div class="modal-footer-premium">
+                <button type="button" class="btn-cancel-premium" (click)="cerrarModalCita()"
+                    [disabled]="isSavingCita">Cancelar</button>
                 <button type="button" class="btn-save-appointment" (click)="registrarCita()" [disabled]="isSavingCita">
                     @if (isSavingCita) {
                     <span class="spinner-save"></span>
