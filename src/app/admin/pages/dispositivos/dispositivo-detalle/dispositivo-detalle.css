@@ -6,10 +6,18 @@
     background-color: #fcfdfe;
 }
 
-.main-content.menu-collapsed { margin-left: 80px; }
+.main-content.menu-collapsed {
+    margin-left: 80px;
+}
 
-.container-fluid { max-width: 1400px; margin: 0 auto; }
+.container-fluid {
+    max-width: 1400px;
+    margin: 0 auto;
+}
 
+/* ==========================================================================
+   Sección de Cabecera
+   ========================================================================== */
 .header-section {
     display: flex;
     justify-content: space-between;
@@ -19,7 +27,11 @@
     border-bottom: 2px solid #e2e8f0;
 }
 
-.title-group { display: flex; flex-direction: column; gap: 0.5rem; }
+.title-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
 
 .title-page {
     font-size: 2rem;
@@ -29,8 +41,37 @@
     letter-spacing: -0.5px;
 }
 
-.subtitle-page { color: #64748b; font-size: 1rem; margin: 0; }
+.subtitle-page {
+    color: #64748b;
+    font-size: 1rem;
+    margin: 0;
+}
 
+/* Botón Volver del Listado */
+.btn-edit-premium {
+    padding: 0.75rem 1.5rem;
+    background: white;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s;
+}
+
+.btn-edit-premium:hover {
+    background: #f1f5f9;
+    color: #1e293b;
+    transform: translateY(-1px);
+}
+
+/* ==========================================================================
+   Tarjeta Detalle y Formulario Grid (Homologado con tu HTML)
+   ========================================================================== */
 .detail-card {
     background: white;
     border-radius: 16px;
@@ -38,20 +79,40 @@
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
-.form-grid {
+/* Mapeado directo a la clase de tu HTML */
+.form-grid-modal {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
+    /* Estructura limpia de 2 columnas */
     gap: 1.5rem;
     margin-bottom: 1.5rem;
 }
 
-.form-group { display: flex; flex-direction: column; gap: 0.5rem; }
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
 
-.full-width-group { margin-bottom: 1.5rem; }
-.full-width-group textarea { resize: none; font-family: inherit; }
+/* Mapeado para que los campos marcados ocupen todo el ancho del grid */
+.form-grid-modal .full-width-modal {
+    grid-column: span 2;
+}
 
-.form-group label { font-size: 0.875rem; font-weight: 600; color: #475569; }
+.form-group label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #475569;
+}
 
+/* Texto monoespaciado estilizado para la Dirección MAC */
+.mono-text {
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+/* Inputs, Selects y Textareas */
 .form-control-premium {
     padding: 0.75rem 1rem;
     border: 1px solid #cbd5e1;
@@ -72,15 +133,22 @@
     background: white;
 }
 
-.action-footer {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 2rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid #e2e8f0;
+select.form-control-premium {
+    cursor: pointer;
 }
 
-.btn-save {
+/* ==========================================================================
+   Botonera / Footer del Formulario
+   ========================================================================== */
+.modal-footer-premium {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+/* Botón Guardar / Actualizar */
+.btn-save-appointment {
     padding: 0.75rem 2rem;
     background: #1e293b;
     color: white;
@@ -95,10 +163,18 @@
     transition: all 0.2s;
 }
 
-.btn-save:hover { background: #0f172a; transform: translateY(-1px); }
-.btn-save:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+.btn-save-appointment:hover:not(:disabled) {
+    background: #0f172a;
+    transform: translateY(-1px);
+}
 
-.btn-cancel {
+.btn-save-appointment:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* Botón Cancelar */
+.btn-cancel-premium {
     padding: 0.75rem 1.5rem;
     background: white;
     color: #475569;
@@ -113,8 +189,12 @@
     transition: all 0.2s;
 }
 
-.btn-cancel:hover { background: #f1f5f9; color: #1e293b; }
+.btn-cancel-premium:hover {
+    background: #f1f5f9;
+    color: #1e293b;
+}
 
+/* Loader de guardado */
 .spinner-save {
     width: 16px;
     height: 16px;
@@ -124,20 +204,31 @@
     animation: spin 1s ease-in-out infinite;
 }
 
-@keyframes spin { to { transform: rotate(360deg); } }
-
-@media (max-width: 1024px) {
-    .form-grid { grid-template-columns: repeat(2, 1fr); }
-    .form-group[style*="span 2"] { grid-column: span 2 !important; }
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
 }
 
-@media (max-width: 768px) {
-    .form-grid { grid-template-columns: 1fr; }
-    .form-group[style*="span"] { grid-column: span 1 !important; }
-    .main-content { margin-left: 0; padding: 1rem; }
-    .header-section { flex-direction: column; align-items: flex-start; gap: 1rem; }
+/* Estilos de Botón para el Estado de Error/Vacío */
+.btn-save {
+    padding: 0.75rem 2rem;
+    background: #1e293b;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
 }
 
+.btn-save:hover {
+    background: #0f172a;
+}
+
+/* ==========================================================================
+   Notificaciones Toast Premium
+   ========================================================================== */
 .toast-premium-container {
     position: fixed;
     top: 25px;
@@ -153,15 +244,88 @@
     color: white;
 }
 
-.toast-premium-container.success { background: #10b981; border-left: 6px solid #047857; }
-.toast-premium-container.error { background: #ef4444; border-left: 6px solid #b91c1c; }
-.toast-premium-container.warning { background: #f59e0b; border-left: 6px solid #b45309; }
+.toast-premium-container.success {
+    background: #10b981;
+    border-left: 6px solid #047857;
+}
 
-.toast-content { display: flex; align-items: center; gap: 0.75rem; }
-.icon-toast { font-size: 1.3rem; }
-.toast-message { font-weight: 600; font-size: 0.95rem; }
+.toast-premium-container.error {
+    background: #ef4444;
+    border-left: 6px solid #b91c1c;
+}
+
+.toast-premium-container.warning {
+    background: #f59e0b;
+    border-left: 6px solid #b45309;
+}
+
+.toast-content {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.icon-toast {
+    font-size: 1.3rem;
+}
+
+.toast-message {
+    font-weight: 600;
+    font-size: 0.95rem;
+}
 
 @keyframes slideInRight {
-    from { transform: translateX(120%); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
+    from {
+        transform: translateX(120%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* ==========================================================================
+   Diseño Responsivo (Media Queries)
+   ========================================================================== */
+@media (max-width: 1024px) {
+    .form-grid-modal {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .form-grid-modal .full-width-modal {
+        grid-column: span 2;
+    }
+}
+
+@media (max-width: 768px) {
+    .form-grid-modal {
+        grid-template-columns: 1fr;
+    }
+
+    .form-grid-modal .full-width-modal {
+        grid-column: span 1;
+    }
+
+    .main-content {
+        margin-left: 0;
+        padding: 1rem;
+        padding-top: 85px;
+    }
+
+    .header-section {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .modal-footer-premium {
+        flex-direction: column-reverse;
+    }
+
+    .modal-footer-premium button {
+        width: 100%;
+        justify-content: center;
+    }
 }

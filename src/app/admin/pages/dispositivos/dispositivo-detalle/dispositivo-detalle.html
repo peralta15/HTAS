@@ -17,14 +17,14 @@
 
         <div class="header-section">
             <div class="title-group">
-                <h2 class="title-page">Ficha del Dispositivo</h2>
-                <p class="subtitle-page">Visualiza y edita las especificaciones del hardware médico.</p>
+                <h2 class="title-page">Editar Dispositivo</h2>
+                <p class="subtitle-page">Visualiza y edita las especificaciones del hardware médico del sistema.</p>
             </div>
 
             <div class="header-controls">
                 <button class="btn-action btn-edit-premium" (click)="volver()">
                     <i class="bi bi-arrow-left"></i>
-                    <span>Volver al Listado</span>
+                    <span>Volver a la lista</span>
                 </button>
             </div>
         </div>
@@ -39,40 +39,35 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Estado Operativo</label>
-                    <select [(ngModel)]="dispositivoSeleccionado.estado" class="form-control-premium">
-                        @for (e of estadosDispositivo; track e) {
-                        <option [value]="e">{{ e }}</option>
-                        }
+                    <label>Dirección MAC</label>
+                    <input type="text" [value]="dispositivoSeleccionado.direccionmac"
+                        class="form-control-premium mono-text" disabled
+                        style="background-color: #f1f5f9; cursor: not-allowed;">
+                </div>
+
+                <div class="form-group">
+                    <label>Estado en el Sistema</label>
+                    <select [(ngModel)]="dispositivoSeleccionado.activo" class="form-control-premium">
+                        <option [ngValue]="true">Activo / Operativo</option>
+                        <option [ngValue]="false">Inactivo / Fuera de servicio</option>
                     </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Categoría / Tipo</label>
-                    <select [(ngModel)]="dispositivoSeleccionado.tipo" class="form-control-premium">
-                        @for (t of tiposDispositivo; track t) {
-                        <option [value]="t">{{ t }}</option>
-                        }
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Modelo de Fábrica</label>
-                    <input type="text" [(ngModel)]="dispositivoSeleccionado.modelo" maxlength="80"
-                        class="form-control-premium" placeholder="Ej. KM-200">
-                </div>
-
-                <div class="form-group">
-                    <label>Número de Serie (S/N)</label>
-                    <input type="text" [(ngModel)]="dispositivoSeleccionado.serie" maxlength="80"
-                        class="form-control-premium" placeholder="Ej. SN-9483A7X">
                 </div>
 
                 <div class="form-group full-width-modal">
-                    <label>Descripción y Características Especiales</label>
-                    <textarea [(ngModel)]="dispositivoSeleccionado.descripcion" rows="4" class="form-control-premium"
-                        placeholder="Especificaciones técnicas, calibración o notas de mantenimiento..."></textarea>
+                    <label>Paciente Vinculado Actual</label>
+                    <div class="date-cell"
+                        style="padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px; background: #fafafa;">
+                        @if (dispositivoSeleccionado.nombrepaciente) {
+                        <i class="bi bi-person-fill me-2 text-primary"></i>
+                        <strong>{{ dispositivoSeleccionado.nombrepaciente }} {{
+                            dispositivoSeleccionado.appaternopaciente }}</strong>
+                        } @else {
+                        <i class="bi bi-person-dash me-2 text-muted"></i>
+                        <span class="text-muted">Dispositivo disponible en almacén (Sin vincular)</span>
+                        }
+                    </div>
                 </div>
+
             </div>
 
             <div class="modal-footer-premium"

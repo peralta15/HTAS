@@ -21,13 +21,9 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
   private cdr = inject(ChangeDetectorRef);
   private platformId = inject(PLATFORM_ID);
 
-  // Almacena el objeto clonado del dispositivo a editar o recuperar
+  // Objeto unificado que interactúa con la vista
   dispositivoSeleccionado: any = null;
   isSaving = false;
-
-  // Catálogos homologados con el formulario general de dispositivos
-  estadosDispositivo = ['Disponible', 'Operativo', 'En mantenimiento', 'Fuera de servicio'];
-  tiposDispositivo = ['Monitor', 'Diagnóstico', 'Terapéutico', 'Quirúrgico', 'Rehabilitación', 'Laboratorio', 'Otro'];
 
   // Sistema de Notificaciones Premium Toast
   mostrarToast = false;
@@ -38,7 +34,6 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
   async ngOnInit() {
     let state: any = null;
 
-    // 1. Recuperación segura del estado de navegación tanto en Browser como en SSR
     if (isPlatformBrowser(this.platformId)) {
       state = history.state;
     } else {
@@ -46,34 +41,31 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
       state = navigation?.extras?.state;
     }
 
-    // Si existe el dispositivo en el state, hacemos la copia para evitar mutaciones directas
+    // 1. Intentar recuperar desde el estado de navegación de Angular
     if (state && state.dispositivo) {
       this.dispositivoSeleccionado = { ...state.dispositivo };
     } else {
-      // 2. Si el usuario recargó la página (F5), recuperamos el ID desde la URL
+      // 2. Recuperación de respaldo ante recargas físicas (F5) usando el ID de la URL
       const idUrl = this.route.snapshot.paramMap.get('id');
 
       if (idUrl) {
         try {
-          // Reutilizamos el método existente para traer todos y buscamos el correspondiente
           const todos = await firstValueFrom(this.usersService.getDispositivos());
           const encontrado = todos?.find((d: any) =>
-            String(d.iddispositivo || d.idDispositivo || d.id) === String(idUrl)
+            String(d.iddispositivo) === String(idUrl)
           );
 
           if (encontrado) {
             this.dispositivoSeleccionado = { ...encontrado };
             this.cdr.detectChanges();
           } else {
-            // Si el ID no pertenece a ningún dispositivo real, saca al usuario
             this.router.navigate(['/dispositivos']);
           }
         } catch (error) {
-          console.error("No se pudo recuperar la lista al recargar con F5:", error);
+          console.error("Error al re-hidratar datos del dispositivo desde el servidor:", error);
           this.router.navigate(['/dispositivos']);
         }
       } else {
-        // Redirección de seguridad si no hay state ni ID en la URL
         this.router.navigate(['/dispositivos']);
       }
     }
@@ -89,7 +81,6 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
     this.location.back();
   }
 
-  // Lanzador global de alertas Toast Premium
   lanzarNotificacion(mensaje: string, tipo: 'success' | 'error' | 'warning' = 'success') {
     this.mensajeToast = mensaje;
     this.tipoToast = tipo;
@@ -107,16 +98,16 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
   async guardarCambios() {
     if (!this.dispositivoSeleccionado) return;
 
-    // Validación unificada del ID primario del dispositivo
-    const id = this.dispositivoSeleccionado.iddispositivo || this.dispositivoSeleccionado.id;
+    // Extracción limpia del ID primario usado por el Router de Angular
+    const id = this.dispositivoSeleccionado.iddispositivo;
     if (!id) {
-      this.lanzarNotificacion("Error: No se encontró el identificador único del dispositivo.", "error");
+      this.lanzarNotificacion("Error interno: No se detectó el ID del dispositivo.", "error");
       return;
     }
 
-    const nombre = (this.dispositivoSeleccionado.nombre || '').trim();
-    if (!nombre) {
-      this.lanzarNotificacion("El nombre del dispositivo es un campo obligatorio.", "warning");
+    const nombreLimpio = (this.dispositivoSeleccionado.nombre || '').trim();
+    if (!nombreLimpio) {
+      this.lanzarNotificacion("El nombre del dispositivo es obligatorio.", "warning");
       return;
     }
 
@@ -124,30 +115,28 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
     this.cdr.detectChanges();
 
     try {
-      // Estructura limpia del Payload mapeado listo para tu API
+      // PAYLOAD CONTROLADO: Coincide perfectamente con las llaves que desestructura tu Express
       const payload = {
-        nombre: nombre,
-        descripcion: (this.dispositivoSeleccionado.descripcion || '').trim(),
-        modelo: (this.dispositivoSeleccionado.modelo || '').trim(),
-        serie: (this.dispositivoSeleccionado.serie || '').trim(),
-        tipo: this.dispositivoSeleccionado.tipo || 'Monitor',
-        estado: this.dispositivoSeleccionado.estado || 'Disponible'
+        nombre: nombreLimpio,
+        direccionMac: this.dispositivoSeleccionado.direccionmac || this.dispositivoSeleccionado.direccionMac,
+        idPacienteAsociado: this.dispositivoSeleccionado.idpaciente || this.dispositivoSeleccionado.idPacienteAsociado || null,
+        activo: !!this.dispositivoSeleccionado.activo
       };
 
-      // Consumo síncrono del servicio mediante RxJS firstValueFrom
+      // Consumo de la petición PUT hacia la API
       await firstValueFrom(this.usersService.actualizarDispositivo(id, payload));
 
       this.lanzarNotificacion("¡Dispositivo actualizado con éxito!", "success");
 
-      // Redirección diferida para permitir la visualización del Toast de éxito
+      // Redirección con retraso para lucir el Toast Premium
       setTimeout(() => {
         this.router.navigate(['/dispositivos']);
       }, 1500);
 
     } catch (error: any) {
-      console.error("Error al guardar cambios en el dispositivo:", error);
-      const msgErr = error.error?.error || error.message || "Error interno en el servidor.";
-      this.lanzarNotificacion(`No se pudo guardar: ${msgErr}`, "error");
+      console.error("Error al actualizar la tabla de dispositivos:", error);
+      const msgErr = error.error?.error || error.message || "Error al procesar la actualización.";
+      this.lanzarNotificacion(`Error: ${msgErr}`, "error");
     } finally {
       this.isSaving = false;
       this.cdr.detectChanges();

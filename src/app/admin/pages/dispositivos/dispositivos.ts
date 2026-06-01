@@ -125,8 +125,7 @@ export class Dispositivos implements OnInit, OnDestroy {
     // Extrae el ID controlando variaciones de mayúsculas/minúsculas de la base de datos
     const id = dispositivo.iddispositivo || dispositivo.idDispositivo || dispositivo.id;
 
-    // Se concatena el ID en la ruta idéntico al comportamiento de medicamentos
-    this.router.navigate(['/dispositivo-detalle', id], {
+    this.router.navigate(['/dispositivos/editar', id], {
       state: { dispositivo: dispositivo }
     });
   }
