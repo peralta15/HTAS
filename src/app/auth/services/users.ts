@@ -25,29 +25,26 @@ export class Users {
     }
   }
 
-  // REGISTRO
+  // ==========================================================================
+  // --- AUTENTICACIÓN Y USUARIOS ---
+  // ==========================================================================
   registrar(datos: any) {
     return this.http.post(`${this.apiUrl}/register`, datos).pipe(
       tap((res: any) => {
-        // Si el registro en Node.js es exitoso, enviamos el PIN por EmailJS
-        // Usamos los datos que vienen del formulario (datos.nombre y datos.pin)
         this.enviarEmailPin(
           datos.correo,
           datos.nombre || 'Usuario',
-          res.pin // El PIN que generó tu backend y devolvió en la respuesta
+          res.pin
         );
       })
     );
   }
 
-  // LOGIN
   login(credenciales: { correo: string, contrasenia: string }) {
     return this.http.post(`${this.apiUrl}/login`, credenciales).pipe(
       tap((res: any) => {
         this.currentUserSubject.next(res);
-        // Guardamos en el navegador para que no se borre al refrescar (F5)
         localStorage.setItem('user_htas', JSON.stringify(res));
-        // Si el login es exitoso pero no está verificado, reenviamos el PIN
         if (res.pinVerificado === false) {
           this.establecerSesion(res);
           this.enviarEmailPin(
@@ -58,7 +55,6 @@ export class Users {
         }
       }),
       catchError(err => {
-        // Si al intentar loguear el backend dice que estamos bloqueados (423)
         if (err.status === 423) {
           this.activarContadorVisual(err.error.segundosRestantes);
         }
@@ -72,15 +68,12 @@ export class Users {
       uid: res.uid,
       nombre: res.nombre,
       rol: res.rol,
-      // Generamos la foto basada en el nombre de Postgres
       photoURL: `https://ui-avatars.com/api/?name=${encodeURIComponent(res.nombre)}&background=b0001e&color=fff&bold=true`
     };
-
     this.currentUserSubject.next(usuarioProcesado);
     localStorage.setItem('user_htas', JSON.stringify(usuarioProcesado));
   }
 
-  // Función para cargar sesión al abrir la página
   cargarSesionPersistente() {
     const saved = localStorage.getItem('user_htas');
     if (saved) {
@@ -93,7 +86,6 @@ export class Users {
     this.currentUserSubject.next(null);
   }
 
-  // VERIFICAR PIN EN POSTGRESQL
   verificarPin(uid: string, pin: string) {
     return this.http.post(`${this.apiUrl}/verify-pin`, { uid, pin }).pipe(
       catchError(err => {
@@ -105,14 +97,11 @@ export class Users {
     );
   }
 
-  // Lógica interna para el contador visual
   private activarContadorVisual(segundos: number) {
     this.estaBloqueado.set(true);
     this.segundosRestantes.set(segundos);
-
     const intervalo = setInterval(() => {
       this.segundosRestantes.update(s => s - 1);
-
       if (this.segundosRestantes() <= 0) {
         this.estaBloqueado.set(false);
         clearInterval(intervalo);
@@ -120,13 +109,9 @@ export class Users {
     }, 1000);
   }
 
-  // REENVIAR PIN (Solicitado manualmente)
   solicitarNuevoPin(uid: string) {
-    // 1. Pedimos los datos actuales al servidor usando el UID
     return this.http.post(`${this.apiUrl}/request-new-pin`, { uid }).pipe(
       tap((res: any) => {
-        // 2. Con la respuesta exitosa, enviamos el correo mediante EmailJS
-        // res.correo, res.nombre y res.pin vienen de tu nueva función en el backend
         this.enviarEmailPin(res.correo, res.nombre, res.pin);
       })
     );
@@ -137,10 +122,9 @@ export class Users {
     const expiracion = new Date(ahora.getTime() + 25 * 60000);
     const horaFormateada = expiracion.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-    // ESTOS NOMBRES DEBEN COINCIDIR CON TU PLANTILLA {{ }}
     const templateParams = {
-      pin_seguridad: pin,      // <--- Antes quizás tenías otro nombre aquí
-      fecha: horaFormateada,   // <--- Antes quizás tenías otro nombre aquí
+      pin_seguridad: pin,
+      fecha: horaFormateada,
       to_email: email,
       nombre_usuario: nombre
     };
@@ -153,13 +137,13 @@ export class Users {
     }
   }
 
+  // ==========================================================================
   // --- GESTIÓN DE CITAS ---
-
+  // ==========================================================================
   crearCita(datosCita: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/agendar-cita`, datosCita);
   }
 
-  // Ahora filtramos por el correo del usuario logueado
   getMisCitas(email: string): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/mis-citas/${email}`);
   }
@@ -180,25 +164,112 @@ export class Users {
     return this.http.delete(`${this.apiUrl}/delete-user/${id}`);
   }
 
-  // Métodos para el Médico (Doctor)
+  // ==========================================================================
+  // --- NOTIFICACIONES Y ROLES ---
+  // ==========================================================================
   getRegistrosUsuarios(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/all-users`);
   }
 
   getAlertasMedicas(): Observable<any[]> {
-    // Endpoint en tu backend que consolida citas, tratamientos y dispositivos del médico
     return this.http.get<any[]>(`${this.apiUrl}/notificaciones-medico`);
   }
 
-  // Métodos para el Paciente
   getNotificacionesPaciente(email: string): Observable<any[]> {
-    // Endpoint en tu backend que consolida el historial/alertas del paciente usando su email
     return this.http.get<any[]>(`${this.apiUrl}/notificaciones-paciente/${email}`);
   }
 
-  // Métodos para el Acompañante
   getNotificacionesAcompanante(idUsuario: string | number): Observable<any[]> {
-    // Endpoint en tu backend que trae las alertas de tomas y asignaciones del acompañante por su ID
     return this.http.get<any[]>(`${this.apiUrl}/notificaciones-acompanante/${idUsuario}`);
+  }
+
+  // ==========================================================================
+  // --- GESTIÓN DE TRATAMIENTOS ---
+  // ==========================================================================
+  getTratamientos(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/tratamientos`);
+  }
+
+  /**
+   * Registra un tratamiento vinculando llaves foráneas requeridas por la BD de HTAS
+   * @param datos Objeto con { idPaciente, idDoctor, idMedicamento, dosis, frecuenciaHoras, fechaInicio, fechaFin, notasInstrucciones }
+   */
+  crearTratamiento(datos: {
+    idPaciente: number;
+    idDoctor?: number | null;
+    idMedicamento: number;
+    dosis: string;
+    frecuenciaHoras: number;
+    fechaInicio: string;
+    fechaFin: string;
+    notasInstrucciones?: string;
+    activo?: boolean;
+  }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/tratamientos`, datos);
+  }
+
+  actualizarTratamiento(id: string | number, datos: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/tratamientos/${id}`, datos);
+  }
+
+  eliminarTratamiento(id: string | number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/tratamientos/${id}`);
+  }
+
+  // ==========================================================================
+  // --- GESTIÓN DE MEDICAMENTOS ---
+  // ==========================================================================
+  getMedicamentos(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/medicamentos`);
+  }
+
+  /**
+   * Inserta un nuevo medicamento adaptado a las columnas de la tabla MEDICAMENTOS
+   * @param datos Objeto con { nombreComercial, sustanciaActiva, presentacion, concentracion, laboratorio, indicacionesGenerales }
+   */
+  crearMedicamento(datos: {
+    nombreComercial: string;
+    sustanciaActiva?: string;
+    presentacion: string;
+    concentracion?: string;
+    laboratorio?: string;
+    indicacionesGenerales?: string;
+  }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/medicamentos`, datos);
+  }
+
+  actualizarMedicamento(id: string | number, datos: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/medicamentos/${id}`, datos);
+  }
+
+  eliminarMedicamento(id: string | number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/medicamentos/${id}`);
+  }
+
+  // ==========================================================================
+  // --- GESTIÓN DE DISPOSITIVOS ---
+  // ==========================================================================
+  getDispositivos(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/dispositivos`);
+  }
+
+  /**
+   * Vincula un dispositivo usando la dirección MAC única nativa
+   * @param datos Objeto con { nombre, direccionMac, idPacienteAsociado }
+   */
+  crearDispositivo(datos: {
+    nombre: string;
+    direccionMac: string; // Formato MAC válido requerido por Postgres
+    idPacienteAsociado?: number | null;
+  }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/dispositivos`, datos);
+  }
+
+  actualizarDispositivo(id: string | number, datos: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/dispositivos/${id}`, datos);
+  }
+
+  eliminarDispositivo(id: string | number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/dispositivos/${id}`);
   }
 }

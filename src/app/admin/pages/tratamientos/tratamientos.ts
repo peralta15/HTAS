@@ -1,0 +1,294 @@
+import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { Menu } from "../../template/menu/menu";
+import { Users } from '../../../auth/services/users';
+import { firstValueFrom } from 'rxjs';
+
+// Importaciones para el control de los calendarios Flatpickr
+import flatpickr from 'flatpickr';
+import { Spanish } from 'flatpickr/dist/l10n/es';
+
+@Component({
+  selector: 'app-tratamientos',
+  standalone: true,
+  imports: [CommonModule, FormsModule, Menu],
+  templateUrl: './tratamientos.html',
+  styleUrls: ['./tratamientos.css']
+})
+export class Tratamientos implements OnInit, OnDestroy {
+  private router = inject(Router);
+  private usersService = inject(Users);
+  private cdr = inject(ChangeDetectorRef);
+  private platformId = inject(PLATFORM_ID);
+
+  tratamientosTodo: any[] = [];
+  searchTerm: string = '';
+
+  // Listas auxiliares para los selectores del Modal de Creación
+  listaPacientes: any[] = [];
+  listaMedicamentos: any[] = [];
+
+  // Paginación
+  paginaActual = 0;
+  itemsPorPagina = 10;
+
+  // Selección y modales
+  tratamientoSeleccionado: any = null;
+  mostrarModalCrear = false;
+  mostrarModalDelete = false;
+  isSaving = false;
+  isDeleting = false;
+
+  // Objeto adaptado al esquema real de la tabla TRATAMIENTOS en PostgreSQL
+  nuevoTratamiento: any = {
+    idPaciente: null,
+    idMedicamento: null,
+    idDoctor: null,
+    dosis: '',
+    frecuenciaHoras: null,
+    fechaInicio: '',
+    fechaFin: '',
+    notesInstrucciones: '',
+    activo: true
+  };
+
+  // Notificaciones Toast
+  mostrarToast = false;
+  mensajeToast = '';
+  tipoToast: 'success' | 'error' | 'warning' = 'success';
+  private toastTimeout: any = null;
+
+  async ngOnInit() {
+    if (isPlatformBrowser(this.platformId)) {
+      await this.cargarTratamientos();
+      await this.cargarCatalogosAuxiliares();
+    }
+  }
+
+  ngOnDestroy() {
+    if (this.toastTimeout) clearTimeout(this.toastTimeout);
+  }
+
+  /**
+   * Inicializa las instancias de Flatpickr vinculándolas a los inputs 
+   * del tratamiento médico actual.
+   */
+  inicializarCalendario() {
+    if (isPlatformBrowser(this.platformId)) {
+      setTimeout(() => {
+        // --- 1. CONFIGURACIÓN PARA FECHA DE INICIO ---
+        const configInicio: any = {
+          locale: Spanish,
+          dateFormat: "Y-m-d",
+          defaultDate: this.nuevoTratamiento?.fechaInicio || null,
+          minDate: "today",
+          appendTo: document.body,
+          static: false,
+          disableMobile: true,
+          onChange: (selectedDates: any, dateStr: string) => {
+            if (this.nuevoTratamiento) {
+              this.nuevoTratamiento.fechaInicio = dateStr;
+              this.cdr.detectChanges();
+            }
+          }
+        };
+        flatpickr('#fechaInicioInput', configInicio);
+
+        // --- 2. CONFIGURACIÓN PARA FECHA DE VENCIMIENTO (FIN) ---
+        const configFin: any = {
+          locale: Spanish,
+          dateFormat: "Y-m-d",
+          defaultDate: this.nuevoTratamiento?.fechaFin || null,
+          minDate: "today",
+          appendTo: document.body,
+          static: false,
+          disableMobile: true,
+          onChange: (selectedDates: any, dateStr: string) => {
+            if (this.nuevoTratamiento) {
+              this.nuevoTratamiento.fechaFin = dateStr;
+              this.cdr.detectChanges();
+            }
+          }
+        };
+        flatpickr('#fechaFinInput', configFin);
+
+      }, 50);
+    }
+  }
+
+  lanzarNotificacion(mensaje: string, tipo: 'success' | 'error' | 'warning' = 'success') {
+    this.mensajeToast = mensaje;
+    this.tipoToast = tipo;
+    this.mostrarToast = true;
+    this.cdr.detectChanges();
+
+    if (this.toastTimeout) clearTimeout(this.toastTimeout);
+    this.toastTimeout = setTimeout(() => {
+      this.mostrarToast = false;
+      this.cdr.detectChanges();
+    }, 4000);
+  }
+
+  async cargarTratamientos() {
+    try {
+      const data = await firstValueFrom(this.usersService.getTratamientos());
+      this.tratamientosTodo = data || [];
+      this.cdr.detectChanges();
+    } catch (error) {
+      console.error('Error al cargar tratamientos:', error);
+      this.tratamientosTodo = [];
+    }
+  }
+
+  async cargarCatalogosAuxiliares() {
+    try {
+      const users = await firstValueFrom(this.usersService.getUsuariosBackend());
+      this.listaPacientes = users || [];
+
+      const meds = await firstValueFrom(this.usersService.getMedicamentos());
+      this.listaMedicamentos = meds || [];
+
+      this.cdr.detectChanges();
+    } catch (error) {
+      console.error('Error al cargar catálogos en tratamientos:', error);
+    }
+  }
+
+  get tratamientosFiltrados() {
+    if (!this.searchTerm) return this.tratamientosTodo;
+    const term = this.searchTerm.toLowerCase();
+    return this.tratamientosTodo.filter(t => {
+      const pacNombre = (t.nombre_paciente || t.nombrepaciente || '').toLowerCase();
+      const pacAp = (t.appaternopaciente || '').toLowerCase();
+      const medNombre = (t.nombre_medicamento || t.nombremedicamento || '').toLowerCase();
+      const dosisText = (t.dosis || '').toLowerCase();
+
+      return pacNombre.includes(term) ||
+        pacAp.includes(term) ||
+        medNombre.includes(term) ||
+        dosisText.includes(term);
+    });
+  }
+
+  get tratamientosPaginados() {
+    const inicio = this.paginaActual * this.itemsPorPagina;
+    return this.tratamientosFiltrados.slice(inicio, inicio + this.itemsPorPagina);
+  }
+
+  cambiarPagina(delta: number) {
+    const totalPaginas = Math.ceil(this.tratamientosFiltrados.length / this.itemsPorPagina);
+    const nuevaPagina = this.paginaActual + delta;
+    if (nuevaPagina >= 0 && nuevaPagina < totalPaginas) {
+      this.paginaActual = nuevaPagina;
+    }
+  }
+
+  seleccionarTratamiento(t: any) {
+    this.tratamientoSeleccionado = { ...t };
+  }
+
+  abrirDetalle(t: any) {
+    this.router.navigate(['/tratamientos/editar', t.idtratamiento || t.id], {
+      state: { tratamiento: t }
+    });
+  }
+
+  abrirCrear() {
+    this.nuevoTratamiento = {
+      idPaciente: null,
+      idMedicamento: null,
+      idDoctor: null,
+      dosis: '',
+      frecuenciaHoras: null,
+      fechaInicio: '',
+      fechaFin: '',
+      notasInstrucciones: '',
+      activo: true
+    };
+    this.mostrarModalCrear = true;
+    this.cdr.detectChanges();
+
+    // Ejecuta la inicialización de Flatpickr inmediatamente después de abrir el modal
+    this.inicializarCalendario();
+  }
+
+  async guardarNuevoTratamiento() {
+    const idPac = this.nuevoTratamiento.idPaciente ? parseInt(this.nuevoTratamiento.idPaciente, 10) : null;
+    const idMed = this.nuevoTratamiento.idMedicamento ? parseInt(this.nuevoTratamiento.idMedicamento, 10) : null;
+    const dosisLimpia = (this.nuevoTratamiento.dosis || '').trim();
+    const frec = this.nuevoTratamiento.frecuenciaHoras ? parseInt(this.nuevoTratamiento.frecuenciaHoras, 10) : null;
+    const fInicio = this.nuevoTratamiento.fechaInicio;
+    const fFin = this.nuevoTratamiento.fechaFin;
+
+    if (!idPac || !idMed || !dosisLimpia || !frec || isNaN(frec) || !fInicio || !fFin) {
+      this.lanzarNotificacion('Faltan datos obligatorios. Paciente, Medicamento, Dosis, Frecuencia y Fechas son requeridos.', 'warning');
+      return;
+    }
+
+    this.isSaving = true;
+    this.cdr.detectChanges();
+
+    try {
+      const payload = {
+        idPaciente: idPac,
+        idMedicamento: idMed,
+        idDoctor: this.nuevoTratamiento.idDoctor ? parseInt(this.nuevoTratamiento.idDoctor, 10) : null,
+        dosis: dosisLimpia,
+        frecuenciaHoras: frec,
+        fechaInicio: fInicio,
+        fechaFin: fFin,
+        notasInstrucciones: (this.nuevoTratamiento.notasInstrucciones || '').trim(),
+        activo: this.nuevoTratamiento.activo === true || this.nuevoTratamiento.activo === 'true'
+      };
+
+      await firstValueFrom(this.usersService.crearTratamiento(payload));
+      await this.cargarTratamientos();
+      this.cerrarModal();
+      this.lanzarNotificacion('¡Éxito! El tratamiento ha sido registrado correctamente.', 'success');
+    } catch (error: any) {
+      console.error('Error al guardar tratamiento:', error);
+      const backendMessage = error.error?.error || 'No se pudo registrar el tratamiento.';
+      this.lanzarNotificacion(backendMessage, 'error');
+    } finally {
+      this.isSaving = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  abrirEliminar() {
+    if (!this.tratamientoSeleccionado) {
+      this.lanzarNotificacion('Selecciona un tratamiento de la tabla primero.', 'warning');
+      return;
+    }
+    this.mostrarModalDelete = true;
+  }
+
+  async confirmarEliminar() {
+    if (!this.tratamientoSeleccionado) return;
+    this.isDeleting = true;
+    this.cdr.detectChanges();
+    try {
+      const id = this.tratamientoSeleccionado.idtratamiento || this.tratamientoSeleccionado.id;
+      await firstValueFrom(this.usersService.eliminarTratamiento(id));
+      await this.cargarTratamientos();
+      this.cerrarModal();
+      this.tratamientoSeleccionado = null;
+      this.lanzarNotificacion('El tratamiento ha sido eliminado.', 'success');
+    } catch (error: any) {
+      console.error('Error al eliminar:', error);
+      const backendMessage = error.error?.error || 'No se pudo eliminar el tratamiento.';
+      this.lanzarNotificacion(backendMessage, 'error');
+    } finally {
+      this.isDeleting = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  cerrarModal() {
+    this.mostrarModalCrear = false;
+    this.mostrarModalDelete = false;
+    this.cdr.detectChanges();
+  }
+}

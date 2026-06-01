@@ -21,6 +21,13 @@ import { MedicoDetalle } from './admin/pages/medicos/medico-detalle/medico-detal
 import { Notificaciones } from './admin/template/notificaciones/notificaciones';
 import { Success } from './pages/success/success';
 import { Citas } from './admin/pages/citas/citas';
+import { CitaDetalle } from './admin/pages/citas/cita-detalle/cita-detalle';
+import { Tratamientos } from './admin/pages/tratamientos/tratamientos';
+import { TratamientoDetalle } from './admin/pages/tratamientos/tratamiento-detalle/tratamiento-detalle';
+import { Medicamentos } from './admin/pages/medicamentos/medicamentos';
+import { MedicamentoDetalle } from './admin/pages/medicamentos/medicamento-detalle/medicamento-detalle';
+import { Dispositivos } from './admin/pages/dispositivos/dispositivos';
+import { DispositivoDetalle } from './admin/pages/dispositivos/dispositivo-detalle/dispositivo-detalle';
 
 export const routes: Routes = [
   {
@@ -103,6 +110,34 @@ export const routes: Routes = [
   {
     path: 'citas',
     component: Citas
+  },
+  {
+    path: 'citas/editar/:id',
+    component: CitaDetalle
+  },
+  {
+    path: 'tratamientos',
+    component: Tratamientos
+  },
+  {
+    path: 'tratamientos/editar/:id',
+    component: TratamientoDetalle
+  },
+  {
+    path: 'medicamentos',
+    component: Medicamentos
+  },
+  {
+    path: 'medicamentos/editar/:id',
+    component: MedicamentoDetalle
+  },
+  {
+    path: 'dispositivos',
+    component: Dispositivos
+  },
+  {
+    path: 'dispositivos/editar/:id',
+    component: DispositivoDetalle
   },
   {
     path: 'perfil',

@@ -39,7 +39,7 @@ export class Menu implements OnInit, OnDestroy {
         { route: '/acompanantes', icon: 'bi-person-fill-add', label: 'Acompañantes' }
       ]
     },
-    { category: 'Seguimiento', items: [{ route: '/citas', icon: 'bi-calendar-check', label: 'Citas' }] },
+    { category: 'Seguimiento', items: [{ route: '/citas', icon: 'bi-calendar-check', label: 'Citas' }, { route: '/tratamientos', icon: 'bi bi-clipboard-data', label: 'Tratamientos' }, { route: '/medicamentos', icon: 'bi-capsule', label: 'Medicamentos' }, { route: '/dispositivos', icon: 'bi-heart-pulse', label: 'Dispositivos' }] },
     { category: 'Cuenta', items: [{ route: '/config', icon: 'bi-gear', label: 'Configuración' }, { route: '/login', icon: 'bi-box-arrow-right', label: 'Cerrar Sesión' }] }
   ];
 
