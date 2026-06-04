@@ -582,12 +582,22 @@ const authController = {
     try {
       await db.query("BEGIN");
 
-      // 1. Actualizar tabla base: USUARIOS
+      // 1. Actualizar tabla base: USUARIOS (Datos básicos comunes)
       const result = await db.query(
         `UPDATE USUARIOS 
-             SET Nombre = $1, ApPaterno = $2, ApMaterno = $3, Correo = $4, Telefono = $5, Genero = $6, Activo = $7
-             WHERE IdUsuario = $8 RETURNING *`,
-        [nombre, apPaterno, apMaterno, correo, telefono, genero, activo, id],
+       SET Nombre = $1, ApPaterno = $2, ApMaterno = $3, Correo = $4, Telefono = $5, Genero = $6, Activo = $7, Rol = $8
+       WHERE IdUsuario = $9 RETURNING *`,
+        [
+          nombre,
+          apPaterno,
+          apMaterno,
+          correo,
+          telefono,
+          genero,
+          activo,
+          rol,
+          id,
+        ],
       );
 
       if (result.rows.length === 0) {
@@ -595,51 +605,57 @@ const authController = {
         return res.status(404).json({ error: "Usuario no encontrado" });
       }
 
-      const rolNormalizado = (rol || "").toLowerCase();
+      const rolNormalizado = (rol || "").toLowerCase().trim();
 
-      // 2. Lógica específica por Rol
+      // 2. Lógica específica por Rol (Filtra si se enviaron propiedades específicas)
 
       // --- DOCTORES ---
+      // Solo intenta insertar/actualizar si el rol coincide Y si se envió la cédula o la especialidad
       if (
-        rolNormalizado === "doctor" ||
-        rolNormalizado === "médico" ||
-        rolNormalizado === "medico"
+        (rolNormalizado === "doctor" ||
+          rolNormalizado === "médico" ||
+          rolNormalizado === "medico") &&
+        (cedula !== undefined ||
+          specialty !== undefined ||
+          direccionClinica !== undefined)
       ) {
         const cedulaFinal = cedula || "00000000";
         const archivoFinal = req.body.archivoCedulaPDF || "";
 
         await db.query(
           `INSERT INTO DOCTORES (IdUsuario, Especialidad, DireccionClinica, Cedula, ArchivoCedulaPDF, TipoSangre, Peso, Altura, AntecedentesFamiliares)
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-                ON CONFLICT (IdUsuario) 
-                DO UPDATE SET 
-                Especialidad = $2, 
-                DireccionClinica = $3, 
-                Cedula = $4,
-                ArchivoCedulaPDF = CASE WHEN $5 <> '' THEN $5 ELSE DOCTORES.ArchivoCedulaPDF END,
-                TipoSangre = COALESCE($6, DOCTORES.TipoSangre),
-                Peso = COALESCE($7, DOCTORES.Peso),
-                Altura = COALESCE($8, DOCTORES.Altura),
-                AntecedentesFamiliares = COALESCE($9, DOCTORES.AntecedentesFamiliares),
-                updated_at = CURRENT_TIMESTAMP`,
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+         ON CONFLICT (IdUsuario) 
+         DO UPDATE SET 
+           Especialidad = COALESCE($2, DOCTORES.Especialidad), 
+           DireccionClinica = COALESCE($3, DOCTORES.DireccionClinica), 
+           Cedula = $4,
+           ArchivoCedulaPDF = CASE WHEN $5 <> '' THEN $5 ELSE DOCTORES.ArchivoCedulaPDF END,
+           TipoSangre = COALESCE($6, DOCTORES.TipoSangre),
+           Peso = COALESCE($7, DOCTORES.Peso),
+           Altura = COALESCE($8, DOCTORES.Altura),
+           AntecedentesFamiliares = COALESCE($9, DOCTORES.AntecedentesFamiliares),
+           updated_at = CURRENT_TIMESTAMP`,
           [
             id,
-            especialidad,
-            direccionClinica,
+            especialidad || null,
+            direccionClinica || null,
             cedulaFinal,
             archivoFinal,
-            tipoSangre,
-            peso,
-            altura,
-            antecedentesFamiliares,
+            tipoSangre || null,
+            peso || null,
+            altura || null,
+            antecedentesFamiliares || null,
           ],
         );
       }
 
       // --- ACOMPAÑANTES ---
+      // Solo procesa si se envían los campos de fecha desde el cliente
       else if (
-        rolNormalizado === "acompañante" ||
-        rolNormalizado === "acompanante"
+        (rolNormalizado === "acompañante" ||
+          rolNormalizado === "acompanante") &&
+        (fechaNacimiento !== undefined || fechaAsignacion !== undefined)
       ) {
         if (!fechaNacimiento || !fechaAsignacion) {
           await db.query("ROLLBACK");
@@ -649,7 +665,6 @@ const authController = {
           });
         }
 
-        // Cortamos el string por si Angular lo envía con formato ISO completo (ej: 1995-12-01T06:00:00.000Z)
         const fnLimpia = fechaNacimiento.includes("T")
           ? fechaNacimiento.split("T")[0]
           : fechaNacimiento;
@@ -659,31 +674,45 @@ const authController = {
 
         await db.query(
           `INSERT INTO ACOMPANANTES (IdUsuario, FechaNacimiento, FechaAsignacion)
-     VALUES ($1, $2, $3)
-     ON CONFLICT (IdUsuario)
-     DO UPDATE SET 
-        FechaNacimiento = EXCLUDED.FechaNacimiento,
-        FechaAsignacion = EXCLUDED.FechaAsignacion,
-        updated_at = CURRENT_TIMESTAMP`,
-          [id, fnLimpia, faLimpia], // <-- Aquí usamos las variables que sí existen y están limpias
+         VALUES ($1, $2, $3)
+         ON CONFLICT (IdUsuario)
+         DO UPDATE SET 
+           FechaNacimiento = EXCLUDED.FechaNacimiento,
+           FechaAsignacion = EXCLUDED.FechaAsignacion,
+           updated_at = CURRENT_TIMESTAMP`,
+          [id, fnLimpia, faLimpia],
         );
       }
 
-      // --- PACIENTES (NUEVO) ---
-      else if (rolNormalizado === "paciente") {
-        const nssFinal = nss || ""; // Evitamos nulls si el campo viene vacío
+      // --- PACIENTES ---
+      // Solo procesa si el payload contiene datos clínicos definidos
+      else if (
+        rolNormalizado === "paciente" &&
+        (nss !== undefined ||
+          tipoSangre !== undefined ||
+          peso !== undefined ||
+          altura !== undefined)
+      ) {
+        const nssFinal = nss || "";
         await db.query(
           `INSERT INTO PACIENTES (IdUsuario, NSS, TipoSangre, Peso, Altura, AntecedentesFamiliares)
-                VALUES ($1, $2, $3, $4, $5, $6)
-                ON CONFLICT (IdUsuario) 
-                DO UPDATE SET 
-                NSS = $2,
-                TipoSangre = COALESCE($3, PACIENTES.TipoSangre),
-                Peso = COALESCE($4, PACIENTES.Peso),
-                Altura = COALESCE($5, PACIENTES.Altura),
-                AntecedentesFamiliares = COALESCE($6, PACIENTES.AntecedentesFamiliares),
-                updated_at = CURRENT_TIMESTAMP`,
-          [id, nssFinal, tipoSangre, peso, altura, antecedentesFamiliares],
+         VALUES ($1, $2, $3, $4, $5, $6)
+         ON CONFLICT (IdUsuario) 
+         DO UPDATE SET 
+           NSS = $2,
+           TipoSangre = COALESCE($3, PACIENTES.TipoSangre),
+           Peso = COALESCE($4, PACIENTES.Peso),
+           Altura = COALESCE($5, PACIENTES.Altura),
+           AntecedentesFamiliares = COALESCE($6, PACIENTES.AntecedentesFamiliares),
+           updated_at = CURRENT_TIMESTAMP`,
+          [
+            id,
+            nssFinal,
+            tipoSangre || null,
+            peso || null,
+            altura || null,
+            antecedentesFamiliares || null,
+          ],
         );
       }
 
@@ -858,19 +887,46 @@ const authController = {
       res.json(result.rows);
     } catch (error) {
       console.error("Error al obtener tratamientos:", error);
-      res.status(500).json({ error: "Error al obtener la lista de tratamientos" });
+      res
+        .status(500)
+        .json({ error: "Error al obtener la lista de tratamientos" });
     }
   },
 
   crearTratamiento: async (req, res) => {
-    const { idPaciente, idDoctor, idMedicamento, dosis, frecuenciaHoras, fechaInicio, fechaFin, notasInstrucciones, activo } = req.body;
+    const {
+      idPaciente,
+      idDoctor,
+      idMedicamento,
+      dosis,
+      frecuenciaHoras,
+      fechaInicio,
+      fechaFin,
+      notasInstrucciones,
+      activo,
+    } = req.body;
     try {
       const result = await db.query(
         `INSERT INTO TRATAMIENTOS (IdPaciente, IdDoctor, IdMedicamento, Dosis, FrecuenciaHoras, FechaInicio, FechaFin, NotasInstrucciones, Activo) 
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
-        [idPaciente, idDoctor || null, idMedicamento, dosis, frecuenciaHoras, fechaInicio, fechaFin, notasInstrucciones, activo ?? true]
+        [
+          idPaciente,
+          idDoctor || null,
+          idMedicamento,
+          dosis,
+          frecuenciaHoras,
+          fechaInicio,
+          fechaFin,
+          notasInstrucciones,
+          activo ?? true,
+        ],
       );
-      res.status(201).json({ message: "Tratamiento creado con éxito", tratamiento: result.rows[0] });
+      res
+        .status(201)
+        .json({
+          message: "Tratamiento creado con éxito",
+          tratamiento: result.rows[0],
+        });
     } catch (error) {
       console.error("Error al crear tratamiento:", error);
       res.status(500).json({ error: "Error al registrar el tratamiento" });
@@ -879,19 +935,37 @@ const authController = {
 
   actualizarTratamiento: async (req, res) => {
     const { id } = req.params;
-    const { dosis, frecuenciaHoras, fechaInicio, fechaFin, notasInstrucciones, activo } = req.body;
+    const {
+      dosis,
+      frecuenciaHoras,
+      fechaInicio,
+      fechaFin,
+      notasInstrucciones,
+      activo,
+    } = req.body;
     try {
       const result = await db.query(
         `UPDATE TRATAMIENTOS 
          SET Dosis = $1, FrecuenciaHoras = $2, FechaInicio = $3, FechaFin = $4, NotasInstrucciones = $5, Activo = $6, updated_at = CURRENT_TIMESTAMP
          WHERE IdTratamiento = $7 RETURNING *`,
-        [dosis, frecuenciaHoras, fechaInicio, fechaFin, notasInstrucciones, activo, id]
+        [
+          dosis,
+          frecuenciaHoras,
+          fechaInicio,
+          fechaFin,
+          notasInstrucciones,
+          activo,
+          id,
+        ],
       );
 
       if (result.rows.length === 0) {
         return res.status(404).json({ error: "Tratamiento no encontrado" });
       }
-      res.json({ message: "Tratamiento actualizado", tratamiento: result.rows[0] });
+      res.json({
+        message: "Tratamiento actualizado",
+        tratamiento: result.rows[0],
+      });
     } catch (error) {
       console.error("Error al actualizar tratamiento:", error);
       res.status(500).json({ error: "Error al actualizar el tratamiento" });
@@ -901,40 +975,58 @@ const authController = {
   eliminarTratamiento: async (req, res) => {
     const { id } = req.params;
     try {
-      const result = await db.query("DELETE FROM TRATAMIENTOS WHERE IdTratamiento = $1 RETURNING *", [id]);
-      if (result.rows.length === 0) return res.status(404).json({ error: "Tratamiento no encontrado" });
+      const result = await db.query(
+        "DELETE FROM TRATAMIENTOS WHERE IdTratamiento = $1 RETURNING *",
+        [id],
+      );
+      if (result.rows.length === 0)
+        return res.status(404).json({ error: "Tratamiento no encontrado" });
       res.json({ message: "Tratamiento eliminado correctamente" });
     } catch (error) {
       console.error("Error al eliminar tratamiento:", error);
-      res.status(500).json({ error: "No se puede eliminar el tratamiento (posee registros asociados)" });
+      res
+        .status(500)
+        .json({
+          error:
+            "No se puede eliminar el tratamiento (posee registros asociados)",
+        });
     }
   },
 
   // ==========================================================================
   // --- GESTIÓN DE MEDICAMENTOS (HTAS) ---
   // ==========================================================================
-getMedicamentos: async (req, res) => {
+  getMedicamentos: async (req, res) => {
     try {
-      const result = await db.query("SELECT * FROM MEDICAMENTOS ORDER BY IdMedicamento DESC");
+      const result = await db.query(
+        "SELECT * FROM MEDICAMENTOS ORDER BY IdMedicamento DESC",
+      );
       return res.json(result.rows);
     } catch (error) {
       console.error("❌ Error al obtener medicamentos:", error);
-      return res.status(500).json({ error: "Error al obtener la lista de medicamentos" });
+      return res
+        .status(500)
+        .json({ error: "Error al obtener la lista de medicamentos" });
     }
   },
 
   crearMedicamento: async (req, res) => {
     // Flexibilidad de mapeo: Soportamos tanto camelCase como minúsculas puras del Frontend
-    const nombreComercial = req.body.nombreComercial || req.body.nombrecomercial;
-    const sustanciaActiva = req.body.sustanciaActiva || req.body.sustanciaactiva;
+    const nombreComercial =
+      req.body.nombreComercial || req.body.nombrecomercial;
+    const sustanciaActiva =
+      req.body.sustanciaActiva || req.body.sustanciaactiva;
     const presentacion = req.body.presentacion;
     const concentracion = req.body.concentracion;
     const laboratorio = req.body.laboratorio;
-    const indicacionesGenerales = req.body.indicacionesGenerales || req.body.indicacionesgenerales;
+    const indicacionesGenerales =
+      req.body.indicacionesGenerales || req.body.indicacionesgenerales;
 
     // Validación de seguridad para evitar inserciones vacías o nulas inesperadas
-    if (!nombreComercial || nombreComercial.trim() === '') {
-      return res.status(400).json({ error: "El campo Nombre Comercial es obligatorio." });
+    if (!nombreComercial || nombreComercial.trim() === "") {
+      return res
+        .status(400)
+        .json({ error: "El campo Nombre Comercial es obligatorio." });
     }
 
     try {
@@ -942,39 +1034,50 @@ getMedicamentos: async (req, res) => {
         `INSERT INTO MEDICAMENTOS (NombreComercial, SustanciaActiva, Presentacion, Concentracion, Laboratorio, IndicacionesGenerales) 
          VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
         [
-          nombreComercial, 
-          sustanciaActiva || null, 
-          presentacion || null, 
-          concentracion || null, 
-          laboratorio || null, 
-          indicacionesGenerales || null
-        ]
+          nombreComercial,
+          sustanciaActiva || null,
+          presentacion || null,
+          concentracion || null,
+          laboratorio || null,
+          indicacionesGenerales || null,
+        ],
       );
-      
-      // Retorna éxito explícito de inmediato para liberar los Spinners del frontend
-      return res.status(201).json({ 
-        message: "Medicamento creado con éxito", 
-        medicamento: result.rows[0] 
-      });
 
+      // Retorna éxito explícito de inmediato para liberar los Spinners del frontend
+      return res.status(201).json({
+        message: "Medicamento creado con éxito",
+        medicamento: result.rows[0],
+      });
     } catch (error) {
       // Siempre responder con un código HTTP de error para evitar congelar la UI de Angular
-      return res.status(500).json({ error: "Error interno en el servidor al registrar el medicamento" });
+      return res
+        .status(500)
+        .json({
+          error: "Error interno en el servidor al registrar el medicamento",
+        });
     }
   },
 
   actualizarMedicamento: async (req, res) => {
     const { id } = req.params;
-    
-    const nombreComercial = req.body.nombreComercial || req.body.nombrecomercial;
-    const sustanciaActiva = req.body.sustanciaActiva || req.body.sustanciaactiva;
+
+    const nombreComercial =
+      req.body.nombreComercial || req.body.nombrecomercial;
+    const sustanciaActiva =
+      req.body.sustanciaActiva || req.body.sustanciaactiva;
     const presentacion = req.body.presentacion;
     const concentracion = req.body.concentracion;
     const laboratorio = req.body.laboratorio;
-    const indicacionesGenerales = req.body.indicacionesGenerales || req.body.indicacionesgenerales;
+    const indicacionesGenerales =
+      req.body.indicacionesGenerales || req.body.indicacionesgenerales;
 
-    if (!nombreComercial || nombreComercial.trim() === '') {
-      return res.status(400).json({ error: "El nombre comercial no puede estar vacío durante la actualización." });
+    if (!nombreComercial || nombreComercial.trim() === "") {
+      return res
+        .status(400)
+        .json({
+          error:
+            "El nombre comercial no puede estar vacío durante la actualización.",
+        });
     }
 
     try {
@@ -983,47 +1086,58 @@ getMedicamentos: async (req, res) => {
          SET NombreComercial = $1, SustanciaActiva = $2, Presentacion = $3, Concentracion = $4, Laboratorio = $5, IndicacionesGenerales = $6
          WHERE IdMedicamento = $7 RETURNING *`,
         [
-          nombreComercial, 
-          sustanciaActiva || null, 
-          presentacion || null, 
-          concentracion || null, 
-          laboratorio || null, 
-          indicacionesGenerales || null, 
-          id
-        ]
+          nombreComercial,
+          sustanciaActiva || null,
+          presentacion || null,
+          concentracion || null,
+          laboratorio || null,
+          indicacionesGenerales || null,
+          id,
+        ],
       );
 
       if (result.rows.length === 0) {
-        return res.status(404).json({ error: "El medicamento solicitado no existe." });
+        return res
+          .status(404)
+          .json({ error: "El medicamento solicitado no existe." });
       }
 
-      return res.json({ 
-        message: "Medicamento actualizado con éxito", 
-        medicamento: result.rows[0] 
+      return res.json({
+        message: "Medicamento actualizado con éxito",
+        medicamento: result.rows[0],
       });
-
     } catch (error) {
       console.error("❌ Error crítico al actualizar medicamento:", error);
-      return res.status(500).json({ error: "Error interno en el servidor al actualizar el medicamento" });
+      return res
+        .status(500)
+        .json({
+          error: "Error interno en el servidor al actualizar el medicamento",
+        });
     }
   },
 
   eliminarMedicamento: async (req, res) => {
     const { id } = req.params;
     console.log(`-> Petición de eliminación para ID: ${id}`);
-    
+
     try {
-      const result = await db.query("DELETE FROM MEDICAMENTOS WHERE IdMedicamento = $1 RETURNING *", [id]);
-      
+      const result = await db.query(
+        "DELETE FROM MEDICAMENTOS WHERE IdMedicamento = $1 RETURNING *",
+        [id],
+      );
+
       if (result.rows.length === 0) {
-        return res.status(404).json({ error: "Medicamento no encontrado para eliminar." });
+        return res
+          .status(404)
+          .json({ error: "Medicamento no encontrado para eliminar." });
       }
-      
+
       return res.json({ message: "Medicamento eliminado correctamente" });
     } catch (error) {
       console.error("❌ Error crítico al eliminar medicamento:", error);
-      return res.status(500).json({ 
-        error: "No se puede eliminar el medicamento debido a que está asociado a otros registros activos (restricción de llave foránea)." 
+      return res.status(500).json({
+        error:
+          "No se puede eliminar el medicamento debido a que está asociado a otros registros activos (restricción de llave foránea).",
       });
     }
   },
@@ -1043,7 +1157,9 @@ getMedicamentos: async (req, res) => {
       res.json(result.rows);
     } catch (error) {
       console.error("Error al obtener dispositivos:", error);
-      res.status(500).json({ error: "Error al obtener la lista de dispositivos" });
+      res
+        .status(500)
+        .json({ error: "Error al obtener la lista de dispositivos" });
     }
   },
 
@@ -1053,12 +1169,22 @@ getMedicamentos: async (req, res) => {
       const result = await db.query(
         `INSERT INTO DISPOSITIVOS (Nombre, DireccionMac, IdPacienteAsociado) 
          VALUES ($1, $2, $3) RETURNING *`,
-        [nombre, direccionMac, idPacienteAsociado || null]
+        [nombre, direccionMac, idPacienteAsociado || null],
       );
-      res.status(201).json({ message: "Dispositivo vinculado con éxito", dispositivo: result.rows[0] });
+      res
+        .status(201)
+        .json({
+          message: "Dispositivo vinculado con éxito",
+          dispositivo: result.rows[0],
+        });
     } catch (error) {
       console.error("Error al vincular dispositivo:", error);
-      res.status(500).json({ error: "Error al registrar dispositivo. Verifique que la dirección MAC sea única y válida." });
+      res
+        .status(500)
+        .json({
+          error:
+            "Error al registrar dispositivo. Verifique que la dirección MAC sea única y válida.",
+        });
     }
   },
 
@@ -1070,25 +1196,37 @@ getMedicamentos: async (req, res) => {
         `UPDATE DISPOSITIVOS 
          SET Nombre = $1, DireccionMac = $2, IdPacienteAsociado = $3, Activo = $4, updated_at = CURRENT_TIMESTAMP
          WHERE IdDispositivo = $5 RETURNING *`,
-        [nombre, direccionMac, idPacienteAsociado || null, activo, id]
+        [nombre, direccionMac, idPacienteAsociado || null, activo, id],
       );
-      if (result.rows.length === 0) return res.status(404).json({ error: "Dispositivo no encontrado" });
-      res.json({ message: "Dispositivo modificado con éxito", dispositivo: result.rows[0] });
+      if (result.rows.length === 0)
+        return res.status(404).json({ error: "Dispositivo no encontrado" });
+      res.json({
+        message: "Dispositivo modificado con éxito",
+        dispositivo: result.rows[0],
+      });
     } catch (error) {
       console.error("Error al actualizar dispositivo:", error);
-      res.status(500).json({ error: "Error al actualizar los datos del dispositivo" });
+      res
+        .status(500)
+        .json({ error: "Error al actualizar los datos del dispositivo" });
     }
   },
 
   eliminarDispositivo: async (req, res) => {
     const { id } = req.params;
     try {
-      const result = await db.query("DELETE FROM DISPOSITIVOS WHERE IdDispositivo = $1 RETURNING *", [id]);
-      if (result.rows.length === 0) return res.status(404).json({ error: "Dispositivo no encontrado" });
+      const result = await db.query(
+        "DELETE FROM DISPOSITIVOS WHERE IdDispositivo = $1 RETURNING *",
+        [id],
+      );
+      if (result.rows.length === 0)
+        return res.status(404).json({ error: "Dispositivo no encontrado" });
       res.json({ message: "Dispositivo eliminado correctamente" });
     } catch (error) {
       console.error("Error al eliminar dispositivo:", error);
-      res.status(500).json({ error: "Error al eliminar dispositivo de la base de datos" });
+      res
+        .status(500)
+        .json({ error: "Error al eliminar dispositivo de la base de datos" });
     }
   },
 };
