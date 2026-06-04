@@ -120,6 +120,14 @@
                     </tr>
                     }
                     }
+                    @if (usuariosPaginados.length === 0) {
+                    <tr>
+                        <td colspan="5" class="empty-state">
+                            <i class="bi bi-people"></i>
+                            <p>No se encontraron acompañantes registrados.</p>
+                        </td>
+                    </tr>
+                    }
                 </tbody>
             </table>
 

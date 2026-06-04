@@ -152,6 +152,14 @@
                     </tr>
                     }
                     }
+                    @if (citasPaginadas.length === 0) {
+                    <tr>
+                        <td colspan="5" class="empty-state">
+                            <i class="bi bi-calendar"></i>
+                            <p>No se encontraron citas programadas.</p>
+                        </td>
+                    </tr>
+                    }
                 </tbody>
             </table>
 

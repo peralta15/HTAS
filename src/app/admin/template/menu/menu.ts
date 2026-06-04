@@ -29,7 +29,7 @@ export class Menu implements OnInit, OnDestroy {
   userPhoto: string = '';
 
   navItems = [
-    { category: 'General', items: [{ route: '/inicio', icon: 'bi-speedometer2', label: 'Dashboard' }] },
+    { category: 'General', items: [{ route: '/inicio', icon: 'bi-speedometer2', label: 'Inicio' }] },
     {
       category: 'Administración',
       items: [
@@ -40,7 +40,7 @@ export class Menu implements OnInit, OnDestroy {
       ]
     },
     { category: 'Seguimiento', items: [{ route: '/citas', icon: 'bi-calendar-check', label: 'Citas' }, { route: '/tratamientos', icon: 'bi bi-clipboard-data', label: 'Tratamientos' }, { route: '/medicamentos', icon: 'bi-capsule', label: 'Medicamentos' }, { route: '/dispositivos', icon: 'bi-heart-pulse', label: 'Dispositivos' }] },
-    { category: 'Cuenta', items: [{ route: '/config', icon: 'bi-gear', label: 'Configuración' }, { route: '/login', icon: 'bi-box-arrow-right', label: 'Cerrar Sesión' }] }
+    { category: 'Cuenta', items: [{ route: '/configuracion', icon: 'bi-gear', label: 'Configuración' }, { route: '/login', icon: 'bi-box-arrow-right', label: 'Cerrar Sesión' }] }
   ];
 
   ngOnInit() {

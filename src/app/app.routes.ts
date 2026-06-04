@@ -28,6 +28,7 @@ import { Medicamentos } from './admin/pages/medicamentos/medicamentos';
 import { MedicamentoDetalle } from './admin/pages/medicamentos/medicamento-detalle/medicamento-detalle';
 import { Dispositivos } from './admin/pages/dispositivos/dispositivos';
 import { DispositivoDetalle } from './admin/pages/dispositivos/dispositivo-detalle/dispositivo-detalle';
+import { Configuracion } from './admin/pages/configuracion/configuracion';
 
 export const routes: Routes = [
   {
@@ -146,6 +147,10 @@ export const routes: Routes = [
   {
     path: 'notificaciones',
     component: Notificaciones
+  },
+  {
+    path: 'configuracion',
+    component: Configuracion
   },
   {
     path: '**',
