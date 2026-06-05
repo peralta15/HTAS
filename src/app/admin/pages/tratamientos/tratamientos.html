@@ -27,6 +27,11 @@
                         placeholder="Buscar tratamiento (paciente, medicamento)...">
                 </div>
 
+                <button class="btn-save" (click)="abrirCrear()">
+                    <i class="bi bi-plus-lg"></i>
+                    <span>Nuevo</span>
+                </button>
+
                 <div class="action-buttons-group" [class.visible]="tratamientoSeleccionado">
                     <button class="btn-action btn-edit-premium" (click)="abrirDetalle(tratamientoSeleccionado)"
                         title="Editar tratamiento" [disabled]="!tratamientoSeleccionado">
@@ -39,11 +44,6 @@
                         <span>Eliminar</span>
                     </button>
                 </div>
-
-                <button class="btn-save" (click)="abrirCrear()">
-                    <i class="bi bi-plus-lg"></i>
-                    <span>Nuevo</span>
-                </button>
             </div>
         </div>
 

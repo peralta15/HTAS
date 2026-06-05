@@ -26,6 +26,11 @@
                     <input type="text" [(ngModel)]="searchTerm" placeholder="Buscar medicamento...">
                 </div>
 
+                <button class="btn-save" (click)="abrirCrear()">
+                    <i class="bi bi-plus-lg"></i>
+                    <span>Nuevo</span>
+                </button>
+
                 <div class="action-buttons-group" [class.visible]="medicamentoSeleccionado">
                     <button class="btn-action btn-edit-premium" (click)="abrirDetalle(medicamentoSeleccionado)"
                         title="Editar medicamento" [disabled]="!medicamentoSeleccionado">
@@ -38,11 +43,6 @@
                         <span>Eliminar</span>
                     </button>
                 </div>
-
-                <button class="btn-save" (click)="abrirCrear()">
-                    <i class="bi bi-plus-lg"></i>
-                    <span>Nuevo</span>
-                </button>
             </div>
         </div>
 

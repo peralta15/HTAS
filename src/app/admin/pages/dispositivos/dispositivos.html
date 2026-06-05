@@ -27,6 +27,11 @@
                     <input type="text" [(ngModel)]="searchTerm" placeholder="Buscar por nombre, MAC o paciente...">
                 </div>
 
+                <button class="btn-save" (click)="abrirCrear()">
+                    <i class="bi bi-plus-lg"></i>
+                    <span>Nuevo</span>
+                </button>
+
                 <div class="action-buttons-group" [class.visible]="dispositivoSeleccionado">
                     <button class="btn-action btn-edit-premium" (click)="irADetalle(dispositivoSeleccionado)"
                         title="Editar dispositivo" [disabled]="!dispositivoSeleccionado">
@@ -39,11 +44,6 @@
                         <span>Eliminar</span>
                     </button>
                 </div>
-
-                <button class="btn-save" (click)="abrirCrear()">
-                    <i class="bi bi-plus-lg"></i>
-                    <span>Nuevo</span>
-                </button>
             </div>
         </div>
 
