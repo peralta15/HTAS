@@ -135,7 +135,7 @@
 
 /* Botón Crear/Guardar Estándar */
 .btn-save {
-    background: #1e293b;
+    background: #b0001e;
     color: white;
     border: none;
     padding: 11px 22px;
@@ -152,7 +152,7 @@
 }
 
 .btn-save:hover {
-    background: #0f172a;
+    background: #8e0018;
     transform: translateY(-1px);
     box-shadow: 0 6px 16px rgba(30, 41, 59, 0.25);
 }
@@ -514,7 +514,7 @@
 
 .btn-save-appointment {
     padding: 10px 22px;
-    background: #10b981;
+    background: #b0001e;
     color: white;
     border: none;
     border-radius: 8px;
@@ -525,12 +525,12 @@
     align-items: center;
     gap: 0.5rem;
     transition: all 0.2s;
-    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.2);
+    box-shadow: 0 2px 6px rgba(176, 0, 30, 0.2);
 }
 
 .btn-save-appointment:hover:not(:disabled) {
-    background: #059669;
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    background: #8e0018;
+    box-shadow: 0 4px 12px rgba(176, 0, 30, 0.3);
 }
 
 .btn-save-appointment:disabled {

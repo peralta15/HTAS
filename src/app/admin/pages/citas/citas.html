@@ -33,19 +33,17 @@
                 </button>
                 }
 
-                @if (currentUser?.rol?.toLowerCase() === 'doctor') {
                 <div class="action-buttons-group" [class.visible]="citaSeleccionada">
                     <button class="btn-action btn-edit-premium" (click)="abrirEditarCita()" title="Editar cita">
                         <i class="bi bi-pencil-fill"></i>
-                        <span>Gestionar</span>
+                        <span>Editar</span>
                     </button>
 
-                    <button class="btn-action btn-delete-premium" (click)="abrirEliminarCita()" title="Cancelar cita">
-                        <i class="bi bi-x-circle-fill"></i>
-                        <span>Cancelar</span>
+                    <button class="btn-action btn-delete-premium" (click)="abrirEliminarCita()" title="Eliminar cita">
+                        <i class="bi bi-trash-fill"></i>
+                        <span>Eliminar</span>
                     </button>
                 </div>
-                }
             </div>
         </div>
 
@@ -180,41 +178,7 @@
     </div>
 </main>
 
-@if (mostrarModalEdit) {
-<div class="modal-overlay">
-    <div class="modal-content">
-        <h3 class="modal-title">Actualizar Estado de Cita</h3>
-        <hr>
-        <div class="form-grid">
-            <div class="form-group">
-                <label>Nuevo Estado</label>
-                <select class="form-select" [(ngModel)]="citaSeleccionada.tempEstado">
-                    <option value="Programada">Programada</option>
-                    <option value="Confirmada">Confirmada</option>
-                    <option value="Completada">Completada</option>
-                    <option value="Cancelada">Cancelada</option>
-                </select>
-            </div>
-            <div class="form-group" style="grid-column: span 2;">
-                <label>Notas del Doctor</label>
-                <textarea class="form-control" rows="3" [(ngModel)]="citaSeleccionada.notasdoctor"
-                    placeholder="Añadir diagnóstico o instrucciones..."></textarea>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button class="btn-cancel" (click)="cerrarModal()" [disabled]="isSaving">Cancelar</button>
-            <button class="btn-save" (click)="guardarCambiosCita()" [disabled]="isSaving">
-                @if (isSaving) {
-                <span class="spinner-save"></span>
-                } @else {
-                <i class="bi bi-check-lg"></i>
-                <span>Actualizar Cita</span>
-                }
-            </button>
-        </div>
-    </div>
-</div>
-}
+
 
 @if (mostrarModalCrear) {
 <div class="modal-overlay">
@@ -299,7 +263,7 @@
         <h3>¿Cancelar Cita?</h3>
         <p class="text-muted">Esta acción notificará automáticamente al sistema.</p>
         <div class="modal-footer-danger">
-            <button class="btn-danger-confirm btn-save" (click)="confirmarEliminarCita()" [disabled]="isDeleting">
+            <button class="btn-danger-confirm" (click)="confirmarEliminarCita()" [disabled]="isDeleting">
                 @if (isDeleting) { <span class="spinner-save"></span> }
                 @else { <span>Sí, Cancelar Cita</span> }
             </button>

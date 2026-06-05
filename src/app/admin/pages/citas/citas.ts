@@ -4,6 +4,7 @@ import { Menu } from "../../template/menu/menu";
 import { FormsModule } from '@angular/forms';
 import { Users } from '../../../auth/services/users';
 import { firstValueFrom } from 'rxjs';
+import { Router } from '@angular/router';
 import { Spanish } from 'flatpickr/dist/l10n/es.js';
 
 declare var flatpickr: any;
@@ -19,6 +20,7 @@ export class Citas implements OnInit, OnDestroy {
   private usersService = inject(Users);
   private cdr = inject(ChangeDetectorRef);
   private platformId = inject(PLATFORM_ID);
+  private router = inject(Router);
 
   citasTodo: any[] = [];
   searchTerm: string = '';
@@ -238,7 +240,8 @@ export class Citas implements OnInit, OnDestroy {
       this.lanzarNotificacion('Selecciona una cita de la tabla primero.', 'warning');
       return;
     }
-    this.mostrarModalEdit = true;
+    const id = this.citaSeleccionada.idcita || this.citaSeleccionada.id;
+    this.router.navigate(['/citas/editar', id], { state: { cita: this.citaSeleccionada } });
   }
 
   abrirEliminarCita() {

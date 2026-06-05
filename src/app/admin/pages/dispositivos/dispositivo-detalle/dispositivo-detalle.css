@@ -150,7 +150,7 @@ select.form-control-premium {
 /* Botón Guardar / Actualizar */
 .btn-save-appointment {
     padding: 0.75rem 2rem;
-    background: #1e293b;
+    background: #b0001e;
     color: white;
     border: none;
     border-radius: 8px;
@@ -164,7 +164,7 @@ select.form-control-premium {
 }
 
 .btn-save-appointment:hover:not(:disabled) {
-    background: #0f172a;
+    background: #8e0018;
     transform: translateY(-1px);
 }
 
@@ -213,7 +213,7 @@ select.form-control-premium {
 /* Estilos de Botón para el Estado de Error/Vacío */
 .btn-save {
     padding: 0.75rem 2rem;
-    background: #1e293b;
+    background: #b0001e;
     color: white;
     border: none;
     border-radius: 8px;
@@ -223,7 +223,7 @@ select.form-control-premium {
 }
 
 .btn-save:hover {
-    background: #0f172a;
+    background: #8e0018;
 }
 
 /* ==========================================================================

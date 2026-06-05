@@ -136,7 +136,7 @@
 }
 
 .btn-save {
-    background: #1e293b;
+    background: #b0001e;
     color: white;
     border: none;
     padding: 12px 22px;
@@ -152,7 +152,7 @@
 }
 
 .btn-save:hover {
-    background: #0f172a;
+    background: #8e0018;
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(15, 23, 42, 0.25);
 }
@@ -573,7 +573,7 @@ select.form-control-premium {
 
 .btn-save-appointment {
     padding: 0.85rem 2rem;
-    background: #10b981;
+    background: #b0001e;
     color: white;
     border: none;
     border-radius: 10px;
@@ -584,13 +584,13 @@ select.form-control-premium {
     align-items: center;
     gap: 0.6rem;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+    box-shadow: 0 4px 12px rgba(176, 0, 30, 0.2);
 }
 
 .btn-save-appointment:hover:not(:disabled) {
-    background: #059669;
+    background: #8e0018;
     transform: translateY(-1px);
-    box-shadow: 0 6px 18px rgba(5, 150, 105, 0.3);
+    box-shadow: 0 6px 18px rgba(176, 0, 30, 0.3);
 }
 
 .btn-save-appointment:disabled {

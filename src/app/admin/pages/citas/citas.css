@@ -729,7 +729,7 @@
 
 .btn-save-appointment {
     padding: 0.75rem 1.75rem;
-    background: #10b981;
+    background: #b0001e;
     color: white;
     border: none;
     border-radius: 8px;
@@ -743,7 +743,7 @@
 }
 
 .btn-save-appointment:hover {
-    background: #059669;
+    background: #8e0018;
 }
 
 /* CONTENEDORES PARA COMPONENTES DE CALENDARIO CUSTOM (FLATPICKR EMBED) */
@@ -860,4 +860,76 @@
 .empty-state p {
     margin: 0;
     font-size: 0.95rem;
+}
+
+/* ==========================================================================
+   MODAL DE PELIGRO (ELIMINAR / CANCELAR)
+   ========================================================================== */
+.modal-danger {
+    text-align: center;
+    width: 500px !important;
+}
+
+.modal-danger h3 {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin: 0.5rem 0;
+}
+
+.modal-danger .text-muted {
+    color: #64748b;
+    margin: 0 0 1.5rem;
+}
+
+.warning-icon-circle {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: #fee2e2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    color: #dc2626;
+    font-size: 1.8rem;
+}
+
+.modal-footer-danger {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.btn-danger-confirm {
+    background: #dc2626;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+.btn-danger-confirm:hover {
+    background: #b91c1c;
+}
+
+.btn-outline-cancel {
+    background: white;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+    padding: 12px 25px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-outline-cancel:hover {
+    background: #f1f5f9;
 }

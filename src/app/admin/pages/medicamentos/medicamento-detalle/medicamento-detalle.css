@@ -109,7 +109,7 @@
 
 .btn-save {
     padding: 0.75rem 2rem;
-    background: #1e293b;
+    background: #b0001e;
     color: white;
     border: none;
     border-radius: 8px;
@@ -123,7 +123,7 @@
 }
 
 .btn-save:hover {
-    background: #0f172a;
+    background: #8e0018;
     transform: translateY(-1px);
 }
 
@@ -214,9 +214,20 @@
     color: white;
 }
 
-.toast-premium-container.success { background: #10b981; border-left: 6px solid #047857; }
-.toast-premium-container.error { background: #ef4444; border-left: 6px solid #b91c1c; }
-.toast-premium-container.warning { background: #f59e0b; border-left: 6px solid #b45309; }
+.toast-premium-container.success {
+    background: #10b981;
+    border-left: 6px solid #047857;
+}
+
+.toast-premium-container.error {
+    background: #ef4444;
+    border-left: 6px solid #b91c1c;
+}
+
+.toast-premium-container.warning {
+    background: #f59e0b;
+    border-left: 6px solid #b45309;
+}
 
 .toast-content {
     display: flex;
@@ -224,10 +235,23 @@
     gap: 0.75rem;
 }
 
-.icon-toast { font-size: 1.3rem; }
-.toast-message { font-weight: 600; font-size: 0.95rem; }
+.icon-toast {
+    font-size: 1.3rem;
+}
+
+.toast-message {
+    font-weight: 600;
+    font-size: 0.95rem;
+}
 
 @keyframes slideInRight {
-    from { transform: translateX(120%); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
+    from {
+        transform: translateX(120%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
 }
