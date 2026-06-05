@@ -29,6 +29,10 @@ export class Tratamientos implements OnInit, OnDestroy {
   // Listas auxiliares para los selectores del Modal de Creación
   listaPacientes: any[] = [];
   listaMedicamentos: any[] = [];
+  filtroPacienteModal: string = '';
+  filtroMedicamentoModal: string = '';
+  mostrarDropdownPacientes = false;
+  mostrarDropdownMedicamentos = false;
 
   // Paginación
   paginaActual = 0;
@@ -78,12 +82,17 @@ export class Tratamientos implements OnInit, OnDestroy {
   inicializarCalendario() {
     if (isPlatformBrowser(this.platformId)) {
       setTimeout(() => {
+        // --- CÁLCULO DE LA FECHA MÁXIMA (Mes actual + 2 meses) ---
+        const hoy = new Date();
+        const fechaMaxima = new Date(hoy.getFullYear(), hoy.getMonth() + 2, hoy.getDate());
+
         // --- 1. CONFIGURACIÓN PARA FECHA DE INICIO ---
         const configInicio: any = {
           locale: Spanish,
           dateFormat: "Y-m-d",
           defaultDate: this.nuevoTratamiento?.fechaInicio || null,
           minDate: "today",
+          maxDate: fechaMaxima, // <-- Restricción añadida
           appendTo: document.body,
           static: false,
           disableMobile: true,
@@ -102,6 +111,7 @@ export class Tratamientos implements OnInit, OnDestroy {
           dateFormat: "Y-m-d",
           defaultDate: this.nuevoTratamiento?.fechaFin || null,
           minDate: "today",
+          maxDate: fechaMaxima, // <-- Restricción añadida
           appendTo: document.body,
           static: false,
           disableMobile: true,
@@ -145,7 +155,7 @@ export class Tratamientos implements OnInit, OnDestroy {
   async cargarCatalogosAuxiliares() {
     try {
       const users = await firstValueFrom(this.usersService.getUsuariosBackend());
-      this.listaPacientes = users || [];
+      this.listaPacientes = (users || []).filter((u: any) => u.rol && u.rol.toLowerCase() === 'paciente');
 
       const meds = await firstValueFrom(this.usersService.getMedicamentos());
       this.listaMedicamentos = meds || [];
@@ -170,6 +180,60 @@ export class Tratamientos implements OnInit, OnDestroy {
         medNombre.includes(term) ||
         dosisText.includes(term);
     });
+  }
+
+  get pacientesFiltradosModal() {
+    let result = this.listaPacientes;
+    if (this.filtroPacienteModal) {
+      const term = this.filtroPacienteModal.toLowerCase();
+      result = this.listaPacientes.filter(p => {
+        const apP = p.apPaterno || p.appaterno || '';
+        const apM = p.apMaterno || p.apmaterno || '';
+        const nombreCompleto = `${p.nombre || ''} ${apP} ${apM}`.toLowerCase();
+        return nombreCompleto.includes(term);
+      });
+    }
+    return result.slice(0, 2);
+  }
+
+  get medicamentosFiltradosModal() {
+    let result = this.listaMedicamentos;
+    if (this.filtroMedicamentoModal) {
+      const term = this.filtroMedicamentoModal.toLowerCase();
+      result = this.listaMedicamentos.filter(m => {
+        const nombreCompleto = `${m.nombrecomercial || m.NombreComercial || ''} ${m.sustanciaactiva || m.SustanciaActiva || ''}`.toLowerCase();
+        return nombreCompleto.includes(term);
+      });
+    }
+    return result.slice(0, 2);
+  }
+
+  seleccionarPacienteModal(p: any) {
+    const apP = p.apPaterno || p.appaterno || '';
+    const apM = p.apMaterno || p.apmaterno || '';
+    this.nuevoTratamiento.idPaciente = p.idusuario ?? p.id;
+    this.filtroPacienteModal = `${p.nombre} ${apP} ${apM}`.trim();
+    this.mostrarDropdownPacientes = false;
+  }
+
+  seleccionarMedicamentoModal(m: any) {
+    this.nuevoTratamiento.idMedicamento = m.idmedicamento;
+    this.filtroMedicamentoModal = `${m.nombrecomercial || m.NombreComercial} (${m.sustanciaactiva || m.SustanciaActiva || 'N/A'})`.trim();
+    this.mostrarDropdownMedicamentos = false;
+  }
+
+  ocultarDropdownPacientes() {
+    setTimeout(() => {
+      this.mostrarDropdownPacientes = false;
+      this.cdr.detectChanges();
+    }, 200);
+  }
+
+  ocultarDropdownMedicamentos() {
+    setTimeout(() => {
+      this.mostrarDropdownMedicamentos = false;
+      this.cdr.detectChanges();
+    }, 200);
   }
 
   get tratamientosPaginados() {
@@ -207,6 +271,8 @@ export class Tratamientos implements OnInit, OnDestroy {
       notasInstrucciones: '',
       activo: true
     };
+    this.filtroPacienteModal = '';
+    this.filtroMedicamentoModal = '';
     this.mostrarModalCrear = true;
     this.cdr.detectChanges();
 

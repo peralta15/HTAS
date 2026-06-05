@@ -70,7 +70,7 @@
                                 <div class="user-info-stack">
                                     <span class="user-name-main">
                                         {{ t.nombre_paciente || t.nombrepaciente || 'Paciente #' + t.idpaciente }}
-                                        {{ t.appaternopaciente || '' }}
+                                        {{ t.appaternopaciente || '' }} {{ t.apmaternopaciente || '' }}
                                     </span>
                                 </div>
                             </div>
@@ -143,52 +143,73 @@
         <div class="modal-body">
             <div class="form-grid-modal">
 
-                <div class="form-group">
-                    <label>Paciente <span class="text-danger">*</span></label>
-                    <select [(ngModel)]="nuevoTratamiento.idPaciente" class="form-control-premium">
-                        <option [ngValue]="null" disabled selected>-- Selecciona un Paciente --</option>
-                        @for (p of listaPacientes; track p.idusuario ?? p.id) {
-                        <option [value]="p.idusuario ?? p.id">
-                            {{ p.nombre }} {{ p.appaterno || '' }}
-                        </option>
+                <div class="form-group" style="position: relative;">
+                    <label>Paciente <span class="text-danger"></span></label>
+                    <div class="search-box-pill" style="width: 100%; border-radius: 8px;">
+                        <i class="bi bi-search"></i>
+                        <input type="text" [(ngModel)]="filtroPacienteModal" (focus)="mostrarDropdownPacientes = true"
+                            (blur)="ocultarDropdownPacientes()" placeholder="Buscar paciente...">
+                    </div>
+                    @if (mostrarDropdownPacientes) {
+                    <div class="custom-dropdown-list">
+                        @if (pacientesFiltradosModal.length === 0) {
+                        <div class="custom-dropdown-item" style="color: #94a3b8; cursor: default;">No se encontraron
+                            pacientes registrados.</div>
                         }
-                    </select>
+                        @for (p of pacientesFiltradosModal; track p.idusuario ?? p.id) {
+                        <div class="custom-dropdown-item" (mousedown)="seleccionarPacienteModal(p)">
+                            {{ p.nombre }} {{ p.apPaterno || p.appaterno || '' }} {{ p.apMaterno || p.apmaterno || '' }}
+                        </div>
+                        }
+                    </div>
+                    }
                 </div>
 
-                <div class="form-group">
-                    <label>Medicamento <span class="text-danger">*</span></label>
-                    <select [(ngModel)]="nuevoTratamiento.idMedicamento" class="form-control-premium">
-                        <option [ngValue]="null" disabled selected>-- Selecciona un Medicamento --</option>
-                        @for (m of listaMedicamentos; track m.idmedicamento) {
-                        <option [value]="m.idmedicamento">
+                <div class="form-group" style="position: relative;">
+                    <label>Medicamento <span class="text-danger"></span></label>
+                    <div class="search-box-pill" style="width: 100%; border-radius: 8px;">
+                        <i class="bi bi-search"></i>
+                        <input type="text" [(ngModel)]="filtroMedicamentoModal"
+                            (focus)="mostrarDropdownMedicamentos = true" (blur)="ocultarDropdownMedicamentos()"
+                            placeholder="Buscar medicamento...">
+                    </div>
+                    @if (mostrarDropdownMedicamentos) {
+                    <div class="custom-dropdown-list">
+                        @if (medicamentosFiltradosModal.length === 0) {
+                        <div class="custom-dropdown-item" style="color: #94a3b8; cursor: default;">No se encontraron
+                            medicamentos registrados.</div>
+                        }
+                        @for (m of medicamentosFiltradosModal; track m.idmedicamento) {
+                        <div class="custom-dropdown-item" (mousedown)="seleccionarMedicamentoModal(m)">
                             {{ m.nombrecomercial || m.NombreComercial }} ({{ m.sustanciaactiva || m.SustanciaActiva ||
                             'N/A' }})
-                        </option>
+                        </div>
                         }
-                    </select>
+                    </div>
+                    }
                 </div>
 
                 <div class="form-group">
-                    <label>Dosis <span class="text-danger">*</span></label>
+                    <label>Dosis <span class="text-danger"></span></label>
                     <input type="text" [(ngModel)]="nuevoTratamiento.dosis" maxlength="100" class="form-control-premium"
                         placeholder="Ej: 1 tableta de 500mg, 5 ml...">
                 </div>
 
                 <div class="form-group">
-                    <label>Frecuencia (Horas) <span class="text-danger">*</span></label>
+                    <label>Frecuencia (Horas) <span class="text-danger"></span></label>
                     <input type="number" [(ngModel)]="nuevoTratamiento.frecuenciaHoras" min="1" max="168"
                         class="form-control-premium" placeholder="Ej: 8 (Cada 8 horas)">
                 </div>
 
                 <div class="form-group">
-                    <label for="fechaInicioInput">Fecha de Inicio <span class="text-danger">*</span></label>
+                    <label for="fechaInicioInput">Fecha de Inicio <span class="text-danger"></span></label>
                     <input type="text" id="fechaInicioInput" class="form-control-premium calendar-input"
                         placeholder="Seleccione la fecha de inicio" [(ngModel)]="nuevoTratamiento.fechaInicio"
                         name="fechaInicio" readonly>
                 </div>
 
                 <div class="form-group">
-                    <label for="fechaFinInput">Fecha de Finalización <span class="text-danger">*</span></label>
+                    <label for="fechaFinInput">Fecha de Finalización <span class="text-danger"></span></label>
                     <input type="text" id="fechaFinInput" class="form-control-premium calendar-input"
                         placeholder="Seleccione la fecha de término" [(ngModel)]="nuevoTratamiento.fechaFin"
                         name="fechaFin" readonly>

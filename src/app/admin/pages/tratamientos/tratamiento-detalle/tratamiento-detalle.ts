@@ -80,6 +80,10 @@ export class TratamientoDetalle implements OnInit, OnDestroy {
   inicializarCalendario() {
     if (isPlatformBrowser(this.platformId)) {
       setTimeout(() => {
+        // --- CÁLCULO DE LA FECHA MÁXIMA (Mes actual + 2 meses) ---
+        const hoy = new Date();
+        const fechaMaxima = new Date(hoy.getFullYear(), hoy.getMonth() + 2, hoy.getDate());
+
         const fechaIniValor = this.tratamientoSeleccionado?.fechainicio || this.tratamientoSeleccionado?.fechaInicio || null;
         const fechaFinValor = this.tratamientoSeleccionado?.fechafin || this.tratamientoSeleccionado?.fechaFin || null;
 
@@ -89,6 +93,7 @@ export class TratamientoDetalle implements OnInit, OnDestroy {
           dateFormat: "Y-m-d",
           defaultDate: fechaIniValor ? fechaIniValor.split('T')[0] : null,
           minDate: "today",
+          maxDate: fechaMaxima, // <-- Restricción añadida
           appendTo: document.body,
           static: false,
           disableMobile: true,
@@ -107,6 +112,7 @@ export class TratamientoDetalle implements OnInit, OnDestroy {
           dateFormat: "Y-m-d",
           defaultDate: fechaFinValor ? fechaFinValor.split('T')[0] : null,
           minDate: "today",
+          maxDate: fechaMaxima, // <-- Restricción añadida
           appendTo: document.body,
           static: false,
           disableMobile: true,
