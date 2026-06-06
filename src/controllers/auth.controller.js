@@ -319,10 +319,11 @@ const authController = {
   },
 
   googleLogin: async (req, res) => {
-    const { nombre, apPaterno, apMaterno, correo, genero } = req.body;
+    // 1. Extraemos el rol que nos envía Angular por el body (con un fallback por si no llega)
+    const { nombre, apPaterno, apMaterno, correo, genero, rol } = req.body;
+    const rolAsignar = rol || 'Paciente'; 
 
     try {
-      // 1. Verificar si ya existe en la base de datos
       const result = await db.query(
         "SELECT idusuario, nombre, pinverificacion, pinverificado, rol, genero FROM USUARIOS WHERE Correo = $1",
         [correo],
@@ -331,38 +332,69 @@ const authController = {
       let usuario;
 
       if (result.rows.length === 0) {
-        // 2. REGISTRO AUTOMÁTICO (Primer inicio de sesión)
+        // 2. REGISTRO AUTOMÁTICO (Primer inicio de sesión con Google)
         await db.query("BEGIN");
         try {
           const nuevoPin = Math.floor(
             100000 + Math.random() * 900000,
           ).toString();
 
-          // Insertamos con valores temporales/default
+          // Reemplazamos la cadena fija 'Paciente' por la variable dinámcia $6 (rolAsignar)
           const nuevoUser = await db.query(
             `INSERT INTO USUARIOS (Nombre, ApPaterno, ApMaterno, Correo, Contrasenia, Rol, Telefono, Genero, PinVerificacion, PinVerificado, Activo) 
-                     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10,FALSE, TRUE) RETURNING *`,
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, TRUE) RETURNING *`,
             [
               nombre,
               apPaterno,
               apMaterno,
               correo,
               "GOOGLE_AUTH_USER",
-              "Paciente",
+              rolAsignar,
               "0000000000",
-              genero,
+              genero || 'Masculino',
               nuevoPin,
+              false,
             ],
           );
 
           usuario = nuevoUser.rows[0];
 
-          // IMPORTANTE: Usamos ON CONFLICT para que si el ID ya existe en PACIENTES por una prueba vieja,
-          // el sistema no se detenga con un error 500.
-          await db.query(
-            "INSERT INTO PACIENTES (IdUsuario) VALUES ($1) ON CONFLICT (IdUsuario) DO NOTHING",
-            [usuario.idusuario],
-          );
+          // 3. INSERCIÓN EN TABLA DE ENTIDAD SEGÚN EL ROL
+          // Evaluamos el rol transformándolo a minúsculas para evitar problemas de capitalización
+          const rolNormalizado = rolAsignar.toLowerCase();
+
+          switch (rolNormalizado) {
+            case 'paciente':
+              await db.query(
+                "INSERT INTO PACIENTES (IdUsuario) VALUES ($1) ON CONFLICT (IdUsuario) DO NOTHING",
+                [usuario.idusuario],
+              );
+              break;
+
+            case 'medico':
+            case 'doctor':
+              await db.query(
+                "INSERT INTO MEDICOS (IdUsuario) VALUES ($1) ON CONFLICT (IdUsuario) DO NOTHING",
+                [usuario.idusuario],
+              );
+              break;
+
+            case 'acompanante':
+            case 'acompañante':
+              await db.query(
+                "INSERT INTO ACOMPANANTES (IdUsuario) VALUES ($1) ON CONFLICT (IdUsuario) DO NOTHING",
+                [usuario.idusuario],
+              );
+              break;
+              
+            default:
+              // Si el rol no coincide con ninguno, por seguridad lo vinculamos a pacientes
+              await db.query(
+                "INSERT INTO PACIENTES (IdUsuario) VALUES ($1) ON CONFLICT (IdUsuario) DO NOTHING",
+                [usuario.idusuario],
+              );
+              break;
+          }
 
           await db.query("COMMIT");
         } catch (insertError) {
@@ -370,11 +402,11 @@ const authController = {
           throw insertError;
         }
       } else {
-        // 3. LOGIN NORMAL (Ya existía)
+        // 4. LOGIN NORMAL (El usuario ya existía en PostgreSQL con su respectivo rol)
         usuario = result.rows[0];
       }
 
-      // 4. Generar Token solo si ya pasó su verificación de PIN
+      // 5. Generar Token JWT
       let accessToken = null;
       if (usuario.pinverificado) {
         accessToken = jwt.sign(
@@ -384,7 +416,6 @@ const authController = {
         );
       }
 
-      // 5. Respuesta limpia para Angular
       res.json({
         uid: usuario.idusuario,
         nombre: usuario.nombre,
@@ -523,7 +554,7 @@ const authController = {
     }
   },
 
-getAllUsers: async (req, res) => {
+  getAllUsers: async (req, res) => {
     try {
       const result = await db.query(
         `SELECT 
@@ -559,7 +590,7 @@ getAllUsers: async (req, res) => {
     }
   },
 
-updateUsuario: async (req, res) => {
+  updateUsuario: async (req, res) => {
     const { id } = req.params;
     const {
       nombre,
@@ -587,7 +618,7 @@ updateUsuario: async (req, res) => {
       nivelPermiso,
       nivelpermiso,
       areaResponsabilidad,
-      arearesponsabilidad
+      arearesponsabilidad,
     } = req.body;
 
     // Asignación final asegurando que si viene de Angular plano o camelCase, se use el valor real
@@ -607,10 +638,10 @@ updateUsuario: async (req, res) => {
         WHERE IdUsuario = $9 RETURNING *`,
         [
           nombre,
-          apellidoPaternoFinal || '',
-          apellidoMaternoFinal || '',
+          apellidoPaternoFinal || "",
+          apellidoMaternoFinal || "",
           correo,
-          telefono || 'Sin teléfono',
+          telefono || "Sin teléfono",
           genero || null,
           activo !== undefined ? activo : true,
           rol,
@@ -735,7 +766,8 @@ updateUsuario: async (req, res) => {
       // --- ADMINISTRADORES ---
       else if (
         (rolNormalizado === "admin" || rolNormalizado === "administrador") &&
-        (nivelPermisoFinal !== undefined || areaResponsabilidadFinal !== undefined)
+        (nivelPermisoFinal !== undefined ||
+          areaResponsabilidadFinal !== undefined)
       ) {
         await db.query(
           `INSERT INTO ADMINISTRADORES (IdUsuario, NivelPermiso, AreaResponsabilidad)
@@ -747,8 +779,8 @@ updateUsuario: async (req, res) => {
             updated_at = CURRENT_TIMESTAMP`,
           [
             id,
-            nivelPermisoFinal || 'Soporte',
-            areaResponsabilidadFinal || 'General'
+            nivelPermisoFinal || "Soporte",
+            areaResponsabilidadFinal || "General",
           ],
         );
       }
@@ -949,12 +981,10 @@ updateUsuario: async (req, res) => {
           activo ?? true,
         ],
       );
-      res
-        .status(201)
-        .json({
-          message: "Tratamiento creado con éxito",
-          tratamiento: result.rows[0],
-        });
+      res.status(201).json({
+        message: "Tratamiento creado con éxito",
+        tratamiento: result.rows[0],
+      });
     } catch (error) {
       console.error("Error al crear tratamiento:", error);
       res.status(500).json({ error: "Error al registrar el tratamiento" });
@@ -1012,12 +1042,10 @@ updateUsuario: async (req, res) => {
       res.json({ message: "Tratamiento eliminado correctamente" });
     } catch (error) {
       console.error("Error al eliminar tratamiento:", error);
-      res
-        .status(500)
-        .json({
-          error:
-            "No se puede eliminar el tratamiento (posee registros asociados)",
-        });
+      res.status(500).json({
+        error:
+          "No se puede eliminar el tratamiento (posee registros asociados)",
+      });
     }
   },
 
@@ -1078,11 +1106,9 @@ updateUsuario: async (req, res) => {
       });
     } catch (error) {
       // Siempre responder con un código HTTP de error para evitar congelar la UI de Angular
-      return res
-        .status(500)
-        .json({
-          error: "Error interno en el servidor al registrar el medicamento",
-        });
+      return res.status(500).json({
+        error: "Error interno en el servidor al registrar el medicamento",
+      });
     }
   },
 
@@ -1100,12 +1126,10 @@ updateUsuario: async (req, res) => {
       req.body.indicacionesGenerales || req.body.indicacionesgenerales;
 
     if (!nombreComercial || nombreComercial.trim() === "") {
-      return res
-        .status(400)
-        .json({
-          error:
-            "El nombre comercial no puede estar vacío durante la actualización.",
-        });
+      return res.status(400).json({
+        error:
+          "El nombre comercial no puede estar vacío durante la actualización.",
+      });
     }
 
     try {
@@ -1136,11 +1160,9 @@ updateUsuario: async (req, res) => {
       });
     } catch (error) {
       console.error("❌ Error crítico al actualizar medicamento:", error);
-      return res
-        .status(500)
-        .json({
-          error: "Error interno en el servidor al actualizar el medicamento",
-        });
+      return res.status(500).json({
+        error: "Error interno en el servidor al actualizar el medicamento",
+      });
     }
   },
 
@@ -1199,20 +1221,16 @@ updateUsuario: async (req, res) => {
          VALUES ($1, $2, $3) RETURNING *`,
         [nombre, direccionMac, idPacienteAsociado || null],
       );
-      res
-        .status(201)
-        .json({
-          message: "Dispositivo vinculado con éxito",
-          dispositivo: result.rows[0],
-        });
+      res.status(201).json({
+        message: "Dispositivo vinculado con éxito",
+        dispositivo: result.rows[0],
+      });
     } catch (error) {
       console.error("Error al vincular dispositivo:", error);
-      res
-        .status(500)
-        .json({
-          error:
-            "Error al registrar dispositivo. Verifique que la dirección MAC sea única y válida.",
-        });
+      res.status(500).json({
+        error:
+          "Error al registrar dispositivo. Verifique que la dirección MAC sea única y válida.",
+      });
     }
   },
 
