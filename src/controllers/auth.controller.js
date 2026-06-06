@@ -523,31 +523,34 @@ const authController = {
     }
   },
 
-  getAllUsers: async (req, res) => {
+getAllUsers: async (req, res) => {
     try {
       const result = await db.query(
         `SELECT 
-                    u.idusuario, u.nombre, 
-                    u.apPaterno AS "apPaterno", 
-                    u.apMaterno AS "apMaterno", 
-                    u.correo, u.rol, u.telefono, u.genero, u.activo,
-                    u.intentosfallidos AS "intentosFallidos",
-                    u.bloqueadohasta AS "bloqueadoHasta",
-                    a.FechaNacimiento as "fechaNacimiento",
-                    a.FechaAsignacion as "fechaAsignacion",
-                    d.Especialidad as "especialidad", 
-                    d.DireccionClinica as "direccionClinica",
-                    d.Cedula as "cedula",
-                    COALESCE(d.TipoSangre, p.TipoSangre) as "tipoSangre",
-                    COALESCE(d.Peso, p.Peso) as "peso",
-                    COALESCE(d.Altura, p.Altura) as "altura",
-                    COALESCE(d.AntecedentesFamiliares, p.AntecedentesFamiliares) as "antecedentesFamiliares",
-                    p.NSS as "nss"
-                 FROM USUARIOS u
-                 LEFT JOIN ACOMPANANTES a ON u.idusuario = a.idusuario
-                 LEFT JOIN DOCTORES d ON u.idusuario = d.idusuario
-                 LEFT JOIN PACIENTES p ON u.idusuario = p.idusuario
-                 ORDER BY u.nombre ASC`,
+            u.idusuario, u.nombre, 
+            u.apPaterno AS "apPaterno", 
+            u.apMaterno AS "apMaterno", 
+            u.correo, u.rol, u.telefono, u.genero, u.activo,
+            u.intentosfallidos AS "intentosFallidos",
+            u.bloqueadohasta AS "bloqueadoHasta",
+            a.FechaNacimiento as "fechaNacimiento",
+            a.FechaAsignacion as "fechaAsignacion",
+            d.Especialidad as "especialidad", 
+            d.DireccionClinica as "direccionClinica",
+            d.Cedula as "cedula",
+            COALESCE(d.TipoSangre, p.TipoSangre) as "tipoSangre",
+            COALESCE(d.Peso, p.Peso) as "peso",
+            COALESCE(d.Altura, p.Altura) as "altura",
+            COALESCE(d.AntecedentesFamiliares, p.AntecedentesFamiliares) as "antecedentesFamiliares",
+            p.NSS as "nss",
+            adm.NivelPermiso as "nivelPermiso",
+            adm.AreaResponsabilidad as "areaResponsabilidad"
+         FROM USUARIOS u
+         LEFT JOIN ACOMPANANTES a ON u.idusuario = a.idusuario
+         LEFT JOIN DOCTORES d ON u.idusuario = d.idusuario
+         LEFT JOIN PACIENTES p ON u.idusuario = p.idusuario
+         LEFT JOIN ADMINISTRADORES adm ON u.idusuario = adm.idusuario
+         ORDER BY u.nombre ASC`,
       );
       res.json(result.rows);
     } catch (error) {
@@ -556,7 +559,7 @@ const authController = {
     }
   },
 
-  updateUsuario: async (req, res) => {
+updateUsuario: async (req, res) => {
     const { id } = req.params;
     const {
       nombre,
@@ -581,18 +584,23 @@ const authController = {
       peso,
       altura,
       antecedentesFamiliares,
+      nivelPermiso,
+      nivelpermiso,
+      areaResponsabilidad,
+      arearesponsabilidad
     } = req.body;
 
     // Asignación final asegurando que si viene de Angular plano o camelCase, se use el valor real
     const apellidoPaternoFinal = apPaterno || appaterno;
     const apellidoMaternoFinal = apMaterno || apmaterno;
     const direccionClinicaFinal = direccionClinica || direccionclinica;
+    const nivelPermisoFinal = nivelPermiso || nivelpermiso;
+    const areaResponsabilidadFinal = areaResponsabilidad || arearesponsabilidad;
 
     try {
       await db.query("BEGIN");
 
       // 1. Actualizar tabla base: USUARIOS (Datos básicos comunes)
-      // Agregamos COALESCE o strings vacíos para blindar las columnas ante un NOT NULL accidental
       const result = await db.query(
         `UPDATE USUARIOS 
         SET Nombre = $1, ApPaterno = $2, ApMaterno = $3, Correo = $4, Telefono = $5, Genero = $6, Activo = $7, Rol = $8
@@ -724,6 +732,27 @@ const authController = {
         );
       }
 
+      // --- ADMINISTRADORES ---
+      else if (
+        (rolNormalizado === "admin" || rolNormalizado === "administrador") &&
+        (nivelPermisoFinal !== undefined || areaResponsabilidadFinal !== undefined)
+      ) {
+        await db.query(
+          `INSERT INTO ADMINISTRADORES (IdUsuario, NivelPermiso, AreaResponsabilidad)
+          VALUES ($1, $2, $3)
+          ON CONFLICT (IdUsuario)
+          DO UPDATE SET
+            NivelPermiso = COALESCE($2, ADMINISTRADORES.NivelPermiso),
+            AreaResponsabilidad = COALESCE($3, ADMINISTRADORES.AreaResponsabilidad),
+            updated_at = CURRENT_TIMESTAMP`,
+          [
+            id,
+            nivelPermisoFinal || 'Soporte',
+            areaResponsabilidadFinal || 'General'
+          ],
+        );
+      }
+
       await db.query("COMMIT");
       res.json({ message: "Actualizado correctamente", user: result.rows[0] });
     } catch (error) {
@@ -733,19 +762,10 @@ const authController = {
     }
   },
 
-  // --- ELIMINAR USUARIO (Borrado lógico o físico) ---
   deleteUsuario: async (req, res) => {
     const { id } = req.params;
-
     try {
-      // Opción A: Borrado físico (Elimina la fila)
-      // Nota: Si tienes llaves foráneas, esto podría dar error si no usas ON DELETE CASCADE
       await db.query("DELETE FROM USUARIOS WHERE IdUsuario = $1", [id]);
-
-      /* Opción B: Borrado lógico (Solo lo desactiva) - Recomendado
-      await db.query('UPDATE USUARIOS SET Activo = FALSE WHERE IdUsuario = $1', [id]); 
-      */
-
       res.json({ message: "Usuario eliminado correctamente" });
     } catch (error) {
       console.error("Error al eliminar:", error);

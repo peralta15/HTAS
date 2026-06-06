@@ -61,7 +61,16 @@ CREATE TABLE ACOMPANANTES (
 
 ALTER TABLE ACOMPANANTES ALTER COLUMN FechaAsignacion DROP NOT NULL;
 
--- 5. TABLA: SESIONES (Soporte Multisesión)
+-- 5. TABLA: ADMINISTRADORES
+CREATE TABLE ADMINISTRADORES (
+    IdUsuario INT PRIMARY KEY REFERENCES USUARIOS(IdUsuario) ON DELETE CASCADE,
+    NivelPermiso VARCHAR(20) DEFAULT 'Soporte' 
+        CHECK (NivelPermiso IN ('SuperAdmin', 'Soporte', 'Moderador')),
+    AreaResponsabilidad VARCHAR(50) DEFAULT 'General', -- Ej: 'Sistemas', 'Atención Médica', 'Auditoría'
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 6. TABLA: SESIONES (Soporte Multisesión)
 CREATE TABLE SESIONES (
     IdSesion SERIAL PRIMARY KEY,
     IdUsuario INT NOT NULL REFERENCES USUARIOS(IdUsuario) ON DELETE CASCADE,
