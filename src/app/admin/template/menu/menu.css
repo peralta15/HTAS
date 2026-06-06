@@ -9,6 +9,9 @@
     top: 0;
     width: 100%;
     z-index: 1050;
+    padding-right: 20px;
+    /* Evita que el perfil se pegue a la orilla de la pantalla */
+    box-sizing: border-box;
 }
 
 /* El cuadro azul/rojo de HTAS */
@@ -43,9 +46,12 @@
 /* ==========================================================================
    2. ICONOS DERECHA Y BUSCADOR
    ========================================================================== */
+.header-right-icons {
+    height: 100%;
+}
+
 .header-right-icons i {
     font-size: 1.2rem;
-    margin-right: 25px;
     cursor: pointer;
 }
 
@@ -107,6 +113,8 @@
 .actions-group {
     display: flex;
     align-items: center;
+    gap: 8px;
+    /* Controla el espacio exacto y pegado entre la campana y el perfil */
     transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
@@ -119,7 +127,6 @@
 .icon-gray {
     color: #6c757d;
     font-size: 1.2rem;
-    margin-right: 25px;
     cursor: pointer;
 }
 
@@ -127,13 +134,17 @@
     position: relative;
     display: flex;
     align-items: center;
+    justify-content: center;
+    width: 40px;
+    /* Ancho fijo para centrar la campana */
     height: 40px;
 }
 
 .notif-badge {
     position: absolute;
-    top: -2px;
-    right: 8px;
+    top: 0px;
+    right: 2px;
+    /* Reajustado para que no baile por los márgenes antiguos */
     background-color: #b0001e;
     color: white;
     font-size: 10px;
@@ -151,9 +162,11 @@
     display: flex;
     align-items: center;
     text-decoration: none;
-    padding: 4px 8px;
+    padding: 4px 12px 4px 4px;
     border-radius: 30px;
     transition: background 0.2s;
+    height: 40px;
+    box-sizing: border-box;
 }
 
 .user-pill:hover {
@@ -161,8 +174,8 @@
 }
 
 .user-img {
-    width: 35px;
-    height: 35px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     margin-right: 10px;
     object-fit: cover;
@@ -172,6 +185,7 @@
     font-weight: 600;
     color: #444;
     font-size: 0.95rem;
+    white-space: nowrap;
 }
 
 /* ==========================================================================
