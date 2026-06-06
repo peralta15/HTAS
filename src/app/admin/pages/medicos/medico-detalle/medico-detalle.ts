@@ -1,5 +1,5 @@
-import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef } from '@angular/core';
-import { CommonModule, Location } from '@angular/common';
+import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef, PLATFORM_ID } from '@angular/core';
+import { CommonModule, Location, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { GoogleService } from '../../../../auth/services/google';
@@ -20,6 +20,7 @@ export class MedicoDetalle implements OnInit, OnDestroy {
   private googleService = inject(GoogleService);
   private usersService = inject(Users);
   private cdr = inject(ChangeDetectorRef);
+  private platformId = inject(PLATFORM_ID); // Inyección necesaria para detectar el SSR
 
   usuarioSeleccionado: any = null;
   isSaving = false;
@@ -31,11 +32,14 @@ export class MedicoDetalle implements OnInit, OnDestroy {
   private toastTimeout: any = null;
 
   ngOnInit() {
-    const state = history.state;
-    if (state && state.usuario) {
-      this.usuarioSeleccionado = { ...state.usuario };
-    } else {
-      this.router.navigate(['/medicos']);
+    // Evita que el servidor (SSR) intente leer "history", lo cual rompía la compilación inicial
+    if (isPlatformBrowser(this.platformId)) {
+      const state = history.state;
+      if (state && state.usuario) {
+        this.usuarioSeleccionado = { ...state.usuario };
+      } else {
+        this.router.navigate(['/medicos']);
+      }
     }
   }
 
@@ -67,11 +71,13 @@ export class MedicoDetalle implements OnInit, OnDestroy {
   async guardarCambios() {
     if (!this.usuarioSeleccionado) return;
 
+    // Recuperar valores limpiando espacios de los ngModel temporales
     const nombre = (this.usuarioSeleccionado.tempNombre || '').trim();
     const apPaterno = (this.usuarioSeleccionado.tempApellidoPaterno || '').trim();
+    const apMaterno = (this.usuarioSeleccionado.tempApellidoMaterno || '').trim();
     const correoFinal = this.usuarioSeleccionado.correo || this.usuarioSeleccionado.Correo;
 
-    // Validación de campos mandatorios
+    // Validación de campos obligatorios en el Frontend
     if (!nombre || !apPaterno || !correoFinal) {
       this.lanzarNotificacion("El nombre, apellido paterno y correo electrónico son requeridos.", "warning");
       return;
@@ -81,23 +87,25 @@ export class MedicoDetalle implements OnInit, OnDestroy {
     this.cdr.detectChanges();
 
     try {
-      const apMaterno = (this.usuarioSeleccionado.tempApellidoMaterno || '').trim();
-      const nombreCompleto = [nombre, apPaterno, apMaterno].filter(p => p).join(' ');
+      // Reconciliación del ID único del médico en el sistema
+      const idFinal = this.usuarioSeleccionado.idusuario || this.usuarioSeleccionado.id;
 
+      // Enviamos el payload manteniendo tanto camelCase como snake_case plano para acoplarse al backend
       const datosActualizados = {
         nombre: nombre,
         apPaterno: apPaterno,
+        appaterno: apPaterno,   // Clave plana en minúsculas capturada por el backend
         apMaterno: apMaterno,
-        NombreCompleto: nombreCompleto,
+        apmaterno: apMaterno,   // Clave plana en minúsculas capturada por el backend
         correo: correoFinal,
         telefono: this.usuarioSeleccionado.telefono || 'Sin teléfono',
         especialidad: this.usuarioSeleccionado.especialidad || 'General',
         direccionClinica: this.usuarioSeleccionado.direccionClinica || 'No registrada',
+        direccionclinica: this.usuarioSeleccionado.direccionClinica || 'No registrada', // Copia de seguridad en minúsculas
         rol: this.usuarioSeleccionado.rol || 'Médico'
       };
 
-      const idFinal = this.usuarioSeleccionado.idusuario || this.usuarioSeleccionado.id;
-
+      // Despacho condicional basado en la persistencia origen
       if (this.usuarioSeleccionado.fuente === 'Firebase') {
         await this.googleService.updateUsuario(idFinal, datosActualizados);
       } else {
@@ -106,7 +114,7 @@ export class MedicoDetalle implements OnInit, OnDestroy {
 
       this.lanzarNotificacion("¡Éxito! Los datos del médico se actualizaron correctamente.", "success");
 
-      // Redirección diferida para permitir la visualización de la confirmación
+      // Redirección diferida fluida
       setTimeout(() => {
         this.router.navigate(['/medicos']);
       }, 2000);

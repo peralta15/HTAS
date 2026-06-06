@@ -22,7 +22,7 @@
             </div>
 
             <div class="header-controls">
-                <button class="btn-action btn-edit-premium" (click)="volver()">
+                <button class="btn-cancel-premium" (click)="volver()">
                     <i class="bi bi-arrow-left"></i>
                     <span>Volver a la lista</span>
                 </button>
@@ -30,9 +30,9 @@
         </div>
 
         <div class="detail-card">
-            <div class="form-grid-modal">
+            <div class="form-grid">
 
-                <div class="form-group full-width-modal">
+                <div class="form-group full-width-group">
                     <label>Nombre del Dispositivo</label>
                     <input type="text" [(ngModel)]="dispositivoSeleccionado.nombre" maxlength="100"
                         class="form-control-premium" placeholder="Ej. Monitor de Signos Vitales HTAS">
@@ -53,29 +53,26 @@
                     </select>
                 </div>
 
-                <div class="form-group full-width-modal">
+                <div class="form-group full-width-group">
                     <label>Paciente Vinculado Actual</label>
-                    <div class="date-cell"
-                        style="padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px; background: #fafafa;">
+                    <div class="patient-badge-container">
                         @if (dispositivoSeleccionado.nombrepaciente) {
-                        <i class="bi bi-person-fill me-2 text-primary"></i>
-                        <strong>{{ dispositivoSeleccionado.nombrepaciente }} {{
-                            dispositivoSeleccionado.appaternopaciente }}</strong>
+                        <i class="bi bi-person-fill icon-patient active"></i>
+                        <span class="patient-name">
+                            {{ dispositivoSeleccionado.nombrepaciente }} {{ dispositivoSeleccionado.appaternopaciente }}
+                        </span>
                         } @else {
-                        <i class="bi bi-person-dash me-2 text-muted"></i>
-                        <span class="text-muted">Dispositivo disponible en almacén (Sin vincular)</span>
+                        <i class="bi bi-person-dash icon-patient unlinked"></i>
+                        <span class="patient-name text-muted">Dispositivo disponible en almacén (Sin vincular)</span>
                         }
                     </div>
                 </div>
 
             </div>
 
-            <div class="modal-footer-premium"
-                style="background: transparent; padding: 1.5rem 0 0 0; border-top: 1px solid #f1f5f9;">
-                <button class="btn-cancel-premium" (click)="volver()">
-                    Cancelar
-                </button>
-                <button class="btn-save-appointment" (click)="guardarCambios()" [disabled]="isSaving">
+            <div class="action-footer">
+                <button class="btn-cancel-premium" (click)="volver()" [disabled]="isSaving">Cancelar</button>
+                <button class="btn-save" (click)="guardarCambios()" [disabled]="isSaving">
                     @if (isSaving) {
                     <span class="spinner-save"></span>
                     <span>Actualizando...</span>
@@ -89,11 +86,11 @@
 
     </div>
     } @else {
-    <div class="table-card" style="margin-top: 2rem;">
+    <div class="detail-card" style="margin-top: 2rem; text-align: center;">
         <div class="empty-state">
-            <i class="bi bi-cpu-fill"></i>
-            <p>No se encontraron datos del dispositivo seleccionado.</p>
-            <button class="btn-save" style="margin: 1rem auto 0;" (click)="volver()">Regresar</button>
+            <i class="bi bi-cpu-fill" style="font-size: 3rem; color: #94a3b8; display: block; margin-bottom: 1rem;"></i>
+            <p style="color: #64748b; font-weight: 600;">No se encontraron datos del dispositivo seleccionado.</p>
+            <button class="btn-save" style="margin: 1.5rem auto 0;" (click)="volver()">Regresar</button>
         </div>
     </div>
     }

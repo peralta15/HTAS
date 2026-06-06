@@ -138,23 +138,20 @@
     background: #b0001e;
     color: white;
     border: none;
-    padding: 11px 22px;
-    border-radius: 50px;
-    /* Estilo pill para hacer juego con el buscador */
+    padding: 10px 20px;
+    border-radius: 10px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 0.88rem;
-    box-shadow: 0 4px 12px rgba(30, 41, 59, 0.15);
+    font-size: 0.9rem;
 }
 
 .btn-save:hover {
     background: #8e0018;
     transform: translateY(-1px);
-    box-shadow: 0 6px 16px rgba(30, 41, 59, 0.25);
 }
 
 /* ==========================================================================

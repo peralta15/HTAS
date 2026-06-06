@@ -21,7 +21,7 @@
             </div>
 
             <div class="header-controls">
-                <button class="btn-cancel" (click)="volver()">
+                <button class="btn-cancel-premium" (click)="volver()">
                     <i class="bi bi-arrow-left"></i>
                     <span>Volver a la lista</span>
                 </button>
@@ -63,6 +63,7 @@
             </div>
 
             <div class="action-footer">
+                <button class="btn-cancel-premium" (click)="volver()" [disabled]="isSaving">Cancelar</button>
                 <button class="btn-save" (click)="guardarCambios()" [disabled]="isSaving">
                     @if (isSaving) {
                     <span class="spinner-save"></span>

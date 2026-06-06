@@ -82,19 +82,24 @@
 
 .form-control-premium:focus {
     outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    border-color: #b0001e;
+    box-shadow: 0 0 0 3px rgba(176, 0, 30, 0.1);
     background: white;
 }
 
 .action-footer {
     display: flex;
     justify-content: flex-end;
+    gap: 1rem;
+    /* Margen entre botones del footer */
     margin-top: 2rem;
     padding-top: 1.5rem;
     border-top: 1px solid #e2e8f0;
 }
 
+/* ==========================================================================
+   Estilos de Botones Premium
+   ========================================================================== */
 .btn-save {
     padding: 0.75rem 2rem;
     background: #b0001e;
@@ -110,7 +115,7 @@
     transition: all 0.2s;
 }
 
-.btn-save:hover {
+.btn-save:hover:not(:disabled) {
     background: #8e0018;
     transform: translateY(-1px);
 }
@@ -121,7 +126,8 @@
     transform: none;
 }
 
-.btn-cancel {
+/* Estilo unificado para los botones secundarios/cancelar */
+.btn-cancel-premium {
     padding: 0.75rem 1.5rem;
     background: white;
     color: #475569;
@@ -136,9 +142,15 @@
     transition: all 0.2s;
 }
 
-.btn-cancel:hover {
+.btn-cancel-premium:hover:not(:disabled) {
     background: #f1f5f9;
     color: #1e293b;
+    transform: translateY(-1px);
+}
+
+.btn-cancel-premium:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 .spinner-save {
@@ -154,39 +166,6 @@
     to {
         transform: rotate(360deg);
     }
-}
-
-@media (max-width: 1024px) {
-    .form-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (max-width: 768px) {
-    .form-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .main-content {
-        margin-left: 0;
-        padding: 1rem;
-    }
-
-    .header-section {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
-    }
-}
-
-/* ==========================================================================
-   Ajustes de Enfoque Institucional
-   ========================================================================== */
-.form-control-premium:focus {
-    outline: none;
-    border-color: #b0001e;
-    box-shadow: 0 0 0 3px rgba(176, 0, 30, 0.1);
-    background: white;
 }
 
 /* ==========================================================================
@@ -246,5 +225,43 @@
     to {
         transform: translateX(0);
         opacity: 1;
+    }
+}
+
+/* ==========================================================================
+   Diseño Responsivo (Media Queries)
+   ========================================================================== */
+@media (max-width: 1024px) {
+    .form-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .main-content {
+        margin-left: 0;
+        padding: 1rem;
+        padding-top: 85px;
+    }
+
+    .header-section {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    /* Los botones en móvil pasan a ser verticales para mejor UX */
+    .action-footer {
+        flex-direction: column-reverse;
+    }
+
+    .action-footer button,
+    .header-controls button {
+        width: 100%;
+        justify-content: center;
     }
 }

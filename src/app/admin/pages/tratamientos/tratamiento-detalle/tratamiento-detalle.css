@@ -1,3 +1,6 @@
+/* ==========================================================================
+   1. ESTILOS BASE Y CONTENEDOR PRINCIPAL
+   ========================================================================== */
 .main-content {
     margin-left: 250px;
     padding: 85px 40px 40px;
@@ -15,6 +18,9 @@
     margin: 0 auto;
 }
 
+/* ==========================================================================
+   2. ENCABEZADO DE LA PÁGINA (HEADER)
+   ========================================================================== */
 .header-section {
     display: flex;
     justify-content: space-between;
@@ -44,6 +50,9 @@
     margin: 0;
 }
 
+/* ==========================================================================
+   3. TARJETA DE DETALLE Y FORMULARIO (TRATAMIENTO)
+   ========================================================================== */
 .detail-card {
     background: white;
     border-radius: 16px;
@@ -99,12 +108,43 @@
     background: white;
 }
 
+/* Support clases para inputs de fecha (Flatpickr) */
+.input-picker-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.picker-custom {
+    padding-right: 2.5rem !important;
+    cursor: pointer;
+    background: #f8fafc !important;
+}
+
+.icon-embed {
+    position: absolute;
+    right: 14px;
+    color: #94a3b8;
+    font-size: 1.1rem;
+    pointer-events: none;
+    transition: color 0.2s ease;
+}
+
+.input-picker-wrapper:focus-within .icon-embed {
+    color: #b0001e;
+}
+
+/* ==========================================================================
+   4. BOTONES Y ACCIONES DEL PIE DE PÁGINA (FOOTER)
+   ========================================================================== */
 .action-footer {
     display: flex;
     justify-content: flex-end;
     margin-top: 2rem;
     padding-top: 1.5rem;
     border-top: 1px solid #e2e8f0;
+    gap: 1rem;
 }
 
 .btn-save {
@@ -122,18 +162,20 @@
     transition: all 0.2s;
 }
 
-.btn-save:hover {
+.btn-save:hover:not(:disabled) {
     background: #8e0018;
     transform: translateY(-1px);
 }
 
-.btn-save:disabled {
-    opacity: 0.7;
+.btn-save:disabled,
+.btn-cancel-premium:disabled {
+    opacity: 0.6;
     cursor: not-allowed;
     transform: none;
 }
 
-.btn-cancel {
+/* Estilo Premium unificado para Cancelar / Volver */
+.btn-cancel-premium {
     padding: 0.75rem 1.5rem;
     background: white;
     color: #475569;
@@ -148,9 +190,10 @@
     transition: all 0.2s;
 }
 
-.btn-cancel:hover {
+.btn-cancel-premium:hover:not(:disabled) {
     background: #f1f5f9;
     color: #1e293b;
+    transform: translateY(-1px);
 }
 
 .spinner-save {
@@ -168,6 +211,9 @@
     }
 }
 
+/* ==========================================================================
+   5. RESPONSIVIDAD (MEDIA QUERIES)
+   ========================================================================== */
 @media (max-width: 1024px) {
     .form-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -190,6 +236,7 @@
     .main-content {
         margin-left: 0;
         padding: 1rem;
+        padding-top: 85px;
     }
 
     .header-section {
@@ -197,9 +244,22 @@
         align-items: flex-start;
         gap: 1rem;
     }
+
+    .action-footer {
+        flex-direction: column-reverse;
+        width: 100%;
+    }
+
+    .action-footer button,
+    .header-controls button {
+        width: 100%;
+        justify-content: center;
+    }
 }
 
-/* Toast */
+/* ==========================================================================
+   6. COMPONENTE TOAST DE NOTIFICACIÓN
+   ========================================================================== */
 .toast-premium-container {
     position: fixed;
     top: 25px;

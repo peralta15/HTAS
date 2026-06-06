@@ -93,8 +93,8 @@
 
 .form-control-premium:focus {
     outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    border-color: #b0001e;
+    box-shadow: 0 0 0 3px rgba(176, 0, 30, 0.1);
     background: white;
 }
 
@@ -114,6 +114,9 @@
     gap: 1rem;
 }
 
+/* ==========================================================================
+   ESTILOS DE BOTONES PREMIUM (COMPARTIDOS)
+   ========================================================================== */
 .btn-save {
     padding: 0.75rem 2rem;
     background: #b0001e;
@@ -129,18 +132,21 @@
     transition: all 0.2s;
 }
 
-.btn-save:hover {
+.btn-save:hover:not(:disabled) {
     background: #8e0018;
     transform: translateY(-1px);
 }
 
-.btn-save:disabled {
-    opacity: 0.7;
+.btn-save:disabled,
+.btn-cancel-premium:disabled,
+.btn-appointment:disabled {
+    opacity: 0.6;
     cursor: not-allowed;
     transform: none;
 }
 
-.btn-cancel {
+/* Estilo unificado y pulido para los botones secundarios de cancelar */
+.btn-cancel-premium {
     padding: 0.75rem 1.5rem;
     background: white;
     color: #475569;
@@ -155,9 +161,10 @@
     transition: all 0.2s;
 }
 
-.btn-cancel:hover {
+.btn-cancel-premium:hover:not(:disabled) {
     background: #f1f5f9;
     color: #1e293b;
+    transform: translateY(-1px);
 }
 
 .btn-appointment {
@@ -175,7 +182,7 @@
     transition: all 0.2s;
 }
 
-.btn-appointment:hover {
+.btn-appointment:hover:not(:disabled) {
     background: #0369a1;
     transform: translateY(-1px);
 }
@@ -211,10 +218,6 @@
     background: #f8fafc !important;
 }
 
-.picker-custom[readonly] {
-    background-color: #f8fafc;
-}
-
 .icon-embed {
     position: absolute;
     right: 14px;
@@ -225,7 +228,7 @@
 }
 
 .input-picker-wrapper:focus-within .icon-embed {
-    color: #3b82f6;
+    color: #b0001e;
 }
 
 /* ==========================================================================
@@ -338,7 +341,7 @@
     font-family: inherit;
 }
 
-.modal-footer {
+.modal-footer-premium {
     display: flex;
     justify-content: flex-end;
     gap: 1rem;
@@ -349,7 +352,7 @@
 
 .btn-save-appointment {
     padding: 0.75rem 1.75rem;
-    background: #10b981;
+    background: #b0001e;
     color: white;
     border: none;
     border-radius: 8px;
@@ -362,8 +365,8 @@
     transition: all 0.2s;
 }
 
-.btn-save-appointment:hover {
-    background: #059669;
+.btn-save-appointment:hover:not(:disabled) {
+    background: #8e0018;
 }
 
 @keyframes scaleUp {
@@ -403,12 +406,27 @@
     .main-content {
         margin-left: 0;
         padding: 1rem;
+        padding-top: 85px;
     }
 
     .header-section {
         flex-direction: column;
         align-items: flex-start;
         gap: 1rem;
+    }
+
+    /* Adaptación responsiva de botones para móvil */
+    .footer-buttons,
+    .modal-footer-premium {
+        flex-direction: column-reverse;
+        width: 100%;
+    }
+
+    .footer-buttons button,
+    .modal-footer-premium button,
+    .header-controls button {
+        width: 100%;
+        justify-content: center;
     }
 
     .modal-premium-card {
@@ -418,7 +436,7 @@
 
     .modal-header,
     .modal-body,
-    .modal-footer {
+    .modal-footer-premium {
         padding-left: 1.25rem;
         padding-right: 1.25rem;
     }
@@ -482,45 +500,4 @@
         transform: translateX(0);
         opacity: 1;
     }
-}
-
-/* Añade o actualiza estos fragmentos en el archivo paciente-detalle.css */
-
-/* Corrección de color de enfoque global del proyecto */
-.form-control-premium:focus {
-    outline: none;
-    border-color: #b0001e;
-    box-shadow: 0 0 0 3px rgba(176, 0, 30, 0.1);
-    background: white;
-}
-
-.input-picker-wrapper:focus-within .icon-embed {
-    color: #b0001e;
-}
-
-/* Clases de Soporte para la botonera Premium del Modal */
-.modal-footer-premium {
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
-    border-top: 1px solid #e2e8f0;
-    padding: 1rem 2rem 1.5rem;
-    background: #f8fafc;
-}
-
-.btn-cancel-premium {
-    padding: 0.75rem 1.5rem;
-    background: white;
-    color: #475569;
-    border: 1px solid #cbd5e1;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.btn-cancel-premium:hover {
-    background: #f1f5f9;
-    color: #1e293b;
 }

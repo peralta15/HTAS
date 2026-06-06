@@ -53,14 +53,15 @@
     display: flex;
     align-items: center;
     width: 340px;
+    max-width: 100%;
+    overflow: hidden;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .search-box-pill:focus-within {
     border-color: #b0001e;
     box-shadow: 0 8px 25px rgba(176, 0, 30, 0.08);
-    width: 390px;
 }
 
 .search-box-pill i {
