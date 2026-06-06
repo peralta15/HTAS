@@ -1,13 +1,18 @@
 import { Component, OnInit, inject, ChangeDetectorRef, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Menu } from "../../template/menu/menu";
-import { Users } from '../../../auth/services/users'; // Ajustado a tu ruta nativa de Auth
+import { Users } from '../../../auth/services/users';
 import { firstValueFrom } from 'rxjs';
+import { BaseChartDirective } from 'ng2-charts';
+import { ChartData, ChartOptions, Chart, registerables } from 'chart.js';
+
+// REGISTRO GLOBAL DE COMPONENTES DE CHART.JS (Soluciona el error de "linear" is not a registered scale)
+Chart.register(...registerables);
 
 @Component({
   selector: 'app-inicio',
   standalone: true,
-  imports: [CommonModule, Menu],
+  imports: [CommonModule, Menu, BaseChartDirective],
   templateUrl: './inicio.html',
   styleUrl: './inicio.css',
 })
@@ -18,7 +23,7 @@ export class Inicio implements OnInit {
 
   isLoading = true;
 
-  // Contadores dinámicos obtenidos de la clasificación por rol
+  // Los contadores globales siguen sumando TODO el universo de usuarios
   metrics = {
     totalUsuarios: 0,
     totalPacientes: 0,
@@ -26,9 +31,32 @@ export class Inicio implements OnInit {
     totalAcompanantes: 0
   };
 
-  // Listados en tiempo real corregidos
   citasRecientes: any[] = [];
   medicamentosControl: any[] = [];
+
+  // ESTRUCTURAS REACTIVAS PARA LAS GRÁFICAS (CHART.JS)
+  public medicamentosChartData: ChartData<'bar'> = {
+    labels: [],
+    datasets: [{ data: [], label: 'Fármacos en Catálogo', backgroundColor: '#b0001e' }]
+  };
+
+  public usuariosChartData: ChartData<'doughnut'> = {
+    labels: ['Pacientes', 'Médicos', 'Acompañantes'],
+    datasets: [{ data: [0, 0, 0], backgroundColor: ['#0d6efd', '#198754', '#0dcaf0'] }]
+  };
+
+  public barChartOptions: ChartOptions<'bar'> = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+  };
+
+  public doughnutChartOptions: ChartOptions<'doughnut'> = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } } }
+  };
 
   async ngOnInit() {
     if (!isPlatformBrowser(this.platformId)) return;
@@ -36,43 +64,44 @@ export class Inicio implements OnInit {
     try {
       this.isLoading = true;
 
-      // Recuperamos la sesión persistente estructurada de HTAS
       const sesionGuardada = localStorage.getItem('user_htas');
       const usuarioLogueado = sesionGuardada ? JSON.parse(sesionGuardada) : null;
       const correoUsuario = usuarioLogueado?.correo || '';
 
-      // Consumo de endpoints paralelos del backend PostgreSQL
       const [usuarios, citas, medicamentos] = await Promise.all([
         firstValueFrom(this.usersService.getUsuariosBackend()),
         correoUsuario ? firstValueFrom(this.usersService.getMisCitas(correoUsuario)) : Promise.resolve([]),
         firstValueFrom(this.usersService.getMedicamentos())
       ]);
 
-      // 1. Clasificación dinámica de usuarios por Rol
+      // 1. Clasificación dinámica de usuarios por Rol (Métricas Globales)
       if (Array.isArray(usuarios)) {
         this.metrics.totalUsuarios = usuarios.length;
         this.metrics.totalPacientes = usuarios.filter((u: any) => u.rol?.toLowerCase() === 'paciente').length;
         this.metrics.totalMedicos = usuarios.filter((u: any) => u.rol?.toLowerCase() === 'medico' || u.rol?.toLowerCase() === 'doctor').length;
         this.metrics.totalAcompanantes = usuarios.filter((u: any) => u.rol?.toLowerCase() === 'acompanante' || u.rol?.toLowerCase() === 'acompañante').length;
+
+        this.usuariosChartData = {
+          labels: ['Pacientes', 'Médicos', 'Acompañantes'],
+          datasets: [{
+            data: [this.metrics.totalPacientes, this.metrics.totalMedicos, this.metrics.totalAcompanantes],
+            backgroundColor: ['#0d6efd', '#198754', '#0dcaf0']
+          }]
+        };
       }
 
-      // 2. Mapeo con nombres exactos y formateo de fecha limpia (DD/MM/YYYY)
+      // 2. Agenda de Citas Activas - LIMITADO A LAS ÚLTIMAS 3 REGISTRADAS
       if (Array.isArray(citas)) {
-        this.citasRecientes = citas.map((c: any) => {
+        const citasMapeadas = citas.map((c: any) => {
           let fechaFormateada = 'Sin fecha';
 
           if (c.fechacita) {
             try {
-              // Al procesar strings ISO directos (con 'T'), extraemos solo la porción de la fecha 'YYYY-MM-DD'
               const fechaISO = c.fechacita.includes('T') ? c.fechacita.split('T')[0] : c.fechacita;
-              const partes = fechaISO.split('-'); // [YYYY, MM, DD]
+              const partes = fechaISO.split('-');
 
               if (partes.length === 3) {
-                const anio = partes[0];
-                const mes = partes[1];
-                const dia = partes[2];
-
-                fechaFormateada = `${dia}/${mes}/${anio}`; // Formato limpio DD/MM/YYYY
+                fechaFormateada = `${partes[2]}/${partes[1]}/${partes[0]}`;
               } else {
                 fechaFormateada = c.fechacita;
               }
@@ -85,23 +114,53 @@ export class Inicio implements OnInit {
           return {
             id: c.idcita,
             fecha: fechaFormateada,
-            hora: c.horacita ? c.horacita.substring(0, 5) : 'S/H', // Corta el formato HH:mm:ss a HH:mm
+            hora: c.horacita ? c.horacita.substring(0, 5) : 'S/H',
             motivo: c.motivo || 'Consulta Médica General',
             modalidad: c.modalidad || 'Presencial',
             paciente: `${c.nombrepaciente || ''} ${c.appaternopaciente || ''}`.trim() || 'Paciente HTAS',
             estado: c.estado || 'Programada'
           };
         });
+
+        // .slice(-3) extrae los últimos 3 elementos. .reverse() los muestra ordenados del más nuevo al más antiguo.
+        this.citasRecientes = citasMapeadas.slice(-3).reverse();
       }
 
-      // 3. CORRECCIÓN: Procesamiento blindado del catálogo de medicamentos (Soporta minúsculas de la BD)
+      // 3. Procesamiento y Limpieza de Fármacos (Catálogo e Inventario)
       if (Array.isArray(medicamentos)) {
-        this.medicamentosControl = medicamentos.map((m: any) => ({
+        const todosLosMedicamentos = medicamentos.map((m: any) => ({
           nombre: m.nombreComercial || m.nombrecomercial || 'Medicamento Sin Nombre',
           sustancia: m.sustanciaActiva || m.sustanciaactiva || 'N/A',
           presentacion: m.presentacion || 'General',
           concentracion: m.concentracion || ''
         }));
+
+        // Desglose Técnico de Fármacos: Extraemos solo los últimos 5 del registro general
+        this.medicamentosControl = todosLosMedicamentos.slice(-5).reverse();
+
+        // Agrupación de sustancias para la gráfica de barras
+        const conteoSustancias: { [key: string]: number } = {};
+        todosLosMedicamentos.forEach(m => {
+          conteoSustancias[m.sustancia] = (conteoSustancias[m.sustancia] || 0) + 1;
+        });
+
+        // Gráfica de Control de Medicamentos en Inventario: Tomamos únicamente las últimas 5 sustancias cargadas
+        const clavesSustancias = Object.keys(conteoSustancias);
+        const valoresSustancias = Object.values(conteoSustancias);
+
+        // Limitamos los labels y la data a los últimos 5 para que la gráfica no genere barras microscópicas
+        const ultimasEtiquetas = clavesSustancias.slice(-5);
+        const ultimosValores = valoresSustancias.slice(-5);
+
+        this.medicamentosChartData = {
+          labels: ultimasEtiquetas,
+          datasets: [{
+            label: 'Cantidad Registrada',
+            data: ultimosValores,
+            backgroundColor: '#b0001e',
+            borderRadius: 6
+          }]
+        };
       }
 
     } catch (error) {
@@ -112,7 +171,6 @@ export class Inicio implements OnInit {
     }
   }
 
-  // Helper visual para los estados de las citas
   getEstadoClass(estado: string): string {
     switch (estado?.toLowerCase()) {
       case 'confirmada':

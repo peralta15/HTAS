@@ -11,7 +11,7 @@ import { BehaviorSubject } from 'rxjs';
 export class Users {
   private platformId = inject(PLATFORM_ID);
   private http = inject(HttpClient);
-  private apiUrl = `${environment.authApi}`; // http://localhost:3000/api/auth
+  private apiUrl = `${environment.authApi}`;
 
   private currentUserSubject = new BehaviorSubject<any>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
@@ -65,7 +65,8 @@ export class Users {
 
   establecerSesion(res: any) {
     const usuarioProcesado = {
-      uid: res.uid,
+      ...res,
+      uid: res.uid || res.idusuario || res.id,
       nombre: res.nombre,
       rol: res.rol,
       photoURL: `https://ui-avatars.com/api/?name=${encodeURIComponent(res.nombre)}&background=b0001e&color=fff&bold=true`

@@ -384,3 +384,12 @@
         padding: 0;
     }
 }
+
+/* ==========================================================================
+   AGREGADO EXCLUSIVO PARA RENDERIZADO DE CONTENEDORES CANVAS (CHART.JS)
+   ========================================================================== */
+.chart-wrapper {
+    width: 100%;
+    display: block;
+    position: relative;
+}

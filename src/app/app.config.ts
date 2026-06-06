@@ -9,9 +9,6 @@ import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { provideAuth, getAuth } from '@angular/fire/auth';
 import { provideFirestore, getFirestore } from '@angular/fire/firestore';
 
-import { AngularFireModule } from '@angular/fire/compat';
-import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
-
 const firebaseConfig = {
   apiKey: "AIzaSyCnYZoq0GBL8EmP20X081k41x6LXoGTk00",
   authDomain: "autenticacion-9d1dc.firebaseapp.com",
@@ -32,11 +29,6 @@ export const appConfig: ApplicationConfig = {
 
     provideFirebaseApp(() => initializeApp(firebaseConfig)),
     provideAuth(() => getAuth()),
-    provideFirestore(() => getFirestore()),
-
-    importProvidersFrom(
-      AngularFireModule.initializeApp(firebaseConfig),
-      AngularFirestoreModule
-    )
+    provideFirestore(() => getFirestore())
   ]
 };

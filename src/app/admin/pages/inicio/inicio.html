@@ -46,42 +46,63 @@
                 </div>
             </div>
 
+            <div class="row g-4 mb-4">
+                <div class="col-lg-7">
+                    <div class="chart-container p-4 shadow-sm bg-white rounded-card">
+                        <h4 class="mb-3 panel-title">Control de Medicamentos en Inventario</h4>
+                        <p class="text-muted small mb-3">Sustancias activas cargadas en el sistema:</p>
+                        <div class="chart-wrapper" style="position: relative; height: 280px;">
+                            @if (medicamentosControl.length > 0) {
+                            <canvas baseChart [data]="medicamentosChartData" [options]="barChartOptions" [type]="'bar'">
+                            </canvas>
+                            } @else {
+                            <div class="placeholder-chart d-flex align-items-center justify-content-center h-100">
+                                <p class="text-muted m-0">No hay fármacos registrados en el catálogo.</p>
+                            </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-5">
+                    <div class="chart-container p-4 shadow-sm bg-white rounded-card">
+                        <h4 class="mb-3 panel-title">Distribución del Personal HTAS</h4>
+                        <p class="text-muted small mb-3">Porcentaje de cuentas activas según rol:</p>
+                        <div class="chart-wrapper d-flex justify-content-center align-items-center"
+                            style="position: relative; height: 280px;">
+                            <canvas baseChart [data]="usuariosChartData" [options]="doughnutChartOptions"
+                                [type]="'doughnut'">
+                            </canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="row g-4">
                 <div class="col-lg-7">
                     <div class="chart-container p-4 shadow-sm bg-white rounded-card">
-                        <h4 class="mb-4 panel-title">Control de Medicamentos en Inventario</h4>
-
-                        @if (medicamentosControl.length > 0) {
-                        <div class="meds-analiticas-box">
-                            <p class="text-muted small mb-3">Distribución y disponibilidad actual de sustancias activas
-                                cargadas en el sistema:</p>
-                            <div class="meds-list-scroll">
-                                @for (med of medicamentosControl; track med.nombre) {
-                                <div class="med-item-row mb-3">
-                                    <div class="d-flex justify-content-between mb-1 small font-semibold text-slate">
-                                        <span>{{ med.nombre }} <span class="text-muted">({{ med.sustancia }} - {{
-                                                med.concentracion }})</span></span>
-                                        <span class="text-muted">{{ med.presentacion }}</span>
-                                    </div>
-                                    <div class="progress" style="height: 8px;">
-                                        <div class="progress-bar" role="progressbar" [style.width]="'100%'"></div>
-                                    </div>
+                        <h4 class="mb-3 panel-title">Desglose Técnico de Fármacos</h4>
+                        <div class="meds-list-scroll">
+                            @if (medicamentosControl.length > 0) {
+                            @for (med of medicamentosControl; track med.nombre) {
+                            <div class="med-item-row mb-3 border-bottom pb-2">
+                                <div class="d-flex justify-content-between mb-1 small font-semibold text-slate">
+                                    <span>{{ med.nombre }} <span class="text-muted">({{ med.sustancia }} - {{
+                                            med.concentracion }})</span></span>
+                                    <span class="badge badge-info">{{ med.presentacion }}</span>
                                 </div>
-                                }
                             </div>
+                            }
+                            } @else {
+                            <p class="text-muted small m-0">Sin detalles de presentación.</p>
+                            }
                         </div>
-                        } @else {
-                        <div class="placeholder-chart d-flex align-items-center justify-content-center">
-                            <p class="text-muted m-0">No hay fármacos registrados en el catálogo del sistema.</p>
-                        </div>
-                        }
                     </div>
                 </div>
 
                 <div class="col-lg-5">
                     <div class="alerts-container p-4 shadow-sm bg-white rounded-card">
                         <h4 class="mb-4 panel-title">Agenda de Citas Activas</h4>
-
                         <div class="citas-list-scroll">
                             @if (citasRecientes.length > 0) {
                             @for (cita of citasRecientes; track cita.id) {
