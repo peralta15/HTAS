@@ -561,7 +561,9 @@ const authController = {
     const {
       nombre,
       apPaterno,
+      appaterno,
       apMaterno,
+      apmaterno,
       correo,
       telefono,
       genero,
@@ -569,7 +571,9 @@ const authController = {
       fechaNacimiento,
       fechaAsignacion,
       especialidad,
+      especialidad: specialty,
       direccionClinica,
+      direccionclinica,
       rol,
       cedula,
       nss,
@@ -579,22 +583,28 @@ const authController = {
       antecedentesFamiliares,
     } = req.body;
 
+    // Asignación final asegurando que si viene de Angular plano o camelCase, se use el valor real
+    const apellidoPaternoFinal = apPaterno || appaterno;
+    const apellidoMaternoFinal = apMaterno || apmaterno;
+    const direccionClinicaFinal = direccionClinica || direccionclinica;
+
     try {
       await db.query("BEGIN");
 
       // 1. Actualizar tabla base: USUARIOS (Datos básicos comunes)
+      // Agregamos COALESCE o strings vacíos para blindar las columnas ante un NOT NULL accidental
       const result = await db.query(
         `UPDATE USUARIOS 
-       SET Nombre = $1, ApPaterno = $2, ApMaterno = $3, Correo = $4, Telefono = $5, Genero = $6, Activo = $7, Rol = $8
-       WHERE IdUsuario = $9 RETURNING *`,
+        SET Nombre = $1, ApPaterno = $2, ApMaterno = $3, Correo = $4, Telefono = $5, Genero = $6, Activo = $7, Rol = $8
+        WHERE IdUsuario = $9 RETURNING *`,
         [
           nombre,
-          apPaterno,
-          apMaterno,
+          apellidoPaternoFinal || '',
+          apellidoMaternoFinal || '',
           correo,
-          telefono,
-          genero,
-          activo,
+          telefono || 'Sin teléfono',
+          genero || null,
+          activo !== undefined ? activo : true,
           rol,
           id,
         ],
@@ -610,36 +620,36 @@ const authController = {
       // 2. Lógica específica por Rol (Filtra si se enviaron propiedades específicas)
 
       // --- DOCTORES ---
-      // Solo intenta insertar/actualizar si el rol coincide Y si se envió la cédula o la especialidad
       if (
         (rolNormalizado === "doctor" ||
           rolNormalizado === "médico" ||
           rolNormalizado === "medico") &&
         (cedula !== undefined ||
+          especialidad !== undefined ||
           specialty !== undefined ||
-          direccionClinica !== undefined)
+          direccionClinicaFinal !== undefined)
       ) {
         const cedulaFinal = cedula || "00000000";
         const archivoFinal = req.body.archivoCedulaPDF || "";
 
         await db.query(
           `INSERT INTO DOCTORES (IdUsuario, Especialidad, DireccionClinica, Cedula, ArchivoCedulaPDF, TipoSangre, Peso, Altura, AntecedentesFamiliares)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-         ON CONFLICT (IdUsuario) 
-         DO UPDATE SET 
-           Especialidad = COALESCE($2, DOCTORES.Especialidad), 
-           DireccionClinica = COALESCE($3, DOCTORES.DireccionClinica), 
-           Cedula = $4,
-           ArchivoCedulaPDF = CASE WHEN $5 <> '' THEN $5 ELSE DOCTORES.ArchivoCedulaPDF END,
-           TipoSangre = COALESCE($6, DOCTORES.TipoSangre),
-           Peso = COALESCE($7, DOCTORES.Peso),
-           Altura = COALESCE($8, DOCTORES.Altura),
-           AntecedentesFamiliares = COALESCE($9, DOCTORES.AntecedentesFamiliares),
-           updated_at = CURRENT_TIMESTAMP`,
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+          ON CONFLICT (IdUsuario) 
+          DO UPDATE SET 
+            Especialidad = COALESCE($2, DOCTORES.Especialidad), 
+            DireccionClinica = COALESCE($3, DOCTORES.DireccionClinica), 
+            Cedula = $4,
+            ArchivoCedulaPDF = CASE WHEN $5 <> '' THEN $5 ELSE DOCTORES.ArchivoCedulaPDF END,
+            TipoSangre = COALESCE($6, DOCTORES.TipoSangre),
+            Peso = COALESCE($7, DOCTORES.Peso),
+            Altura = COALESCE($8, DOCTORES.Altura),
+            AntecedentesFamiliares = COALESCE($9, DOCTORES.AntecedentesFamiliares),
+            updated_at = CURRENT_TIMESTAMP`,
           [
             id,
             especialidad || null,
-            direccionClinica || null,
+            direccionClinicaFinal || null,
             cedulaFinal,
             archivoFinal,
             tipoSangre || null,
@@ -651,7 +661,6 @@ const authController = {
       }
 
       // --- ACOMPAÑANTES ---
-      // Solo procesa si se envían los campos de fecha desde el cliente
       else if (
         (rolNormalizado === "acompañante" ||
           rolNormalizado === "acompanante") &&
@@ -674,18 +683,17 @@ const authController = {
 
         await db.query(
           `INSERT INTO ACOMPANANTES (IdUsuario, FechaNacimiento, FechaAsignacion)
-         VALUES ($1, $2, $3)
-         ON CONFLICT (IdUsuario)
-         DO UPDATE SET 
-           FechaNacimiento = EXCLUDED.FechaNacimiento,
-           FechaAsignacion = EXCLUDED.FechaAsignacion,
-           updated_at = CURRENT_TIMESTAMP`,
+          VALUES ($1, $2, $3)
+          ON CONFLICT (IdUsuario)
+          DO UPDATE SET 
+            FechaNacimiento = EXCLUDED.FechaNacimiento,
+            FechaAsignacion = EXCLUDED.FechaAsignacion,
+            updated_at = CURRENT_TIMESTAMP`,
           [id, fnLimpia, faLimpia],
         );
       }
 
       // --- PACIENTES ---
-      // Solo procesa si el payload contiene datos clínicos definidos
       else if (
         rolNormalizado === "paciente" &&
         (nss !== undefined ||
@@ -696,15 +704,15 @@ const authController = {
         const nssFinal = nss || "";
         await db.query(
           `INSERT INTO PACIENTES (IdUsuario, NSS, TipoSangre, Peso, Altura, AntecedentesFamiliares)
-         VALUES ($1, $2, $3, $4, $5, $6)
-         ON CONFLICT (IdUsuario) 
-         DO UPDATE SET 
-           NSS = $2,
-           TipoSangre = COALESCE($3, PACIENTES.TipoSangre),
-           Peso = COALESCE($4, PACIENTES.Peso),
-           Altura = COALESCE($5, PACIENTES.Altura),
-           AntecedentesFamiliares = COALESCE($6, PACIENTES.AntecedentesFamiliares),
-           updated_at = CURRENT_TIMESTAMP`,
+          VALUES ($1, $2, $3, $4, $5, $6)
+          ON CONFLICT (IdUsuario) 
+          DO UPDATE SET 
+            NSS = $2,
+            TipoSangre = COALESCE($3, PACIENTES.TipoSangre),
+            Peso = COALESCE($4, PACIENTES.Peso),
+            Altura = COALESCE($5, PACIENTES.Altura),
+            AntecedentesFamiliares = COALESCE($6, PACIENTES.AntecedentesFamiliares),
+            updated_at = CURRENT_TIMESTAMP`,
           [
             id,
             nssFinal,
