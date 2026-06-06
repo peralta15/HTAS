@@ -27,25 +27,37 @@ export class Menu implements OnInit, OnDestroy {
   public user$: Observable<any> = this.googleService.user$;
   userName: string = 'Usuario';
   userPhoto: string = '';
+  userRol: string = '';
+  searchTerm: string = '';
 
-  navItems = [
-    { category: 'General', items: [{ route: '/inicio', icon: 'bi-speedometer2', label: 'Inicio' }] },
+  // TU ESTRUCTURA BASE ORIGINAL INTACTA
+  private allNavItems = [
+    { category: 'General', items: [{ route: '/inicio', icon: 'bi-speedometer2', label: 'Inicio', queryParams: {} }] },
     {
       category: 'Administración',
       items: [
-        { route: '/usuarios', icon: 'bi-people', label: 'Usuarios' },
-        { route: '/medicos', icon: 'bi-person-badge', label: 'Médicos' },
-        { route: '/pacientes', icon: 'bi-person-heart', label: 'Pacientes' },
-        { route: '/acompanantes', icon: 'bi-person-fill-add', label: 'Acompañantes' }
+        { route: '/usuarios', icon: 'bi-people', label: 'Usuarios', queryParams: {} },
+        { route: '/medicos', icon: 'bi-person-badge', label: 'Médicos', queryParams: {} },
+        { route: '/pacientes', icon: 'bi-person-heart', label: 'Pacientes', queryParams: {} },
+        { route: '/acompanantes', icon: 'bi-person-fill-add', label: 'Acompañantes', queryParams: {} }
       ]
     },
-    { category: 'Seguimiento', items: [{ route: '/citas', icon: 'bi-calendar-check', label: 'Citas' }, { route: '/tratamientos', icon: 'bi bi-clipboard-data', label: 'Tratamientos' }, { route: '/medicamentos', icon: 'bi-capsule', label: 'Medicamentos' }, { route: '/dispositivos', icon: 'bi-heart-pulse', label: 'Dispositivos' }] },
-    { category: 'Cuenta', items: [{ route: '/configuracion', icon: 'bi-gear', label: 'Configuración' }, { route: '/login', icon: 'bi-box-arrow-right', label: 'Cerrar Sesión' }] }
+    {
+      category: 'Seguimiento',
+      items: [
+        { route: '/citas', icon: 'bi-calendar-check', label: 'Citas', queryParams: {} },
+        { route: '/tratamientos', icon: 'bi-clipboard-data', label: 'Tratamientos', queryParams: {} },
+        { route: '/medicamentos', icon: 'bi-capsule', label: 'Medicamentos', queryParams: {} },
+        { route: '/dispositivos', icon: 'bi-heart-pulse', label: 'Dispositivos', queryParams: {} }
+      ]
+    },
+    { category: 'Cuenta', items: [{ route: '/configuracion', icon: 'bi-gear', label: 'Configuración', queryParams: {} }] }
   ];
+
+  menuFiltrado: any[] = [];
 
   ngOnInit() {
     const uService = this.usersService as any;
-    // Detectar si estamos en el navegador
     const isBrowser = typeof window !== 'undefined';
 
     if (isBrowser && uService.cargarSesionPersistente) {
@@ -57,29 +69,110 @@ export class Menu implements OnInit, OnDestroy {
       (uService.currentUser$ || of(null)).pipe(startWith(null))
     ]).subscribe((res: any[]) => {
       const gUser = res[0];
-
-      // PROTECCIÓN: Solo intentar leer localStorage si es el navegador
       let pUser = res[1];
+
       if (!pUser && isBrowser) {
         const saved = localStorage.getItem('user_htas');
         pUser = saved ? JSON.parse(saved) : null;
       }
 
+      // PRIORIDAD 1: Usuarios registrados/autenticados que provienen de PostgreSQL
       if (pUser) {
         this.userName = pUser.nombre || pUser.NombreCompleto || 'Usuario';
-        this.userPhoto = pUser.photoURL || this.generarAvatar(this.userName);
-      } else if (gUser) {
+        // Respeta la foto guardada en base de datos; si no tiene, genera sus iniciales
+        this.userPhoto = pUser.photoURL || pUser.foto || this.generarAvatar(this.userName);
+        this.userRol = pUser.rol || '';
+
+        if (!uService.currentUserSubject.value) {
+          uService.currentUserSubject.next(pUser);
+        }
+      }
+      // PRIORIDAD 2: Fallback directo a sesión activa de Google temporal
+      else if (gUser) {
         this.userName = gUser.nombre || gUser.displayName || 'Usuario';
         this.userPhoto = gUser.photoURL || this.generarAvatar(this.userName);
-      } else {
+        this.userRol = 'Paciente';
+      }
+      // PRIORIDAD 3: Estado Invitado
+      else {
         this.userName = 'Invitado';
         this.userPhoto = this.generarAvatar('Invitado');
+        this.userRol = 'Invitado';
       }
 
-      // Evita el error NG0100 usando un pequeño delay
+      this.generarMenuPorRol();
+
       setTimeout(() => {
         this.cdr.detectChanges();
       }, 0);
+    });
+  }
+
+  private generarMenuPorRol() {
+    // Clonación profunda para no alterar "allNavItems" jamás
+    const mapeoOriginal = JSON.parse(JSON.stringify(this.allNavItems));
+    const rol = this.userRol.toLowerCase();
+
+    this.menuFiltrado = mapeoOriginal.filter((section: any) => {
+
+      // REGLAS PARA ROL: INVITADO
+      if (rol === 'invitado') {
+        if (section.category === 'Administración') return false;
+        if (section.category === 'Seguimiento') {
+          section.items.forEach((item: any) => {
+            item.queryParams = { canAdd: false, canEdit: false, canDelete: false };
+          });
+        }
+      }
+
+      // REGLAS PARA ROL: PACIENTE
+      if (rol === 'paciente') {
+        if (section.category === 'Administración') {
+          section.items = section.items.filter((i: any) => i.route === '/usuarios');
+        }
+        if (section.category === 'Seguimiento') {
+          section.items.forEach((item: any) => {
+            if (item.route === '/citas') item.queryParams = { canAdd: true, canEdit: false, canDelete: false };
+            if (item.route === '/tratamientos' || item.route === '/medicamentos') item.queryParams = { canAdd: false, canEdit: false, canDelete: false };
+            if (item.route === '/dispositivos') item.queryParams = { canAdd: true, canEdit: false, canDelete: false };
+          });
+        }
+      }
+
+      // REGLAS PARA ROL: ACOMPAÑANTE
+      if (rol === 'acompañante' || rol === 'acompanante') {
+        if (section.category === 'Administración') {
+          section.items = section.items.filter((i: any) => i.route === '/usuarios');
+        }
+        if (section.category === 'Seguimiento') {
+          section.items.forEach((item: any) => {
+            if (item.route === '/citas') item.queryParams = { canAdd: false, canEdit: false, canDelete: false };
+            if (item.route === '/tratamientos' || item.route === '/medicamentos') item.queryParams = { canAdd: false, canEdit: false, canDelete: false };
+            if (item.route === '/dispositivos') item.queryParams = { canAdd: false, canEdit: true, canDelete: false };
+          });
+        }
+      }
+
+      // REGLAS PARA ROL: MÉDICO / DOCTOR
+      if (rol === 'doctor' || rol === 'medico') {
+        if (section.category === 'Administración') {
+          section.items = section.items.filter((i: any) => i.route !== '/medicos');
+          section.items.forEach((item: any) => {
+            if (item.route === '/pacientes' || item.route === '/acompanantes') {
+              item.queryParams = { canAdd: true, canEdit: true, canDelete: true };
+            }
+          });
+        }
+        if (section.category === 'Seguimiento') {
+          section.items.forEach((item: any) => {
+            if (item.route === '/tratamientos' || item.route === '/medicamentos' || item.route === '/dispositivos') {
+              item.queryParams = { canAdd: true, canEdit: true, canDelete: true };
+            }
+          });
+        }
+      }
+
+      return section.items.length > 0;
     });
   }
 
@@ -87,13 +180,42 @@ export class Menu implements OnInit, OnDestroy {
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(nombre)}&background=b0001e&color=fff&bold=true`;
   }
 
+  // Método de auxilio por si la URL de la imagen guardada o externa falla en responder
+  public generarAvatarFallback(nombre: string): string {
+    return this.generarAvatar(nombre);
+  }
+
   ngOnDestroy() {
     this.authSub?.unsubscribe();
   }
 
   toggleSidebar() { this.isCollapsed = !this.isCollapsed; }
-  toggleSearch() { this.showSearch = !this.showSearch; }
-  onSearch(v: string) { if (v.trim()) console.log('Buscando:', v); }
+
+  toggleSearch() {
+    this.showSearch = !this.showSearch;
+    if (!this.showSearch) this.searchTerm = '';
+  }
+
+  // Escanea e interactúa con el contenido directo basándose en los privilegios de su rol actual
+  onSearch(value: string) {
+    this.searchTerm = value;
+    const query = value.toLowerCase().trim();
+
+    if (!query) return;
+
+    for (const section of this.menuFiltrado) {
+      const matchItem = section.items.find((item: any) =>
+        item.label.toLowerCase().includes(query)
+      );
+
+      if (matchItem) {
+        this.router.navigate([matchItem.route], { queryParams: matchItem.queryParams });
+        this.searchTerm = '';
+        this.showSearch = false;
+        break;
+      }
+    }
+  }
 
   logout() {
     this.googleService.logout();

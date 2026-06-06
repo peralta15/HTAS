@@ -26,7 +26,7 @@
                     <input type="text" [(ngModel)]="searchTerm" placeholder="Buscar por paciente o motivo...">
                 </div>
 
-                @if (currentUser?.rol?.toLowerCase() === 'paciente') {
+                @if (verificarPermiso('crear')) {
                 <button class="btn-save btn-new-appointment" (click)="abrirCrearCita()">
                     <i class="bi bi-plus-lg"></i>
                     <span>Cita</span>
@@ -34,15 +34,19 @@
                 }
 
                 <div class="action-buttons-group" [class.visible]="citaSeleccionada">
+                    @if (verificarPermiso('editar')) {
                     <button class="btn-action btn-edit-premium" (click)="abrirEditarCita()" title="Editar cita">
                         <i class="bi bi-pencil-fill"></i>
                         <span>Editar</span>
                     </button>
+                    }
 
+                    @if (verificarPermiso('eliminar')) {
                     <button class="btn-action btn-delete-premium" (click)="abrirEliminarCita()" title="Eliminar cita">
                         <i class="bi bi-trash-fill"></i>
                         <span>Eliminar</span>
                     </button>
+                    }
                 </div>
             </div>
         </div>
@@ -177,8 +181,6 @@
         </div>
     </div>
 </main>
-
-
 
 @if (mostrarModalCrear) {
 <div class="modal-overlay">

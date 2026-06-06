@@ -1,7 +1,8 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Menu } from "../menu/menu";
-import { Users } from '../../../auth/services/users'; // <--- Inyectamos directamente tu servicio existente
+import { Users } from '../../../auth/services/users';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-notificaciones',
@@ -10,8 +11,10 @@ import { Users } from '../../../auth/services/users'; // <--- Inyectamos directa
   templateUrl: './notificaciones.html',
   styleUrl: './notificaciones.css',
 })
-export class Notificaciones implements OnInit {
-  public usersService = inject(Users); // <--- Inyección del servicio
+export class Notificaciones implements OnInit, OnDestroy {
+  public usersService = inject(Users);
+  private cdr = inject(ChangeDetectorRef);
+  private userSub!: Subscription;
 
   rolUsuario: string = '';
   loading: boolean = false;
@@ -23,73 +26,87 @@ export class Notificaciones implements OnInit {
   notificacionesAcompanante: any[] = [];
 
   ngOnInit() {
-    // Nos suscribimos al estado del usuario logueado en tu servicio
-    this.usersService.currentUser$.subscribe(user => {
-      // Si por alguna razón no hay sesión en el Subject, intentamos levantar la persistente
+    this.userSub = this.usersService.currentUser$.subscribe(user => {
       if (!user) {
         this.usersService.cargarSesionPersistente();
         return;
       }
 
-      // Extraemos los datos reales guardados tras el login exitoso
+      // Normalizamos la asignación del rol conservando el valor real
       this.rolUsuario = user.rol;
       this.cargarNotificacionesDeServicio(user);
     });
   }
 
+  ngOnDestroy() {
+    if (this.userSub) {
+      this.userSub.unsubscribe();
+    }
+  }
+
   cargarNotificacionesDeServicio(user: any) {
     this.loading = true;
+    const rolLower = (this.rolUsuario || '').toLowerCase();
 
-    if (this.rolUsuario === 'Doctor') {
-      // 1. Cargar todos los usuarios registrados del sistema (usando tu método real)
+    // Médicos y Administradores visualizan globalmente todas las alertas del sistema
+    if (rolLower === 'doctor' || rolLower === 'medico' || rolLower === 'administrador' || rolLower === 'admin') {
+
+      // 1. Cargar todos los usuarios registrados del sistema
       this.usersService.getRegistrosUsuarios().subscribe({
-        next: (res) => { this.registrosUsuarios = res; },
-        error: (err) => console.error('Error al obtener usuarios en panel médico:', err)
+        next: (res) => {
+          this.registrosUsuarios = res || [];
+          this.cdr.detectChanges();
+        },
+        error: (err) => console.error('Error al obtener usuarios en panel de control:', err)
       });
 
-      // 2. Cargar alertas del médico (citas, tratamientos, dispositivos)
+      // 2. Cargar todas las alertas (Citas, tratamientos, medicamentos y dispositivos)
       this.usersService.getAlertasMedicas().subscribe({
         next: (res) => {
-          this.alertasMedicas = res;
+          this.alertasMedicas = res || [];
           this.loading = false;
+          this.cdr.detectChanges();
         },
         error: (err) => {
-          console.error('Error al obtener alertas médicas:', err);
+          console.error('Error al obtener alertas del sistema:', err);
           this.loading = false;
+          this.cdr.detectChanges();
         }
       });
     }
 
-    else if (this.rolUsuario === 'Paciente') {
-      // Cargar notificaciones personalizadas para el paciente mediante su correo real
+    else if (rolLower === 'paciente') {
       this.usersService.getNotificacionesPaciente(user.correo || user.Email).subscribe({
         next: (res) => {
-          this.notificacionesPaciente = res;
+          this.notificacionesPaciente = res || [];
           this.loading = false;
+          this.cdr.detectChanges();
         },
         error: (err) => {
           console.error('Error al obtener alertas del paciente:', err);
           this.loading = false;
+          this.cdr.detectChanges();
         }
       });
     }
 
-    else if (this.rolUsuario === 'Acompañante') {
-      // Cargar alertas del acompañante usando su UID o ID numérico de la sesión
+    else if (rolLower === 'acompañante' || rolLower === 'acompanante') {
       this.usersService.getNotificacionesAcompanante(user.uid || user.IdUsuario).subscribe({
         next: (res) => {
-          this.notificacionesAcompanante = res;
+          this.notificacionesAcompanante = res || [];
           this.loading = false;
+          this.cdr.detectChanges();
         },
         error: (err) => {
           console.error('Error al obtener alertas del acompañante:', err);
           this.loading = false;
+          this.cdr.detectChanges();
         }
       });
     }
   }
 
-  // selectores CSS dinámicos basados en la Paleta de Colores
+  // Selectores CSS dinámicos basados en la Paleta de Colores de HTAS
   obtenerIconoClase(tipo: string): string {
     if (!tipo) return 'bg-secondary';
     const t = tipo.toLowerCase();

@@ -27,22 +27,29 @@
                         placeholder="Buscar tratamiento (paciente, medicamento)...">
                 </div>
 
+                @if (verificarPermiso('crear')) {
                 <button class="btn-save" (click)="abrirCrear()">
                     <i class="bi bi-plus-lg"></i>
                     <span>Nuevo</span>
                 </button>
+                }
 
                 <div class="action-buttons-group" [class.visible]="tratamientoSeleccionado">
+                    @if (verificarPermiso('editar')) {
                     <button class="btn-action btn-edit-premium" (click)="abrirDetalle(tratamientoSeleccionado)"
                         title="Editar tratamiento" [disabled]="!tratamientoSeleccionado">
                         <i class="bi bi-pencil-fill"></i>
                         <span>Editar</span>
                     </button>
+                    }
+
+                    @if (verificarPermiso('eliminar')) {
                     <button class="btn-action btn-delete-premium" (click)="abrirEliminar()"
                         title="Eliminar tratamiento">
                         <i class="bi bi-trash-fill"></i>
                         <span>Eliminar</span>
                     </button>
+                    }
                 </div>
             </div>
         </div>
@@ -106,7 +113,7 @@
                     }
                     @if (tratamientosPaginados.length === 0) {
                     <tr>
-                        <td colspan="6" class="empty-state">
+                        <td colspan="5" class="empty-state">
                             <i class="bi bi-clipboard-pulse"></i>
                             <p>No se encontraron tratamientos registrados.</p>
                         </td>
@@ -144,7 +151,7 @@
             <div class="form-grid-modal">
 
                 <div class="form-group" style="position: relative;">
-                    <label>Paciente <span class="text-danger"></span></label>
+                    <label>Paciente</label>
                     <div class="search-box-pill" style="width: 100%; border-radius: 8px;">
                         <i class="bi bi-search"></i>
                         <input type="text" [(ngModel)]="filtroPacienteModal" (focus)="mostrarDropdownPacientes = true"
@@ -166,7 +173,7 @@
                 </div>
 
                 <div class="form-group" style="position: relative;">
-                    <label>Medicamento <span class="text-danger"></span></label>
+                    <label>Medicamento</label>
                     <div class="search-box-pill" style="width: 100%; border-radius: 8px;">
                         <i class="bi bi-search"></i>
                         <input type="text" [(ngModel)]="filtroMedicamentoModal"
@@ -190,26 +197,26 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Dosis <span class="text-danger"></span></label>
+                    <label>Dosis</label>
                     <input type="text" [(ngModel)]="nuevoTratamiento.dosis" maxlength="100" class="form-control-premium"
                         placeholder="Ej: 1 tableta de 500mg, 5 ml...">
                 </div>
 
                 <div class="form-group">
-                    <label>Frecuencia (Horas) <span class="text-danger"></span></label>
+                    <label>Frecuencia (Horas)</label>
                     <input type="number" [(ngModel)]="nuevoTratamiento.frecuenciaHoras" min="1" max="168"
                         class="form-control-premium" placeholder="Ej: 8 (Cada 8 horas)">
                 </div>
 
                 <div class="form-group">
-                    <label for="fechaInicioInput">Fecha de Inicio <span class="text-danger"></span></label>
+                    <label for="fechaInicioInput">Fecha de Inicio</label>
                     <input type="text" id="fechaInicioInput" class="form-control-premium calendar-input"
                         placeholder="Seleccione la fecha de inicio" [(ngModel)]="nuevoTratamiento.fechaInicio"
                         name="fechaInicio" readonly>
                 </div>
 
                 <div class="form-group">
-                    <label for="fechaFinInput">Fecha de Finalización <span class="text-danger"></span></label>
+                    <label for="fechaFinInput">Fecha de Finalización</label>
                     <input type="text" id="fechaFinInput" class="form-control-premium calendar-input"
                         placeholder="Seleccione la fecha de término" [(ngModel)]="nuevoTratamiento.fechaFin"
                         name="fechaFin" readonly>

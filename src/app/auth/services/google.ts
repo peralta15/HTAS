@@ -68,7 +68,8 @@ export class GoogleService {
     }
   }
 
-  async loginWithGoogle() {
+  // Modificamos la firma de la función para aceptar el rol deseado
+  async loginWithGoogle(rolSolicitado: string = 'Paciente') {
     const provider = new GoogleAuthProvider();
     const result = await signInWithPopup(this.auth, provider);
     const user = result.user;
@@ -81,7 +82,8 @@ export class GoogleService {
       nombre: partes[0] || 'Usuario',
       apPaterno: partes[1] || '',
       apMaterno: partes.slice(2).join(' ') || '',
-      uid_firebase: user.uid
+      uid_firebase: user.uid,
+      rol: rolSolicitado // <-- Enviamos el rol dinámico al backend
     };
 
     try {
@@ -89,7 +91,6 @@ export class GoogleService {
         this.http.post(`${this.apiUrl}/google-login`, datosParaBackend)
       );
 
-      // Si el usuario no está verificado, mandamos el PIN que nos dio el backend
       if (response && response.pinVerificado === false) {
         await this.enviarEmailPin(user.email!, response.nombre, response.pin);
       }

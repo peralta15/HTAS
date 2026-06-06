@@ -22,6 +22,7 @@ export class Dispositivos implements OnInit, OnDestroy {
   dispositivosTodo: any[] = [];
   pacientesLista: any[] = [];
   searchTerm: string = '';
+  currentUser: any = null;
 
   // Paginación
   paginaActual = 0;
@@ -51,12 +52,41 @@ export class Dispositivos implements OnInit, OnDestroy {
 
   async ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
+      const saved = localStorage.getItem('user_htas');
+      if (saved) {
+        this.currentUser = JSON.parse(saved);
+      }
       await this.cargarDispositivos();
+      await this.cargarPacientesAuxiliares();
     }
   }
 
   ngOnDestroy() {
     if (this.toastTimeout) clearTimeout(this.toastTimeout);
+  }
+
+  /**
+   * Validador estricto de roles para el módulo de DISPOSITIVOS:
+   * - 'administrador' y 'medico' pueden todo.
+   * - 'paciente' SOLO puede crear (agregar).
+   * - 'acompañante' SOLO puede editar.
+   * - 'invitado' SOLO puede visualizar.
+   */
+  verificarPermiso(accion: 'crear' | 'editar' | 'eliminar'): boolean {
+    if (!this.currentUser || !this.currentUser.rol) return false;
+
+    const rol = this.currentUser.rol.toLowerCase();
+
+    switch (accion) {
+      case 'crear':
+        return rol === 'administrador' || rol === 'medico' || rol === 'paciente';
+      case 'editar':
+        return rol === 'administrador' || rol === 'medico' || rol === 'acompañante';
+      case 'eliminar':
+        return rol === 'administrador' || rol === 'medico';
+      default:
+        return false;
+    }
   }
 
   lanzarNotificacion(mensaje: string, tipo: 'success' | 'error' | 'warning' = 'success') {
@@ -81,6 +111,16 @@ export class Dispositivos implements OnInit, OnDestroy {
       console.error('Error al cargar dispositivos:', error);
       this.dispositivosTodo = [];
       this.lanzarNotificacion('Error al conectar con el servidor de dispositivos.', 'error');
+    }
+  }
+
+  async cargarPacientesAuxiliares() {
+    try {
+      const users = await firstValueFrom(this.usersService.getUsuariosBackend());
+      this.pacientesLista = (users || []).filter((u: any) => u.rol && u.rol.toLowerCase() === 'paciente');
+      this.cdr.detectChanges();
+    } catch (error) {
+      console.error('Error al cargar catálogo de pacientes:', error);
     }
   }
 
@@ -112,17 +152,17 @@ export class Dispositivos implements OnInit, OnDestroy {
     this.dispositivoSeleccionado = { ...d };
   }
 
-  /**
-   * Redirige formalmente a la vista detallada de edición.
-   * Envía el parámetro de ID en la URL y el objeto completo en el State.
-   */
   irADetalle(dispositivo: any) {
+    if (!this.verificarPermiso('editar')) {
+      this.lanzarNotificacion('Tu rol no cuenta con permisos para editar dispositivos.', 'error');
+      return;
+    }
+
     if (!dispositivo) {
       this.lanzarNotificacion('Por favor, selecciona un dispositivo para editar.', 'warning');
       return;
     }
 
-    // Extrae el ID controlando variaciones de mayúsculas/minúsculas de la base de datos
     const id = dispositivo.iddispositivo || dispositivo.idDispositivo || dispositivo.id;
 
     this.router.navigate(['/dispositivos/editar', id], {
@@ -131,6 +171,11 @@ export class Dispositivos implements OnInit, OnDestroy {
   }
 
   abrirCrear() {
+    if (!this.verificarPermiso('crear')) {
+      this.lanzarNotificacion('Tu rol no cuenta con permisos para registrar dispositivos.', 'error');
+      return;
+    }
+
     this.dispositivoForm = {
       idDispositivo: null,
       nombre: '',
@@ -143,6 +188,11 @@ export class Dispositivos implements OnInit, OnDestroy {
   }
 
   async guardarDispositivo() {
+    if (!this.verificarPermiso('crear')) {
+      this.lanzarNotificacion('Operación rechazada debido a tus restricciones de rol.', 'error');
+      return;
+    }
+
     if (!this.dispositivoForm.nombre.trim()) {
       this.lanzarNotificacion('El nombre del dispositivo es obligatorio.', 'warning');
       return;
@@ -177,6 +227,11 @@ export class Dispositivos implements OnInit, OnDestroy {
   }
 
   abrirEliminar() {
+    if (!this.verificarPermiso('eliminar')) {
+      this.lanzarNotificacion('Tu rol no cuenta con permisos para eliminar dispositivos.', 'error');
+      return;
+    }
+
     if (!this.dispositivoSeleccionado) {
       this.lanzarNotificacion('Selecciona un dispositivo de la tabla primero.', 'warning');
       return;
@@ -185,6 +240,11 @@ export class Dispositivos implements OnInit, OnDestroy {
   }
 
   async confirmarEliminar() {
+    if (!this.verificarPermiso('eliminar')) {
+      this.lanzarNotificacion('Acción denegada por permisos de seguridad.', 'error');
+      return;
+    }
+
     if (!this.dispositivoSeleccionado) return;
     this.isDeleting = true;
     try {

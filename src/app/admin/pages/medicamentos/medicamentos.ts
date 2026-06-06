@@ -26,6 +26,11 @@ export class Medicamentos implements OnInit, OnDestroy {
   paginaActual = 0;
   itemsPorPagina = 10;
 
+  // Variables de control operacionales
+  canAdd: boolean = false;
+  canEdit: boolean = false;
+  canDelete: boolean = false;
+
   // Selección y modales
   medicamentoSeleccionado: any = null;
   mostrarModalCrear = false;
@@ -33,7 +38,6 @@ export class Medicamentos implements OnInit, OnDestroy {
   isSaving = false;
   isDeleting = false;
 
-  // Estructura limpia adaptada al backend
   nuevoMedicamento: any = {
     nombreComercial: '',
     sustanciaActiva: '',
@@ -51,12 +55,45 @@ export class Medicamentos implements OnInit, OnDestroy {
 
   async ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
+      this.establecerPermisosPorRol();
       await this.cargarMedicamentos();
     }
   }
 
   ngOnDestroy() {
     if (this.toastTimeout) clearTimeout(this.toastTimeout);
+  }
+
+  /**
+   * Evalúa de forma estricta la matriz de accesos requerida.
+   * Modificado para admitir al rol de 'administrador'.
+   */
+  private establecerPermisosPorRol() {
+    const uService = this.usersService as any;
+    let rolUsuario = 'invitado';
+
+    if (uService.currentUserSubject && uService.currentUserSubject.value) {
+      rolUsuario = (uService.currentUserSubject.value.rol || 'invitado').toLowerCase();
+    } else {
+      const saved = localStorage.getItem('user_htas');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        rolUsuario = (parsed.rol || 'invitado').toLowerCase();
+      }
+    }
+
+    // Regla del sistema: Tanto Médico como Administrador gestionan completamente medicamentos
+    if (rolUsuario === 'doctor' || rolUsuario === 'medico' || rolUsuario === 'administrador') {
+      this.canAdd = true;
+      this.canEdit = true;
+      this.canDelete = true;
+    } else {
+      // Paciente, Acompañante e Invitado quedan en modo Solo Visualizar
+      this.canAdd = false;
+      this.canEdit = false;
+      this.canDelete = false;
+    }
+    this.cdr.detectChanges();
   }
 
   lanzarNotificacion(mensaje: string, tipo: 'success' | 'error' | 'warning' = 'success') {
@@ -110,11 +147,15 @@ export class Medicamentos implements OnInit, OnDestroy {
   }
 
   seleccionarMedicamento(m: any) {
+    // Si no tiene permisos de edición ni borrado, no permitimos activar la selección visual
+    if (!this.canEdit && !this.canDelete) return;
+
     this.medicamentoSeleccionado = { ...m };
     this.cdr.detectChanges();
   }
 
   abrirDetalle(m: any) {
+    if (!this.canEdit) return;
     const id = m.IdMedicamento || m.idmedicamento || m.id;
     this.router.navigate(['/medicamentos/editar', id], {
       state: { medicamento: m }
@@ -122,6 +163,7 @@ export class Medicamentos implements OnInit, OnDestroy {
   }
 
   abrirCrear() {
+    if (!this.canAdd) return;
     this.nuevoMedicamento = {
       nombreComercial: '',
       sustanciaActiva: '',
@@ -135,13 +177,14 @@ export class Medicamentos implements OnInit, OnDestroy {
   }
 
   async guardarNuevoMedicamento() {
+    if (!this.canAdd) return;
     if (!this.nuevoMedicamento.nombreComercial || !this.nuevoMedicamento.nombreComercial.trim()) {
       this.lanzarNotificacion('El nombre comercial del medicamento es obligatorio.', 'warning');
       return;
     }
 
     this.isSaving = true;
-    this.cdr.detectChanges(); // Renderiza el spinner de inmediato
+    this.cdr.detectChanges();
 
     try {
       await firstValueFrom(this.usersService.crearMedicamento(this.nuevoMedicamento));
@@ -152,13 +195,13 @@ export class Medicamentos implements OnInit, OnDestroy {
       console.error('Error al guardar medicamento en componente:', error);
       this.lanzarNotificacion('No se pudo registrar el medicamento. Revisa la consola.', 'error');
     } finally {
-      // Garantiza que el botón se libere pase lo que pase en la solicitud HTTP
       this.isSaving = false;
       this.cdr.detectChanges();
     }
   }
 
   abrirEliminar() {
+    if (!this.canDelete) return;
     if (!this.medicamentoSeleccionado) {
       this.lanzarNotificacion('Selecciona un medicamento de la tabla primero.', 'warning');
       return;
@@ -168,7 +211,7 @@ export class Medicamentos implements OnInit, OnDestroy {
   }
 
   async confirmarEliminar() {
-    if (!this.medicamentoSeleccionado) return;
+    if (!this.canDelete || !this.medicamentoSeleccionado) return;
     this.isDeleting = true;
     this.cdr.detectChanges();
 

@@ -47,13 +47,13 @@ export class Citas implements OnInit, OnDestroy {
     sintomas: ''
   };
 
-  // Sistema de Notificaciones Premium integradas (Reemplazo de Swal)
+  // Sistema de Notificaciones Premium
   mostrarToast = false;
   mensajeToast = '';
   tipoToast: 'success' | 'error' | 'warning' = 'success';
   private toastTimeout: any = null;
 
-  // Instancias locales de Flatpickr para destruirlas adecuadamente
+  // Instancias locales de Flatpickr
   private fpFechaInstance: any = null;
   private fpHoraInstance: any = null;
 
@@ -72,7 +72,33 @@ export class Citas implements OnInit, OnDestroy {
     if (this.toastTimeout) clearTimeout(this.toastTimeout);
   }
 
-  // Controlador de Lanzamiento de Notificación Flotante
+  /**
+   * Validador de permisos ajustado: Médicos y Administradores controlan todo,
+   * Pacientes solo crean.
+   */
+  verificarPermiso(accion: 'crear' | 'editar' | 'eliminar'): boolean {
+    if (!this.currentUser || !this.currentUser.rol) return false;
+
+    const rol = this.currentUser.rol.toLowerCase();
+
+    switch (accion) {
+      case 'crear':
+        // Pacientes, Médicos y Administradores pueden generar citas
+        return rol === 'paciente' || rol === 'medico' || rol === 'administrador';
+
+      case 'editar':
+        // Tanto Médicos como el Administrador pueden editar citas
+        return rol === 'medico' || rol === 'administrador';
+
+      case 'eliminar':
+        // Tanto Médicos como el Administrador pueden eliminar/cancelar citas
+        return rol === 'medico' || rol === 'administrador';
+
+      default:
+        return false;
+    }
+  }
+
   lanzarNotificacion(mensaje: string, tipo: 'success' | 'error' | 'warning' = 'success') {
     this.mensajeToast = mensaje;
     this.tipoToast = tipo;
@@ -134,6 +160,11 @@ export class Citas implements OnInit, OnDestroy {
   }
 
   abrirCrearCita() {
+    if (!this.verificarPermiso('crear')) {
+      this.lanzarNotificacion('No posees los permisos requeridos para agendar citas.', 'error');
+      return;
+    }
+
     const hoy = new Date();
     const anio = hoy.getFullYear();
     const mes = String(hoy.getMonth() + 1).padStart(2, '0');
@@ -152,6 +183,11 @@ export class Citas implements OnInit, OnDestroy {
   }
 
   async guardarNuevaCita() {
+    if (!this.verificarPermiso('crear')) {
+      this.lanzarNotificacion('Acción denegada por restricciones de rol.', 'error');
+      return;
+    }
+
     if (!this.nuevaCita.fecha || !this.nuevaCita.hora || !this.nuevaCita.motivo.trim()) {
       this.lanzarNotificacion('Por favor llena los campos obligatorios del formulario.', 'warning');
       return;
@@ -177,7 +213,7 @@ export class Citas implements OnInit, OnDestroy {
       await firstValueFrom(this.usersService.crearCita(citaParaEnviar));
       await this.cargarCitas();
       this.cerrarModal();
-      this.lanzarNotificacion('¡Éxito! Tu cita médica ha sido agendada correctamente.', 'success');
+      this.lanzarNotificacion('¡Éxito! La cita médica ha sido agendada correctamente.', 'success');
     } catch (error) {
       console.error('Error al guardar cita:', error);
       this.lanzarNotificacion('No se pudo agendar la cita médica en el servidor.', 'error');
@@ -187,31 +223,36 @@ export class Citas implements OnInit, OnDestroy {
     }
   }
 
-  async guardarCambiosCita() {
-    if (!this.citaSeleccionada) return;
-    this.isSaving = true;
-
-    try {
-      const datosUpdate = {
-        estado: this.citaSeleccionada.tempEstado,
-        notasDoctor: this.citaSeleccionada.notasdoctor
-      };
-
-      await firstValueFrom(this.usersService.actualizarEstadoCita(this.citaSeleccionada.idcita, datosUpdate));
-      await this.cargarCitas();
-      this.cerrarModal();
-      this.citaSeleccionada = null;
-      this.lanzarNotificacion('La cita médica ha sido actualizada con éxito.', 'success');
-    } catch (error) {
-      console.error('Error al actualizar:', error);
-      this.lanzarNotificacion('No se pudieron guardar los cambios de la cita.', 'error');
-    } finally {
-      this.isSaving = false;
-      this.cdr.detectChanges();
+  abrirEditarCita() {
+    if (!this.verificarPermiso('editar')) {
+      this.lanzarNotificacion('Tu rol no cuenta con permisos para editar citas.', 'error');
+      return;
     }
+    if (!this.citaSeleccionada) {
+      this.lanzarNotificacion('Selecciona una cita de la tabla primero.', 'warning');
+      return;
+    }
+    const id = this.citaSeleccionada.idcita || this.citaSeleccionada.id;
+    this.router.navigate(['/citas/editar', id], { state: { cita: this.citaSeleccionada } });
+  }
+
+  abrirEliminarCita() {
+    if (!this.verificarPermiso('eliminar')) {
+      this.lanzarNotificacion('Tu rol no cuenta con permisos para cancelar citas.', 'error');
+      return;
+    }
+    if (!this.citaSeleccionada) {
+      this.lanzarNotificacion('Selecciona una cita para cancelar.', 'warning');
+      return;
+    }
+    this.mostrarModalDelete = true;
   }
 
   async confirmarEliminarCita() {
+    if (!this.verificarPermiso('eliminar')) {
+      this.lanzarNotificacion('Acción inválida para tu rol.', 'error');
+      return;
+    }
     if (!this.citaSeleccionada) return;
     this.isDeleting = true;
 
@@ -235,23 +276,6 @@ export class Citas implements OnInit, OnDestroy {
     this.expandedId = this.expandedId === id ? null : id;
   }
 
-  abrirEditarCita() {
-    if (!this.citaSeleccionada) {
-      this.lanzarNotificacion('Selecciona una cita de la tabla primero.', 'warning');
-      return;
-    }
-    const id = this.citaSeleccionada.idcita || this.citaSeleccionada.id;
-    this.router.navigate(['/citas/editar', id], { state: { cita: this.citaSeleccionada } });
-  }
-
-  abrirEliminarCita() {
-    if (!this.citaSeleccionada) {
-      this.lanzarNotificacion('Selecciona una cita para cancelar.', 'warning');
-      return;
-    }
-    this.mostrarModalDelete = true;
-  }
-
   cerrarModal() {
     this.destruirCalendarios();
     this.mostrarModalCrear = false;
@@ -265,7 +289,6 @@ export class Citas implements OnInit, OnDestroy {
         const hoy = new Date();
         const fechaMaximaCita = new Date(hoy.getFullYear(), hoy.getMonth() + 2, hoy.getDate());
 
-        // 1. SELECTOR PARA FECHA
         this.fpFechaInstance = flatpickr("#fechaCitaInput", {
           locale: Spanish,
           dateFormat: "Y-m-d",
@@ -281,7 +304,6 @@ export class Citas implements OnInit, OnDestroy {
           }
         });
 
-        // 2. SELECTOR PARA HORA
         this.fpHoraInstance = flatpickr("#horaCitaInput", {
           locale: Spanish,
           enableTime: true,

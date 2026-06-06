@@ -12,20 +12,20 @@
 
         <div class="header-right-icons d-flex align-items-center">
             <div class="search-container d-flex align-items-center" [class.active]="showSearch">
-                <input type="text" class="search-input" placeholder="Buscar..." #searchInput
+                <input type="text" class="search-input" placeholder="Buscar..." #searchInput [value]="searchTerm"
                     (keyup.enter)="onSearch(searchInput.value)">
-                <i class="bi bi-search icon-gray" (click)="toggleSearch()"></i>
+                <i class="bi bi-search icon-gray" (click)="onSearch(searchInput.value); toggleSearch()"></i>
             </div>
 
             <div class="actions-group d-flex align-items-center">
                 <a routerLink="/notificaciones" class="notif-wrapper">
                     <i class="bi bi-bell icon-gray"></i>
-                    <span class="notif-badge">3</span>
                 </a>
 
                 <ng-container *ngIf="userName !== 'Invitado'; else noUser">
                     <a routerLink="/perfil" class="user-pill d-flex align-items-center">
-                        <img [src]="userPhoto" class="user-img" [alt]="userName">
+                        <img [src]="userPhoto" class="user-img" [alt]="userName" referrerpolicy="no-referrer"
+                            (error)="userPhoto = generarAvatarFallback(userName)">
                         <span class="user-name-text">{{ userName }}</span>
                     </a>
                 </ng-container>
@@ -43,7 +43,8 @@
 
     <aside class="sidebar-menu" [class.collapsed]="isCollapsed">
         <ul class="nav-links-list">
-            @for (section of navItems; track section.category) {
+
+            @for (section of menuFiltrado; track section.category) {
             @if (!isCollapsed) {
             <li class="nav-section-title">{{ section.category }}</li>
             } @else {
@@ -52,7 +53,8 @@
 
             @for (item of section.items; track item.label) {
             <li>
-                <a [routerLink]="item.route" routerLinkActive="active-item" class="nav-item-link">
+                <a [routerLink]="item.route" [queryParams]="item.queryParams" routerLinkActive="active-item"
+                    class="nav-item-link">
                     <i class="bi {{item.icon}}"></i>
                     @if (!isCollapsed) {
                     <span class="nav-label">{{item.label}}</span>
@@ -61,6 +63,19 @@
             </li>
             }
             }
+
+            <hr class="sidebar-divider">
+            <li>
+                <button (click)="logout()"
+                    class="nav-item-link w-100 text-start bg-transparent border-0 d-flex align-items-center"
+                    style="cursor: pointer;">
+                    <i class="bi bi-box-arrow-right"></i>
+                    @if (!isCollapsed) {
+                    <span class="nav-label">Cerrar Sesión</span>
+                    }
+                </button>
+            </li>
+
         </ul>
     </aside>
 </div>

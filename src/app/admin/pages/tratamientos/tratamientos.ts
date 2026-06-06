@@ -25,6 +25,7 @@ export class Tratamientos implements OnInit, OnDestroy {
 
   tratamientosTodo: any[] = [];
   searchTerm: string = '';
+  currentUser: any = null;
 
   // Listas auxiliares para los selectores del Modal de Creación
   listaPacientes: any[] = [];
@@ -54,7 +55,7 @@ export class Tratamientos implements OnInit, OnDestroy {
     frecuenciaHoras: null,
     fechaInicio: '',
     fechaFin: '',
-    notesInstrucciones: '',
+    notasInstrucciones: '',
     activo: true
   };
 
@@ -66,6 +67,10 @@ export class Tratamientos implements OnInit, OnDestroy {
 
   async ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
+      const saved = localStorage.getItem('user_htas');
+      if (saved) {
+        this.currentUser = JSON.parse(saved);
+      }
       await this.cargarTratamientos();
       await this.cargarCatalogosAuxiliares();
     }
@@ -76,23 +81,36 @@ export class Tratamientos implements OnInit, OnDestroy {
   }
 
   /**
-   * Inicializa las instancias de Flatpickr vinculándolas a los inputs 
-   * del tratamiento médico actual.
+   * Validador estricto basado en tus requerimientos para Tratamientos:
+   * Solo 'administrador' y 'medico' pueden Crear, Editar o Eliminar.
    */
+  verificarPermiso(accion: 'crear' | 'editar' | 'eliminar'): boolean {
+    if (!this.currentUser || !this.currentUser.rol) return false;
+
+    const rol = this.currentUser.rol.toLowerCase();
+
+    switch (accion) {
+      case 'crear':
+      case 'editar':
+      case 'eliminar':
+        return rol === 'administrador' || rol === 'medico';
+      default:
+        return false;
+    }
+  }
+
   inicializarCalendario() {
     if (isPlatformBrowser(this.platformId)) {
       setTimeout(() => {
-        // --- CÁLCULO DE LA FECHA MÁXIMA (Mes actual + 2 meses) ---
         const hoy = new Date();
         const fechaMaxima = new Date(hoy.getFullYear(), hoy.getMonth() + 2, hoy.getDate());
 
-        // --- 1. CONFIGURACIÓN PARA FECHA DE INICIO ---
         const configInicio: any = {
           locale: Spanish,
           dateFormat: "Y-m-d",
           defaultDate: this.nuevoTratamiento?.fechaInicio || null,
           minDate: "today",
-          maxDate: fechaMaxima, // <-- Restricción añadida
+          maxDate: fechaMaxima,
           appendTo: document.body,
           static: false,
           disableMobile: true,
@@ -105,13 +123,12 @@ export class Tratamientos implements OnInit, OnDestroy {
         };
         flatpickr('#fechaInicioInput', configInicio);
 
-        // --- 2. CONFIGURACIÓN PARA FECHA DE VENCIMIENTO (FIN) ---
         const configFin: any = {
           locale: Spanish,
           dateFormat: "Y-m-d",
           defaultDate: this.nuevoTratamiento?.fechaFin || null,
           minDate: "today",
-          maxDate: fechaMaxima, // <-- Restricción añadida
+          maxDate: fechaMaxima,
           appendTo: document.body,
           static: false,
           disableMobile: true,
@@ -254,12 +271,20 @@ export class Tratamientos implements OnInit, OnDestroy {
   }
 
   abrirDetalle(t: any) {
+    if (!this.verificarPermiso('editar')) {
+      this.lanzarNotificacion('No tienes permisos para realizar modificaciones.', 'error');
+      return;
+    }
     this.router.navigate(['/tratamientos/editar', t.idtratamiento || t.id], {
       state: { tratamiento: t }
     });
   }
 
   abrirCrear() {
+    if (!this.verificarPermiso('crear')) {
+      this.lanzarNotificacion('Tu rol no cuenta con permisos para crear nuevos tratamientos.', 'error');
+      return;
+    }
     this.nuevoTratamiento = {
       idPaciente: null,
       idMedicamento: null,
@@ -275,12 +300,15 @@ export class Tratamientos implements OnInit, OnDestroy {
     this.filtroMedicamentoModal = '';
     this.mostrarModalCrear = true;
     this.cdr.detectChanges();
-
-    // Ejecuta la inicialización de Flatpickr inmediatamente después de abrir el modal
     this.inicializarCalendario();
   }
 
   async guardarNuevoTratamiento() {
+    if (!this.verificarPermiso('crear')) {
+      this.lanzarNotificacion('Operación rechazada debido a tus restricciones de rol.', 'error');
+      return;
+    }
+
     const idPac = this.nuevoTratamiento.idPaciente ? parseInt(this.nuevoTratamiento.idPaciente, 10) : null;
     const idMed = this.nuevoTratamiento.idMedicamento ? parseInt(this.nuevoTratamiento.idMedicamento, 10) : null;
     const dosisLimpia = (this.nuevoTratamiento.dosis || '').trim();
@@ -302,7 +330,7 @@ export class Tratamientos implements OnInit, OnDestroy {
         idMedicamento: idMed,
         idDoctor: this.nuevoTratamiento.idDoctor ? parseInt(this.nuevoTratamiento.idDoctor, 10) : null,
         dosis: dosisLimpia,
-        frecuenciaHoras: frec,
+        frecuenciaHoras: frec, // <- CORREGIDO: Se cambió de 'frecuenciaHours' a 'frecuenciaHoras' para cumplir con la interfaz del servicio
         fechaInicio: fInicio,
         fechaFin: fFin,
         notasInstrucciones: (this.nuevoTratamiento.notasInstrucciones || '').trim(),
@@ -324,6 +352,10 @@ export class Tratamientos implements OnInit, OnDestroy {
   }
 
   abrirEliminar() {
+    if (!this.verificarPermiso('eliminar')) {
+      this.lanzarNotificacion('No cuentas con permisos para eliminar registros.', 'error');
+      return;
+    }
     if (!this.tratamientoSeleccionado) {
       this.lanzarNotificacion('Selecciona un tratamiento de la tabla primero.', 'warning');
       return;
@@ -332,6 +364,10 @@ export class Tratamientos implements OnInit, OnDestroy {
   }
 
   async confirmarEliminar() {
+    if (!this.verificarPermiso('eliminar')) {
+      this.lanzarNotificacion('Acción denegada por permisos de seguridad.', 'error');
+      return;
+    }
     if (!this.tratamientoSeleccionado) return;
     this.isDeleting = true;
     this.cdr.detectChanges();
@@ -341,7 +377,7 @@ export class Tratamientos implements OnInit, OnDestroy {
       await this.cargarTratamientos();
       this.cerrarModal();
       this.tratamientoSeleccionado = null;
-      this.lanzarNotificacion('El tratamiento ha sido eliminado.', 'success');
+      this.lanzarNotificacion('El tratamiento ha sido eliminado con éxito.', 'success');
     } catch (error: any) {
       console.error('Error al eliminar:', error);
       const backendMessage = error.error?.error || 'No se pudo eliminar el tratamiento.';

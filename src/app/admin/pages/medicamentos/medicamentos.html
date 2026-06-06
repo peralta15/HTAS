@@ -26,23 +26,36 @@
                     <input type="text" [(ngModel)]="searchTerm" placeholder="Buscar medicamento...">
                 </div>
 
+                <!-- CONTROL DE RENDERIZADO PARA AGREGAR NUEVO MEDICAMENTO -->
+                @if (canAdd) {
                 <button class="btn-save" (click)="abrirCrear()">
                     <i class="bi bi-plus-lg"></i>
                     <span>Nuevo</span>
                 </button>
+                }
 
+                <!-- CONTROL DE RENDERIZADO PARA ACCIONES (EDITAR / ELIMINAR) -->
+                @if (canEdit || canDelete) {
                 <div class="action-buttons-group" [class.visible]="medicamentoSeleccionado">
+
+                    @if (canEdit) {
                     <button class="btn-action btn-edit-premium" (click)="abrirDetalle(medicamentoSeleccionado)"
                         title="Editar medicamento" [disabled]="!medicamentoSeleccionado">
                         <i class="bi bi-pencil-fill"></i>
                         <span>Editar</span>
                     </button>
+                    }
+
+                    @if (canDelete) {
                     <button class="btn-action btn-delete-premium" (click)="abrirEliminar()"
                         title="Eliminar medicamento">
                         <i class="bi bi-trash-fill"></i>
                         <span>Eliminar</span>
                     </button>
+                    }
+
                 </div>
+                }
             </div>
         </div>
 

@@ -27,22 +27,29 @@
                     <input type="text" [(ngModel)]="searchTerm" placeholder="Buscar por nombre, MAC o paciente...">
                 </div>
 
+                @if (verificarPermiso('crear')) {
                 <button class="btn-save" (click)="abrirCrear()">
                     <i class="bi bi-plus-lg"></i>
                     <span>Nuevo</span>
                 </button>
+                }
 
                 <div class="action-buttons-group" [class.visible]="dispositivoSeleccionado">
+                    @if (verificarPermiso('editar')) {
                     <button class="btn-action btn-edit-premium" (click)="irADetalle(dispositivoSeleccionado)"
                         title="Editar dispositivo" [disabled]="!dispositivoSeleccionado">
                         <i class="bi bi-pencil-fill"></i>
                         <span>Editar</span>
                     </button>
+                    }
+
+                    @if (verificarPermiso('eliminar')) {
                     <button class="btn-action btn-delete-premium" (click)="abrirEliminar()"
                         title="Eliminar dispositivo">
                         <i class="bi bi-trash-fill"></i>
                         <span>Eliminar</span>
                     </button>
+                    }
                 </div>
             </div>
         </div>
