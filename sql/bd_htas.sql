@@ -23,6 +23,8 @@ CREATE TABLE USUARIOS (
     deleted_at TIMESTAMP NULL
 );
 
+ALTER TABLE USUARIOS ADD COLUMN GoogleFitToken JSONB;
+
 SELECT*FROM USUARIOS;
 
 -- 2. TABLA: DOCTORES
@@ -170,6 +172,29 @@ CREATE TABLE DISPOSITIVOS (
     -- Auditoría básica
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+ALTER TABLE DISPOSITIVOS 
+ALTER COLUMN DireccionMac TYPE VARCHAR(50) USING DireccionMac::text;
+
+-- 7. TABLA: MEDICIONES_PRESION (Lecturas del Tensiómetro)
+CREATE TABLE MEDICIONES_PRESION (
+    IdMedicion SERIAL PRIMARY KEY,
+    IdPaciente INT NOT NULL REFERENCES PACIENTES(IdUsuario) ON DELETE CASCADE,
+    
+    -- Valores del Tensiómetro (Basados en la imagen del Femmto)
+    Sistolica INT NOT NULL CHECK (Sistolica BETWEEN 40 AND 260),  -- SYS mmHg (Ej: 103)
+    Diastolica INT NOT NULL CHECK (Diastolica BETWEEN 30 AND 200), -- DIA mmHg (Ej: 60)
+    Pulso INT NOT NULL CHECK (Pulso BETWEEN 30 AND 220),           -- PULSE /min (Ej: 68)
+    
+    -- Información de contexto
+    Unidad VARCHAR(10) DEFAULT 'mmHg',
+    MetodoSincronizacion VARCHAR(20) DEFAULT 'Bluetooth' 
+        CHECK (MetodoSincronizacion IN ('Bluetooth', 'Manual')),
+    
+    -- Auditoría de tiempo
+    FechaHoraLectura TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Momento en que se registró
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Índice para mejorar la velocidad de búsqueda por fecha (muy útil para calendarios)

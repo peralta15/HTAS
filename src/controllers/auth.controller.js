@@ -5,6 +5,13 @@ const nodemailer = require("nodemailer");
 const pdf = require("pdf-parse");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const { verificarRecaptcha } = require("../utils/verificarRecaptcha");
+const { google } = require('googleapis');
+
+const oauth2Client = new google.auth.OAuth2(
+  process.env.GOOGLE_CLIENT_ID,
+  process.env.GOOGLE_CLIENT_SECRET,
+  process.env.GOOGLE_REDIRECT_URI
+);
 
 const authController = {
   register: async (req, res) => {
@@ -321,7 +328,7 @@ const authController = {
   googleLogin: async (req, res) => {
     // 1. Extraemos el rol que nos envía Angular por el body (con un fallback por si no llega)
     const { nombre, apPaterno, apMaterno, correo, genero, rol } = req.body;
-    const rolAsignar = rol || 'Paciente'; 
+    const rolAsignar = rol || "Paciente";
 
     try {
       const result = await db.query(
@@ -351,7 +358,7 @@ const authController = {
               "GOOGLE_AUTH_USER",
               rolAsignar,
               "0000000000",
-              genero || 'Masculino',
+              genero || "Masculino",
               nuevoPin,
               false,
             ],
@@ -364,29 +371,29 @@ const authController = {
           const rolNormalizado = rolAsignar.toLowerCase();
 
           switch (rolNormalizado) {
-            case 'paciente':
+            case "paciente":
               await db.query(
                 "INSERT INTO PACIENTES (IdUsuario) VALUES ($1) ON CONFLICT (IdUsuario) DO NOTHING",
                 [usuario.idusuario],
               );
               break;
 
-            case 'medico':
-            case 'doctor':
+            case "medico":
+            case "doctor":
               await db.query(
                 "INSERT INTO MEDICOS (IdUsuario) VALUES ($1) ON CONFLICT (IdUsuario) DO NOTHING",
                 [usuario.idusuario],
               );
               break;
 
-            case 'acompanante':
-            case 'acompañante':
+            case "acompanante":
+            case "acompañante":
               await db.query(
                 "INSERT INTO ACOMPANANTES (IdUsuario) VALUES ($1) ON CONFLICT (IdUsuario) DO NOTHING",
                 [usuario.idusuario],
               );
               break;
-              
+
             default:
               // Si el rol no coincide con ninguno, por seguridad lo vinculamos a pacientes
               await db.query(
@@ -428,6 +435,65 @@ const authController = {
       res.status(500).json({ error: "Error al procesar el acceso con Google" });
     }
   },
+
+  googleFitAuth: (req, res) => {
+    const { userId } = req.query; // Angular debe enviar el ID del usuario
+    const url = oauth2Client.generateAuthUrl({
+      access_type: 'offline',
+      scope: [
+        'https://www.googleapis.com/auth/fitness.blood_pressure.read',
+        'https://www.googleapis.com/auth/fitness.heart_rate.read'
+      ],
+      state: userId, // Esto vuelve en el callback para saber quién es
+      prompt: 'consent'
+    });
+    res.json({ url });
+  },
+
+  googleFitCallback: async (req, res) => {
+    const { code, state } = req.query; // state es el userId que enviamos
+    try {
+      const { tokens } = await oauth2Client.getToken(code);
+      
+      // Guardar tokens en la BD
+      await db.query(
+        "UPDATE USUARIOS SET GoogleFitToken = $1 WHERE IdUsuario = $2",
+        [JSON.stringify(tokens), state]
+      );
+
+      res.redirect('http://localhost:4200/dispositivos/editar/6?status=success');
+    } catch (error) {
+      console.error("Error en callback:", error);
+      res.redirect('http://localhost:4200/dispositivos/editar/6?status=error');
+    }
+  },
+
+  // Agrega esto a tu controlador de Google
+googleFitData: async (req, res) => {
+  const { idPaciente } = req.params;
+
+  // 1. Obtén el token guardado de la base de datos
+  const result = await db.query("SELECT GoogleFitToken FROM USUARIOS WHERE IdUsuario = $1", [idPaciente]);
+  const token = JSON.parse(result.rows[0].googlefittoken);
+
+  // 2. Configura el cliente con el token obtenido
+  oauth2Client.setCredentials(token);
+
+  // 3. Pide los datos a la API de Fitness
+  const fitness = google.fitness({ version: 'v1', auth: oauth2Client });
+  
+  const response = await fitness.users.dataset.aggregate({
+    userId: 'me',
+    requestBody: {
+      aggregateBy: [{ dataTypeName: 'com.google.blood_pressure' }],
+      startTimeMillis: Date.now() - (7 * 24 * 60 * 60 * 1000), // Datos de la última semana
+      endTimeMillis: Date.now()
+    }
+  });
+
+  // 4. Envía los datos al Frontend
+  res.json(response.data.bucket); 
+},
 
   enviarMensaje: async (req, res) => {
     const { nombre, apellidos, email, telefono, mensaje } = req.body;
@@ -888,6 +954,20 @@ const authController = {
     }
   },
 
+  getAllCitas: async (req, res) => {
+    try {
+      const query = `
+        SELECT * FROM CITAS 
+        ORDER BY FechaCita DESC, HoraCita DESC`;
+
+      const result = await db.query(query);
+      res.json(result.rows);
+    } catch (error) {
+      console.error("Error al obtener todas las citas:", error);
+      res.status(500).json({ error: "Error al obtener el listado de citas" });
+    }
+  },
+
   getCitasUsuario: async (req, res) => {
     const { email } = req.params; // Cambiamos UID por email para esta tabla plana
     try {
@@ -1215,11 +1295,15 @@ const authController = {
 
   crearDispositivo: async (req, res) => {
     const { nombre, direccionMac, idPacienteAsociado } = req.body;
+    const macNormalizada = direccionMac
+      ? direccionMac.trim().toUpperCase()
+      : "";
+
     try {
       const result = await db.query(
         `INSERT INTO DISPOSITIVOS (Nombre, DireccionMac, IdPacienteAsociado) 
          VALUES ($1, $2, $3) RETURNING *`,
-        [nombre, direccionMac, idPacienteAsociado || null],
+        [nombre, macNormalizada, idPacienteAsociado || null],
       );
       res.status(201).json({
         message: "Dispositivo vinculado con éxito",
@@ -1229,7 +1313,7 @@ const authController = {
       console.error("Error al vincular dispositivo:", error);
       res.status(500).json({
         error:
-          "Error al registrar dispositivo. Verifique que la dirección MAC sea única y válida.",
+          "Error al registrar dispositivo. Verifique que la identificación (MAC/Serie) sea única.",
       });
     }
   },
@@ -1237,15 +1321,20 @@ const authController = {
   actualizarDispositivo: async (req, res) => {
     const { id } = req.params;
     const { nombre, direccionMac, idPacienteAsociado, activo } = req.body;
+    const macNormalizada = direccionMac
+      ? direccionMac.trim().toUpperCase()
+      : "";
+
     try {
       const result = await db.query(
         `UPDATE DISPOSITIVOS 
          SET Nombre = $1, DireccionMac = $2, IdPacienteAsociado = $3, Activo = $4, updated_at = CURRENT_TIMESTAMP
          WHERE IdDispositivo = $5 RETURNING *`,
-        [nombre, direccionMac, idPacienteAsociado || null, activo, id],
+        [nombre, macNormalizada, idPacienteAsociado || null, activo, id],
       );
       if (result.rows.length === 0)
         return res.status(404).json({ error: "Dispositivo no encontrado" });
+
       res.json({
         message: "Dispositivo modificado con éxito",
         dispositivo: result.rows[0],
@@ -1273,6 +1362,115 @@ const authController = {
       res
         .status(500)
         .json({ error: "Error al eliminar dispositivo de la base de datos" });
+    }
+  },
+
+  registrarMedicion: async (req, res) => {
+    const { idPaciente, sistolica, diastolica, pulso, metodoSincronizacion } =
+      req.body;
+
+    // Validación estricta de campos requeridos
+    if (!idPaciente || !sistolica || !diastolica || !pulso) {
+      return res.status(400).json({
+        error:
+          "Todos los campos de la medición (idPaciente, sistolica, diastolica, pulso) son obligatorios.",
+      });
+    }
+
+    try {
+      // Validamos que los rangos numéricos sean lógicos antes de tocar la BD
+      // (así evitamos que falle por los CHECK de la tabla si el Bluetooth mandó basura)
+      if (
+        sistolica < 40 ||
+        sistolica > 260 ||
+        diastolica < 30 ||
+        diastolica > 200 ||
+        pulso < 30 ||
+        pulso > 220
+      ) {
+        return res.status(400).json({
+          error:
+            "Los valores de la medición están fuera de los rangos fisiológicos permitidos.",
+        });
+      }
+
+      const query = `
+        INSERT INTO MEDICIONES_PRESION (IdPaciente, Sistolica, Diastolica, Pulso, MetodoSincronizacion)
+        VALUES ($1, $2, $3, $4, $5) 
+        RETURNING *`;
+
+      const result = await db.query(query, [
+        idPaciente,
+        sistolica,
+        diastolica,
+        pulso,
+        metodoSincronizacion || "Bluetooth", // Si no se manda, por defecto es Bluetooth
+      ]);
+
+      res.status(201).json({
+        message: "¡Medición del baumanómetro registrada con éxito!",
+        medicion: result.rows[0],
+      });
+    } catch (error) {
+      console.error("Error crítico al registrar medición:", error);
+      res
+        .status(500)
+        .json({
+          error: "Error interno del servidor al guardar la lectura médica.",
+        });
+    }
+  },
+
+  getMedicionesPaciente: async (req, res) => {
+    const { idPaciente } = req.params;
+
+    try {
+      // Obtenemos el historial ordenado de la más reciente a la más antigua
+      const query = `
+        SELECT IdMedicion, Sistolica, Diastolica, Pulso, Unidad, MetodoSincronizacion, FechaHoraLectura
+        FROM MEDICIONES_PRESION
+        WHERE IdPaciente = $1
+        ORDER BY FechaHoraLectura DESC`;
+
+      const result = await db.query(query, [idPaciente]);
+
+      res.json(result.rows);
+    } catch (error) {
+      console.error("Error al obtener mediciones:", error);
+      res
+        .status(500)
+        .json({ error: "Error al obtener el historial de mediciones." });
+    }
+  },
+
+  getUltimaMedicionPaciente: async (req, res) => {
+    const { idPaciente } = req.params;
+
+    try {
+      // Trae únicamente la última fila usando LIMIT 1
+      const query = `
+        SELECT IdMedicion, Sistolica, Diastolica, Pulso, Unidad, MetodoSincronizacion, FechaHoraLectura
+        FROM MEDICIONES_PRESION
+        WHERE IdPaciente = $1
+        ORDER BY FechaHoraLectura DESC
+        LIMIT 1`;
+
+      const result = await db.query(query, [idPaciente]);
+
+      if (result.rows.length === 0) {
+        return res
+          .status(404)
+          .json({
+            message: "No se encontraron mediciones previas para este paciente.",
+          });
+      }
+
+      res.json(result.rows[0]);
+    } catch (error) {
+      console.error("Error al obtener la última medición:", error);
+      res
+        .status(500)
+        .json({ error: "Error al obtener la última lectura médica." });
     }
   },
 };
