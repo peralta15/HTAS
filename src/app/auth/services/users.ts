@@ -145,6 +145,10 @@ export class Users {
     return this.http.post(`${this.apiUrl}/agendar-cita`, datosCita);
   }
 
+  getAllCitas(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/todas-las-citas`);
+  }
+
   getMisCitas(email: string): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/mis-citas/${email}`);
   }
@@ -272,5 +276,39 @@ export class Users {
 
   eliminarDispositivo(id: string | number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/dispositivos/${id}`);
+  }
+
+  // ==========================================================================
+  // --- GESTIÓN DE MEDICIONES DEL BAUMANÓMETRO (TENSÍMETRO FEMMTO) ---
+  // ==========================================================================
+
+  /**
+   * Envía la lectura del baumanómetro al backend
+   * @param datos Objeto con { idPaciente, sistolica, diastolica, pulso, metodoSincronizacion }
+   */
+  registrarMedicion(datos: {
+    idPaciente: number;
+    sistolica: number;
+    diastolica: number;
+    pulso: number;
+    metodoSincronizacion?: string;
+  }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/mediciones`, datos);
+  }
+
+  /**
+   * Obtiene el historial completo de mediciones de un paciente
+   * @param idPaciente El ID del usuario paciente
+   */
+  getMedicionesPaciente(idPaciente: number | string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/mediciones/paciente/${idPaciente}`);
+  }
+
+  /**
+   * Obtiene la lectura más reciente del paciente (útil para el dashboard)
+   * @param idPaciente El ID del usuario paciente
+   */
+  getUltimaMedicionPaciente(idPaciente: number | string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/mediciones/paciente/${idPaciente}/ultima`);
   }
 }

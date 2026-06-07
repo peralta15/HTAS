@@ -69,7 +69,13 @@ export class Tratamientos implements OnInit, OnDestroy {
     if (isPlatformBrowser(this.platformId)) {
       const saved = localStorage.getItem('user_htas');
       if (saved) {
-        this.currentUser = JSON.parse(saved);
+        try {
+          this.currentUser = JSON.parse(saved);
+          // Log para depurar qué está llegando realmente
+          console.log("Rol del usuario cargado:", this.currentUser.rol);
+        } catch (e) {
+          console.error("Error al parsear usuario", e);
+        }
       }
       await this.cargarTratamientos();
       await this.cargarCatalogosAuxiliares();
@@ -87,13 +93,22 @@ export class Tratamientos implements OnInit, OnDestroy {
   verificarPermiso(accion: 'crear' | 'editar' | 'eliminar'): boolean {
     if (!this.currentUser || !this.currentUser.rol) return false;
 
-    const rol = this.currentUser.rol.toLowerCase();
+    // 1. Normalizamos: pasamos a minúsculas, quitamos espacios y tildes
+    const rol = this.currentUser.rol
+      .toLowerCase()
+      .trim()
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // Quita tildes
 
+    // 2. Definimos los grupos permitidos
+    const esAdmin = rol === 'administrador';
+    const esMedico = rol.includes('medico') || rol.includes('doctor');
+
+    // 3. Lógica de acceso
     switch (accion) {
       case 'crear':
       case 'editar':
       case 'eliminar':
-        return rol === 'administrador' || rol === 'medico';
+        return esAdmin || esMedico;
       default:
         return false;
     }

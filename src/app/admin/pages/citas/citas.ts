@@ -79,20 +79,24 @@ export class Citas implements OnInit, OnDestroy {
   verificarPermiso(accion: 'crear' | 'editar' | 'eliminar'): boolean {
     if (!this.currentUser || !this.currentUser.rol) return false;
 
-    const rol = this.currentUser.rol.toLowerCase();
+    // Normalizamos el rol del usuario actual
+    const rol = this.currentUser.rol
+      .toLowerCase()
+      .trim()
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+    const esAdmin = rol === 'administrador';
+    const esMedicoODoctor = rol.includes('medico') || rol.includes('doctor');
 
     switch (accion) {
       case 'crear':
-        // Pacientes, Médicos y Administradores pueden generar citas
-        return rol === 'paciente' || rol === 'medico' || rol === 'administrador';
+        // Pacientes, Médicos, Doctores y Administradores pueden generar citas
+        return rol === 'paciente';
 
       case 'editar':
-        // Tanto Médicos como el Administrador pueden editar citas
-        return rol === 'medico' || rol === 'administrador';
-
       case 'eliminar':
-        // Tanto Médicos como el Administrador pueden eliminar/cancelar citas
-        return rol === 'medico' || rol === 'administrador';
+        // Solo Médicos, Doctores y el Administrador pueden editar o eliminar
+        return esMedicoODoctor || esAdmin;
 
       default:
         return false;
@@ -115,8 +119,27 @@ export class Citas implements OnInit, OnDestroy {
 
   async cargarCitas() {
     if (!this.currentUser || !this.currentUser.correo) return;
+
+    const rol = this.currentUser.rol.toLowerCase().trim()
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+    // Agregamos 'acompanante' a la lógica de acceso total
+    const tieneAccesoGlobal = rol.includes('medico') ||
+      rol.includes('doctor') ||
+      rol.includes('administrador') ||
+      rol.includes('acompanante');
+
+    let data: any[] = [];
+
     try {
-      const data = await firstValueFrom(this.usersService.getMisCitas(this.currentUser.correo));
+      if (tieneAccesoGlobal) {
+        // Usamos el nuevo método getAllCitas que creamos
+        data = await firstValueFrom(this.usersService.getAllCitas());
+      } else {
+        // El paciente solo ve las suyas
+        data = await firstValueFrom(this.usersService.getMisCitas(this.currentUser.correo));
+      }
+
       this.citasTodo = data.map(c => ({
         ...c,
         id: c.idcita,
@@ -125,6 +148,7 @@ export class Citas implements OnInit, OnDestroy {
       this.cdr.detectChanges();
     } catch (error) {
       console.error('Error al cargar citas:', error);
+      this.lanzarNotificacion('Error al cargar la lista de citas', 'error');
     }
   }
 

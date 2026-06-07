@@ -152,20 +152,32 @@
 
                 <div class="form-group" style="grid-column: span 2;">
                     <label>Dirección MAC</label>
-                    <input type="text" [(ngModel)]="dispositivoForm.direccionMac" maxlength="17"
-                        class="form-control-premium mono-text" placeholder="Ej: AA:BB:CC:DD:EE:FF">
+                    <input type="text" [(ngModel)]="dispositivoForm.direccionMac" maxlength="30"
+                        class="form-control-premium mono-text" placeholder="Ej: AA:BB:CC:DD:EE:FF o AA-BBCCD">
                 </div>
 
-                <div class="form-group" style="grid-column: span 2;">
+                <div class="form-group" style="position: relative; grid-column: span 2;">
                     <label>Vincular Paciente (Opcional)</label>
-                    <select [(ngModel)]="dispositivoForm.idPacienteAsociado" class="form-control-premium">
-                        <option [ngValue]="null">-- Dejar sin asignar / Disponible --</option>
-                        @for (paciente of pacientesLista; track paciente.idusuario) {
-                        <option [ngValue]="paciente.idusuario">
-                            {{ paciente.nombre }} {{ paciente.appaterno }} (ID: {{ paciente.idusuario }})
-                        </option>
+                    <div class="search-box-pill" style="width: 100%; border-radius: 8px;">
+                        <i class="bi bi-search"></i>
+                        <input type="text" [(ngModel)]="filtroPacienteModal" (focus)="mostrarDropdownPacientes = true"
+                            (blur)="ocultarDropdownPacientes()" placeholder="Buscar paciente por nombre o apellidos...">
+                    </div>
+
+                    @if (mostrarDropdownPacientes) {
+                    <div class="custom-dropdown-list">
+                        @if (pacientesFiltradosModal.length === 0) {
+                        <div class="custom-dropdown-item" style="color: #94a3b8; cursor: default;">
+                            No se encontraron pacientes.
+                        </div>
                         }
-                    </select>
+                        @for (p of pacientesFiltradosModal; track p.idusuario) {
+                        <div class="custom-dropdown-item" (mousedown)="seleccionarPacienteModal(p)">
+                            {{ p.nombre }} {{ p.appaterno || '' }} {{ p.apmaterno || '' }}
+                        </div>
+                        }
+                    </div>
+                    }
                 </div>
             </div>
         </div>

@@ -44,6 +44,9 @@ export class Dispositivos implements OnInit, OnDestroy {
     activo: true
   };
 
+  filtroPacienteModal: string = '';
+  mostrarDropdownPacientes = false;
+
   // Notificaciones Toast
   mostrarToast = false;
   mensajeToast = '';
@@ -55,6 +58,8 @@ export class Dispositivos implements OnInit, OnDestroy {
       const saved = localStorage.getItem('user_htas');
       if (saved) {
         this.currentUser = JSON.parse(saved);
+        // Depuración: Verifica qué rol llega realmente
+        console.log("Usuario actual cargado:", this.currentUser);
       }
       await this.cargarDispositivos();
       await this.cargarPacientesAuxiliares();
@@ -66,24 +71,27 @@ export class Dispositivos implements OnInit, OnDestroy {
   }
 
   /**
-   * Validador estricto de roles para el módulo de DISPOSITIVOS:
-   * - 'administrador' y 'medico' pueden todo.
-   * - 'paciente' SOLO puede crear (agregar).
-   * - 'acompañante' SOLO puede editar.
-   * - 'invitado' SOLO puede visualizar.
+   * Validador de roles para el módulo de DISPOSITIVOS.
+   * Se agregó soporte para 'doctor' y 'medico' indistintamente.
    */
   verificarPermiso(accion: 'crear' | 'editar' | 'eliminar'): boolean {
     if (!this.currentUser || !this.currentUser.rol) return false;
 
-    const rol = this.currentUser.rol.toLowerCase();
+    const rol = this.currentUser.rol.toLowerCase().trim();
+
+    // Lista de roles permitidos
+    const esAdmin = rol === 'administrador';
+    const esMedico = rol === 'medico' || rol === 'doctor';
+    const esPaciente = rol === 'paciente';
+    const esAcompanante = rol === 'acompañante';
 
     switch (accion) {
       case 'crear':
-        return rol === 'administrador' || rol === 'medico' || rol === 'paciente';
+        return esAdmin || esMedico || esPaciente;
       case 'editar':
-        return rol === 'administrador' || rol === 'medico' || rol === 'acompañante';
+        return esAdmin || esMedico || esAcompanante;
       case 'eliminar':
-        return rol === 'administrador' || rol === 'medico';
+        return esAdmin || esMedico;
       default:
         return false;
     }
@@ -170,6 +178,38 @@ export class Dispositivos implements OnInit, OnDestroy {
     });
   }
 
+  // Método para seleccionar el paciente y rellenar el input
+  seleccionarPacienteModal(p: any) {
+    this.dispositivoForm.idPacienteAsociado = p.idusuario;
+
+    // Concatenación de nombre y apellidos
+    const nombreCompleto = `${p.nombre || ''} ${p.appaterno || ''} ${p.apmaterno || ''}`.trim();
+    this.filtroPacienteModal = nombreCompleto;
+
+    this.mostrarDropdownPacientes = false;
+    this.cdr.detectChanges(); // Vital para que la vista se actualice
+  }
+
+  // Getter para filtrar pacientes incluyendo apellidos en la búsqueda
+  get pacientesFiltradosModal() {
+    let result = this.pacientesLista;
+    if (this.filtroPacienteModal) {
+      const term = this.filtroPacienteModal.toLowerCase();
+      result = this.pacientesLista.filter(p => {
+        const nombreCompleto = `${p.nombre || ''} ${p.appaterno || ''} ${p.apmaterno || ''}`.toLowerCase();
+        return nombreCompleto.includes(term);
+      });
+    }
+    return result.slice(0, 5);
+  }
+
+  ocultarDropdownPacientes() {
+    setTimeout(() => {
+      this.mostrarDropdownPacientes = false;
+      this.cdr.detectChanges();
+    }, 200);
+  }
+
   abrirCrear() {
     if (!this.verificarPermiso('crear')) {
       this.lanzarNotificacion('Tu rol no cuenta con permisos para registrar dispositivos.', 'error');
@@ -193,19 +233,15 @@ export class Dispositivos implements OnInit, OnDestroy {
       return;
     }
 
-    if (!this.dispositivoForm.nombre.trim()) {
-      this.lanzarNotificacion('El nombre del dispositivo es obligatorio.', 'warning');
+    if (!this.dispositivoForm.nombre.trim() || !this.dispositivoForm.direccionMac.trim()) {
+      this.lanzarNotificacion('Nombre y MAC son obligatorios.', 'warning');
       return;
     }
 
-    if (!this.dispositivoForm.direccionMac.trim()) {
-      this.lanzarNotificacion('La dirección MAC es obligatoria.', 'warning');
-      return;
-    }
-
-    const macRegex = /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/;
+    // Ajustado para permitir formato MAC o Serie (como KF-DT65X)
+    const macRegex = /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$|^[A-Z0-9-]{5,20}$/;
     if (!macRegex.test(this.dispositivoForm.direccionMac)) {
-      this.lanzarNotificacion('El formato de la dirección MAC no es válido. Ej: AA:BB:CC:DD:EE:FF', 'warning');
+      this.lanzarNotificacion('Formato no válido. Use MAC estándar o Serie.', 'warning');
       return;
     }
 
@@ -213,13 +249,12 @@ export class Dispositivos implements OnInit, OnDestroy {
     try {
       await firstValueFrom(this.usersService.crearDispositivo(this.dispositivoForm));
       this.lanzarNotificacion('¡Éxito! El dispositivo ha sido registrado correctamente.', 'success');
-
       await this.cargarDispositivos();
       this.cerrarModal();
       this.dispositivoSeleccionado = null;
     } catch (error) {
       console.error('Error al registrar dispositivo:', error);
-      this.lanzarNotificacion('Error en el registro. Compruebe que la dirección MAC sea única.', 'error');
+      this.lanzarNotificacion('Error en el registro. Verifique los datos.', 'error');
     } finally {
       this.isSaving = false;
       this.cdr.detectChanges();
@@ -231,7 +266,6 @@ export class Dispositivos implements OnInit, OnDestroy {
       this.lanzarNotificacion('Tu rol no cuenta con permisos para eliminar dispositivos.', 'error');
       return;
     }
-
     if (!this.dispositivoSeleccionado) {
       this.lanzarNotificacion('Selecciona un dispositivo de la tabla primero.', 'warning');
       return;
@@ -240,10 +274,7 @@ export class Dispositivos implements OnInit, OnDestroy {
   }
 
   async confirmarEliminar() {
-    if (!this.verificarPermiso('eliminar')) {
-      this.lanzarNotificacion('Acción denegada por permisos de seguridad.', 'error');
-      return;
-    }
+    if (!this.verificarPermiso('eliminar')) return;
 
     if (!this.dispositivoSeleccionado) return;
     this.isDeleting = true;

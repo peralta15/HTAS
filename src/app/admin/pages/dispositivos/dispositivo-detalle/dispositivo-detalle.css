@@ -311,3 +311,90 @@
         opacity: 1;
     }
 }
+
+/* ==========================================================================
+   7. ESTILOS PARA LA TARJETA DE ÚLTIMA MEDICIÓN
+   ========================================================================== */
+
+.section-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #334155;
+    margin: 0 0 1rem 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.section-title::before {
+    content: "";
+    display: inline-block;
+    width: 4px;
+    height: 18px;
+    background-color: #b0001e;
+    border-radius: 2px;
+}
+
+.stats-grid {
+    display: flex;
+    gap: 1rem;
+    padding: 0.5rem 0;
+}
+
+.stat-box {
+    background: #f8fafc;
+    padding: 1rem;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    text-align: center;
+    flex: 1;
+    transition: transform 0.2s;
+}
+
+.stat-box small {
+    display: block;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: #64748b;
+    margin-bottom: 0.25rem;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #1e293b;
+}
+
+.stat-value small {
+    display: inline;
+    font-size: 0.8rem;
+    color: #94a3b8;
+    font-weight: 600;
+}
+
+/* Ajuste fino del footer de la tarjeta */
+.text-muted.small {
+    margin-top: 1rem;
+    color: #94a3b8;
+    font-size: 0.8rem;
+    text-align: right;
+    font-style: italic;
+}
+
+/* Responsividad de las cajas de estadísticas */
+@media (max-width: 600px) {
+    .stats-grid {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .stat-box {
+        text-align: left;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+}

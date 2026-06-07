@@ -31,7 +31,6 @@
 
         <div class="detail-card">
             <div class="form-grid">
-
                 <div class="form-group full-width-group">
                     <label>Nombre del Dispositivo</label>
                     <input type="text" [(ngModel)]="dispositivoSeleccionado.nombre" maxlength="100"
@@ -67,8 +66,56 @@
                         }
                     </div>
                 </div>
-
             </div>
+
+            <div class="form-group full-width-group" style="margin-top: 1rem;">
+                <label>Sincronización con Google Fit</label>
+                <div class="d-flex align-items-center gap-3">
+
+                    <button type="button" class="btn btn-outline-primary" (click)="vincularGoogleFit()">
+                        <i class="bi bi-google"></i> Vincular Google Fit
+                    </button>
+
+                    @if (dispositivoSeleccionado.googleFitToken) {
+                    <span class="badge bg-success">
+                        <i class="bi bi-check-lg"></i> Vinculado
+                    </span>
+                    <button type="button" class="btn btn-sm btn-link" (click)="cargarDatosGoogleFit()">
+                        Refrescar Datos
+                    </button>
+                    }
+                </div>
+            </div>
+
+            @if (ultimaMedicion) {
+            <div style="margin-top: 1.5rem; border-top: 1px solid #e2e8f0; padding-top: 1.5rem;">
+                <h4 class="section-title">Última Lectura del Paciente</h4>
+                <div class="stats-grid" style="display: flex; gap: 20px; padding: 1rem 0;">
+                    <div class="stat-box">
+                        <small>Sistólica</small>
+                        <div class="stat-value">{{ ultimaMedicion.sistolica || ultimaMedicion.Sistolica }}
+                            <small>mmHg</small>
+                        </div>
+                    </div>
+                    <div class="stat-box">
+                        <small>Diastólica</small>
+                        <div class="stat-value">{{ ultimaMedicion.diastolica || ultimaMedicion.Diastolica }}
+                            <small>mmHg</small>
+                        </div>
+                    </div>
+                    <div class="stat-box">
+                        <small>Pulso</small>
+                        <div class="stat-value">{{ ultimaMedicion.pulso || ultimaMedicion.Pulso }} <small>bpm</small>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-muted small">
+                    Registrado vía: {{ ultimaMedicion.metodosincronizacion || ultimaMedicion.MetodoSincronizacion }} |
+                    Fecha: {{ (ultimaMedicion.fechahoralectura || ultimaMedicion.FechaHoraLectura) | date:'dd/MM/yyyy
+                    HH:mm' }}
+                </p>
+            </div>
+            }
 
             <div class="action-footer">
                 <button class="btn-cancel-premium" (click)="volver()" [disabled]="isSaving">Cancelar</button>

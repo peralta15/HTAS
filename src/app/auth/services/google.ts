@@ -127,4 +127,34 @@ export class GoogleService {
 
   logout() { return signOut(this.auth); }
   get user$(): Observable<any> { return authState(this.auth); }
+
+  // 1. Obtiene la URL de Google para vincular la cuenta
+  async iniciarVinculacionGoogleFit(userId: string) {
+    // Llamamos al backend para que nos dé la URL generada por Google
+    const response: any = await firstValueFrom(
+      this.http.get(`${this.apiUrl}/google-fit/auth?userId=${userId}`)
+    );
+
+    window.location.href = response.url;
+  }
+
+  verificarEstadoVinculacion() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('status') === 'success';
+  }
+
+  async obtenerDatosGoogleFit(idPaciente: string) {
+    try {
+      // Esta llamada va a tu servidor Node.js
+      // Asegúrate de que el endpoint en tu backend sea /google-fit/data/:idPaciente
+      const data = await firstValueFrom(
+        this.http.get(`${this.apiUrl.replace('/auth', '')}/google-fit/data/${idPaciente}`)
+      );
+
+      return data;
+    } catch (error) {
+      console.error('Error al obtener datos de Google Fit:', error);
+      throw error;
+    }
+  }
 }

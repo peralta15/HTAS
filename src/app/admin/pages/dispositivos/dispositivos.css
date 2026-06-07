@@ -745,3 +745,90 @@
         width: 100%;
     }
 }
+
+/* ==========================================================================
+   8. ESTILOS PARA DROPDOWN DE BÚSQUEDA (PACIENTES)
+   ========================================================================== */
+
+/* Contenedor relativo para que el dropdown se posicione correctamente bajo el input */
+.search-box-pill {
+    /* Mantenemos tu estilo actual, solo aseguramos el z-index */
+    z-index: 10;
+}
+
+/* El contenedor de la lista de resultados */
+.custom-dropdown-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    margin-top: 8px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+
+    /* CAMBIO AQUÍ: Eliminamos el hidden y aseguramos el scroll vertical */
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: 250px;
+
+    /* Agregamos un pequeño padding derecho para que el contenido no pegue con el scroll */
+    padding-right: 4px;
+}
+
+/* Cada item dentro del dropdown */
+.custom-dropdown-item {
+    padding: 12px 16px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #334155;
+    transition: all 0.2s;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.custom-dropdown-item:last-child {
+    border-bottom: none;
+}
+
+/* Efecto hover al pasar el ratón */
+.custom-dropdown-item:hover {
+    background-color: #f8fafc;
+    color: #b0001e;
+    font-weight: 500;
+}
+
+/* Ajuste específico para cuando el buscador está vacío */
+.custom-dropdown-item:empty {
+    padding: 10px;
+    color: #94a3b8;
+    cursor: default;
+}
+
+/* ==========================================================================
+   ESTILO DE SCROLLBAR PARA EL DROPDOWN (Igual a Tratamientos)
+   ========================================================================== */
+
+/* 1. Definir el ancho del scrollbar */
+.custom-dropdown-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+/* 2. El track (la pista de fondo) debe ser transparente para integrarse */
+.custom-dropdown-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* 3. La "manija" o barra debe tener el color gris suave y bordes redondeados */
+.custom-dropdown-list::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    /* Color gris premium */
+    border-radius: 10px;
+    /* Bordes redondeados como en image_82092d.png */
+}
+
+/* 4. Efecto sutil al pasar el mouse por encima */
+.custom-dropdown-list::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
