@@ -61,6 +61,50 @@
                         oninput="this.value = this.value.replace(/[^0-9]/g, '')" [(ngModel)]="usuarioSeleccionado.nss"
                         class="form-control-premium">
                 </div>
+
+                <div class="form-group">
+                    <label>Género</label>
+                    <select [(ngModel)]="usuarioSeleccionado.genero" class="form-control-premium">
+                        <option [ngValue]="null" disabled selected>Seleccione género...</option>
+                        <option value="Masculino">Masculino</option>
+                        <option value="Femenino">Femenino</option>
+                        <option value="Otro">Otro</option>
+                        <option value="No especificado">No especificado</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Tipo de Sangre</label>
+                    <select [(ngModel)]="usuarioSeleccionado.tipoSangre" class="form-control-premium">
+                        <option [ngValue]="null" disabled selected>Seleccione tipo...</option>
+                        <option value="O+">O+</option>
+                        <option value="O-">O-</option>
+                        <option value="A+">A+</option>
+                        <option value="A-">A-</option>
+                        <option value="B+">B+</option>
+                        <option value="B-">B-</option>
+                        <option value="AB+">AB+</option>
+                        <option value="AB-">AB-</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Peso (kg)</label>
+                    <input type="number" step="0.01" min="0" max="600" placeholder="Ej: 78.50"
+                        [(ngModel)]="usuarioSeleccionado.peso" class="form-control-premium">
+                </div>
+
+                <div class="form-group">
+                    <label>Altura (metros)</label>
+                    <input type="number" step="0.01" min="0" max="3" placeholder="Ej: 1.75"
+                        [(ngModel)]="usuarioSeleccionado.altura" class="form-control-premium">
+                </div>
+            </div>
+            <div class="form-group" style="margin-top: 15px; padding: 0 15px;">
+                <label>Antecedentes Familiares</label>
+                <textarea [(ngModel)]="usuarioSeleccionado.antecedentesFamiliares" rows="3"
+                    placeholder="Describa antecedentes médicos familiares relevantes..."
+                    class="form-control-premium"></textarea>
             </div>
 
             <div class="action-footer">

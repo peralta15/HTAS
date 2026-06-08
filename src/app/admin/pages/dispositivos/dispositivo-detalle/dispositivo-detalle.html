@@ -68,25 +68,6 @@
                 </div>
             </div>
 
-            <div class="form-group full-width-group" style="margin-top: 1rem;">
-                <label>Sincronización con Google Fit</label>
-                <div class="d-flex align-items-center gap-3">
-
-                    <button type="button" class="btn btn-outline-primary" (click)="vincularGoogleFit()">
-                        <i class="bi bi-google"></i> Vincular Google Fit
-                    </button>
-
-                    @if (dispositivoSeleccionado.googleFitToken) {
-                    <span class="badge bg-success">
-                        <i class="bi bi-check-lg"></i> Vinculado
-                    </span>
-                    <button type="button" class="btn btn-sm btn-link" (click)="cargarDatosGoogleFit()">
-                        Refrescar Datos
-                    </button>
-                    }
-                </div>
-            </div>
-
             @if (ultimaMedicion) {
             <div style="margin-top: 1.5rem; border-top: 1px solid #e2e8f0; padding-top: 1.5rem;">
                 <h4 class="section-title">Última Lectura del Paciente</h4>

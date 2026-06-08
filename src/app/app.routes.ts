@@ -29,6 +29,7 @@ import { MedicamentoDetalle } from './admin/pages/medicamentos/medicamento-detal
 import { Dispositivos } from './admin/pages/dispositivos/dispositivos';
 import { DispositivoDetalle } from './admin/pages/dispositivos/dispositivo-detalle/dispositivo-detalle';
 import { Configuracion } from './admin/pages/configuracion/configuracion';
+import { MonitoreoPresion } from './admin/pages/monitoreo-presion/monitoreo-presion';
 
 export const routes: Routes = [
   {
@@ -151,6 +152,10 @@ export const routes: Routes = [
   {
     path: 'configuracion',
     component: Configuracion
+  },
+  {
+    path: 'monitoreo-presion',
+    component: MonitoreoPresion
   },
   {
     path: '**',

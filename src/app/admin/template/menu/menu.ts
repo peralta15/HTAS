@@ -32,7 +32,7 @@ export class Menu implements OnInit, OnDestroy {
 
   // TU ESTRUCTURA BASE ORIGINAL INTACTA
   private allNavItems = [
-    { category: 'General', items: [{ route: '/inicio', icon: 'bi-speedometer2', label: 'Inicio', queryParams: {} }] },
+    { category: 'General', items: [{ route: '/inicio', icon: 'bi bi-house-heart', label: 'Inicio', queryParams: {} }] },
     {
       category: 'Administración',
       items: [
@@ -48,7 +48,8 @@ export class Menu implements OnInit, OnDestroy {
         { route: '/citas', icon: 'bi-calendar-check', label: 'Citas', queryParams: {} },
         { route: '/tratamientos', icon: 'bi-clipboard-data', label: 'Tratamientos', queryParams: {} },
         { route: '/medicamentos', icon: 'bi-capsule', label: 'Medicamentos', queryParams: {} },
-        { route: '/dispositivos', icon: 'bi-heart-pulse', label: 'Dispositivos', queryParams: {} }
+        { route: '/dispositivos', icon: 'bi-heart-pulse', label: 'Dispositivos', queryParams: {} },
+        { route: '/monitoreo-presion', icon: 'bi-speedometer2', label: 'Presión Arterial', queryParams: {} }
       ]
     },
     { category: 'Cuenta', items: [{ route: '/configuracion', icon: 'bi-gear', label: 'Configuración', queryParams: {} }] }

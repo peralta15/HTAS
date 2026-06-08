@@ -225,7 +225,7 @@ export class PacienteDetalle implements OnInit, OnDestroy {
 
     this.isSaving = true;
     const fuenteActual = this.usuarioSeleccionado.fuente;
-    const id = this.usuarioSeleccionado.id;
+    const id = this.usuarioSeleccionado.idusuario || this.usuarioSeleccionado.id; // Asegurar captura de ID
 
     try {
       const apMaterno = (this.usuarioSeleccionado.tempApellidoMaterno || '').trim();
@@ -240,6 +240,7 @@ export class PacienteDetalle implements OnInit, OnDestroy {
         };
         await this.googleService.updateUsuario(id, dataFirebase);
       } else {
+        // Mapeo exacto con las variables estructuradas en el updateUsuario del Backend
         const datosPostgres = {
           nombre: nombre,
           apPaterno: apPaterno,
@@ -248,7 +249,12 @@ export class PacienteDetalle implements OnInit, OnDestroy {
           apmaterno: apMaterno,
           correo: this.usuarioSeleccionado.correo,
           telefono: this.usuarioSeleccionado.telefono,
-          nss: this.usuarioSeleccionado.nss,
+          genero: this.usuarioSeleccionado.genero || null, // <- Agregado
+          nss: this.usuarioSeleccionado.nss || null,
+          tipoSangre: this.usuarioSeleccionado.tipoSangre || null, // <- Agregado
+          peso: this.usuarioSeleccionado.peso || null, // <- Agregado
+          altura: this.usuarioSeleccionado.altura || null, // <- Agregado
+          antecedentesFamiliares: this.usuarioSeleccionado.antecedentesFamiliares || null, // <- Agregado
           rol: 'Paciente',
           activo: this.usuarioSeleccionado.activo ?? true
         };

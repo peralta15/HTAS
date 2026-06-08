@@ -6,6 +6,9 @@ export const environment = {
     // Ruta para gestión de usuarios (CRUD)
     usersApi: 'http://localhost:3000/api/users',
 
+    iaApi: 'http://localhost:3000/api/ia',
+    htasApi: 'http://localhost:3000/api/htas',
+
     stripePublicKey: 'pk_test_51TF59VK1qKH77YTduyJn44BruhEDaWGDisu6ry0DtNKZwiTnFGyMysighKG4gecGIdX4TSFc66sike4gZoJ1xCXA008uHnREBG',
     checkoutApi: 'http://localhost:3000/api/auth/create-checkout-session',
     recaptchaSiteKey: '6LdV0u8sAAAAAGK4Rkxxa98_h0eb2lUng2dv7RZa'
