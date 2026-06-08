@@ -14,8 +14,11 @@ exports.evaluarCrisisHTAS = async (req, res) => {
             Toma_Medicamento: parseInt(tomaMedicamento)
         };
 
-        // 3. Petición al servidor de FastAPI (Puerto 8000)
-        const respuestaPython = await axios.post('http://127.0.0.1:8000/predecir_crisis', datosParaPython);
+        // 🌐 MODIFICADO: Cambiamos el endpoint fijo por la variable de entorno de Render
+        const IA_SERVER_URL = process.env.URL_IA || 'http://127.0.0.1:8000';
+
+        // 3. Petición al servidor de FastAPI en la nube
+        const respuestaPython = await axios.post(`${IA_SERVER_URL}/predecir_crisis`, datosParaPython);
 
         // 4. (Opcional) Aquí puedes meter lógica para guardar en tu base de datos
         // Ej: await Paciente.guardarHistorial(...)
@@ -36,7 +39,7 @@ exports.evaluarCrisisHTAS = async (req, res) => {
             });
         }
 
-        console.error("Error al conectar con el servidor de IA (Python):", error.message);
+        console.error("Error al conectar con el servidor de IA (Python) en la nube:", error.message);
         return res.status(500).json({
             success: false,
             error: "No se pudo establecer conexión con el módulo de Inteligencia Artificial."

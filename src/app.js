@@ -27,8 +27,12 @@ app.post('/api/htas/evaluar', async (req, res) => {
             Toma_Medicamento: parseInt(tomaMedicamento)
         };
 
-        // Node.js le hace la petición al servidor de FastAPI (Puerto 8000)
-        const respuestaPython = await axios.post('http://127.0.0.1:8000/predecir_crisis', datosParaPython);
+        // 🌐 MODIFICADO: Lee la URL desde las variables de entorno (.env)
+        // Si no existe, usa local por seguridad para que no truene si pruebas en tu PC
+        const IA_SERVER_URL = process.env.URL_IA || 'http://127.0.0.1:8000';
+
+        // Petición al endpoint de la IA en la nube
+        const respuestaPython = await axios.post(`${IA_SERVER_URL}/predecir_crisis`, datosParaPython);
 
         // Devolvemos la respuesta de la IA de vuelta al cliente
         return res.status(200).json({
@@ -46,7 +50,7 @@ app.post('/api/htas/evaluar', async (req, res) => {
             });
         }
 
-        console.error("Error de conexión con FastAPI:", error.message);
+        console.error("Error de conexión con FastAPI en la nube:", error.message);
         return res.status(500).json({
             success: false,
             error: "No se pudo conectar con el módulo de Inteligencia Artificial."
