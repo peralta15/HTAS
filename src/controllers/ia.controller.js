@@ -1,4 +1,5 @@
-const ollama = require('ollama');
+// 1. Importamos la clase Ollama directamente de la librería
+const { Ollama } = require('ollama');
 
 // Endpoint para analizar los datos de presión arterial con LLM
 const analizarPresion = async (req, res) => {
@@ -32,17 +33,21 @@ const analizarPresion = async (req, res) => {
         console.log("=== Nueva petición de análisis recibida ===");
         console.log(`Métricas -> Sistólica: ${presionSistolica}, Diastólica: ${presionDiastolica}, Pulso: ${pulso}`);
 
-        // 🌐 Le decimos a la librería de Ollama que apunte a tu túnel de ngrok guardado en Render
-        process.env.OLLAMA_HOST = process.env.URL_OLLAMA || 'http://127.0.0.1:11434';
+        // 🌐 Recogemos la URL de Render, y si no existe por ahora, usa la local
+        const NGROK_URL = process.env.URL_OLLAMA || 'http://127.0.0.1:11434';
 
-        // 🚀 CONFIGURACIÓN DE NGROK: Inyectamos el header obligatorio para saltar la pantalla gris
-        ollama.default.config = {
+        // 🚀 SOLUCIÓN: Creamos una instancia personalizada pasándole el host explícito
+        const ollamaCliente = new Ollama({ host: NGROK_URL });
+
+        // CONFIGURACIÓN DE NGROK: Inyectamos el header obligatorio para saltar la pantalla gris
+        ollamaCliente.config = {
             headers: {
                 'ngrok-skip-browser-warning': 'true'
             }
         };
 
-        const response = await ollama.default.chat({
+        // Hacemos la petición usando nuestra instancia configurada
+        const response = await ollamaCliente.chat({
             model: 'qwen2.5-coder:1.5b',
             messages: [{ role: 'user', content: prompt }],
             options: {
