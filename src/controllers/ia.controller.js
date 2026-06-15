@@ -1,6 +1,6 @@
 const ollama = require('ollama');
 
-// Endpoint para analizar los datos de presión arterial
+// Endpoint para analizar los datos de presión arterial con LLM
 const analizarPresion = async (req, res) => {
     // Recibimos los datos del paciente desde Angular
     const { presionSistolica, presionDiastolica, pulso } = req.body;
@@ -18,7 +18,7 @@ const analizarPresion = async (req, res) => {
 
     Estructura requerida del JSON:
     {
-      "estado": "Normal, Elevada, Hipertensión Estadio 1, Hipertensión Estadio 2 o Crisis de Hihentensión",
+      "estado": "Normal, Elevada, Hipertensión Estadio 1, Hipertensión Estadio 2 o Crisis de Hipertensión",
       "riesgo": "Bajo, Moderado o Alto",
       "alerta": "Un mensaje claro sobre qué valores específicos (${presionSistolica}/${presionDiastolica} o pulso de ${pulso}) requieren atención inmediata o cuidado especial.",
       "seguimiento": "Indicaciones precisas de monitoreo (ej. medir 2 veces al día, bitácora semanal o acudir a urgencias).",
@@ -32,7 +32,10 @@ const analizarPresion = async (req, res) => {
         console.log("=== Nueva petición de análisis recibida ===");
         console.log(`Métricas -> Sistólica: ${presionSistolica}, Diastólica: ${presionDiastolica}, Pulso: ${pulso}`);
 
-        // 🚀 CONFIGURACIÓN DE NGROK: Inyectamos el header para saltar la advertencia
+        // 🌐 Le decimos a la librería de Ollama que apunte a tu túnel de ngrok guardado en Render
+        process.env.OLLAMA_HOST = process.env.URL_OLLAMA || 'http://127.0.0.1:11434';
+
+        // 🚀 CONFIGURACIÓN DE NGROK: Inyectamos el header obligatorio para saltar la pantalla gris
         ollama.default.config = {
             headers: {
                 'ngrok-skip-browser-warning': 'true'

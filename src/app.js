@@ -14,6 +14,7 @@ app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use('/api/auth', authRoutes);
 app.use('/api/ia', iaRoutes);
 
+// Endpoint para el algoritmo de Machine Learning (.pkl) en FastAPI
 app.post('/api/htas/evaluar', async (req, res) => {
     try {
         // Recibimos los datos enviados desde el frontend o Postman
@@ -27,19 +28,11 @@ app.post('/api/htas/evaluar', async (req, res) => {
             Toma_Medicamento: parseInt(tomaMedicamento)
         };
 
-        // Lee la URL desde las variables de entorno de Render (.env)
-        const IA_SERVER_URL = process.env.URL_IA || 'http://127.0.0.1:8000';
+        // 🌐 Lee la URL exclusiva de tu microservicio de Python en Render
+        const FASTAPI_URL = process.env.URL_FASTAPI || 'http://127.0.0.1:8000';
 
-        // 🌐 PETICIÓN AXIOS MODIFICADA: Enviamos el header para evadir el muro de ngrok
-        const respuestaPython = await axios.post(
-            `${IA_SERVER_URL}/predecir_crisis`, 
-            datosParaPython,
-            {
-                headers: {
-                    'ngrok-skip-browser-warning': 'true'
-                }
-            }
-        );
+        // Petición directa a Render (No necesita los headers de ngrok porque ya es pública)
+        const respuestaPython = await axios.post(`${FASTAPI_URL}/predecir_crisis`, datosParaPython);
 
         // Devolvemos la respuesta de la IA de vuelta al cliente
         return res.status(200).json({
