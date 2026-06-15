@@ -10,12 +10,12 @@ import { provideAuth, getAuth } from '@angular/fire/auth';
 import { provideFirestore, getFirestore } from '@angular/fire/firestore';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCnYZoq0GBL8EmP20X081k41x6LXoGTk00",
-  authDomain: "autenticacion-9d1dc.firebaseapp.com",
-  projectId: "autenticacion-9d1dc",
-  storageBucket: "autenticacion-9d1dc.firebasestorage.app",
-  messagingSenderId: "377227345815",
-  appId: "1:377227345815:web:f3d167dffb374a72304ed2"
+  apiKey: "AIzaSyCGHR8BA6n-atm5SYDeIxuWGbe5PXjJA4I",
+  authDomain: "hipertensionarterialsistemica1.firebaseapp.com",
+  projectId: "hipertensionarterialsistemica1",
+  storageBucket: "hipertensionarterialsistemica1.firebasestorage.app",
+  messagingSenderId: "895386114852",
+  appId: "1:895386114852:web:14cb1ce2328938a527f1b1"
 };
 
 export const appConfig: ApplicationConfig = {

@@ -13,7 +13,7 @@ export class GoogleService {
   private firestore = inject(Firestore);
   private http = inject(HttpClient);
 
-  private apiUrl = 'http://localhost:3000/api/auth';
+  private apiUrl = 'https://htas-backend-node.onrender.com/api/auth';
 
   constructor() {
     emailjs.init('RH7T2EvEV4pbSWkXQ');
