@@ -18,7 +18,7 @@ const analizarPresion = async (req, res) => {
 
     Estructura requerida del JSON:
     {
-      "estado": "Normal, Elevada, Hipertensión Estadio 1, Hipertensión Estadio 2 o Crisis de Hipertensión",
+      "estado": "Normal, Elevada, Hipertensión Estadio 1, Hipertensión Estadio 2 o Crisis de Hihentensión",
       "riesgo": "Bajo, Moderado o Alto",
       "alerta": "Un mensaje claro sobre qué valores específicos (${presionSistolica}/${presionDiastolica} o pulso de ${pulso}) requieren atención inmediata o cuidado especial.",
       "seguimiento": "Indicaciones precisas de monitoreo (ej. medir 2 veces al día, bitácora semanal o acudir a urgencias).",
@@ -31,6 +31,13 @@ const analizarPresion = async (req, res) => {
     try {
         console.log("=== Nueva petición de análisis recibida ===");
         console.log(`Métricas -> Sistólica: ${presionSistolica}, Diastólica: ${presionDiastolica}, Pulso: ${pulso}`);
+
+        // 🚀 CONFIGURACIÓN DE NGROK: Inyectamos el header para saltar la advertencia
+        ollama.default.config = {
+            headers: {
+                'ngrok-skip-browser-warning': 'true'
+            }
+        };
 
         const response = await ollama.default.chat({
             model: 'qwen2.5-coder:1.5b',
