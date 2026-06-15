@@ -18,7 +18,7 @@ const analizarPresion = async (req, res) => {
 
     Estructura requerida del JSON:
     {
-      "estado": "Normal, Elevada, Hipertensión Estadio 1, Hipertensión Estadio 2 o Crisis de Hipertensión",
+      "estado": "Normal, Elevada, Hitempensión Estadio 1, Hipertensión Estadio 2 o Crisis de Hipertensión",
       "riesgo": "Bajo, Moderado o Alto",
       "alerta": "Un mensaje claro sobre qué valores específicos (${presionSistolica}/${presionDiastolica} o pulso de ${pulso}) requieren atención inmediata o cuidado especial.",
       "seguimiento": "Indicaciones precisas de monitoreo (ej. medir 2 veces al día, bitácora semanal o acudir a urgencias).",
@@ -32,20 +32,18 @@ const analizarPresion = async (req, res) => {
         console.log("=== Nueva petición de análisis recibida ===");
         console.log(`Métricas -> Sistólica: ${presionSistolica}, Diastólica: ${presionDiastolica}, Pulso: ${pulso}`);
 
-        // 🌐 Forzamos la lectura de la variable que pusiste en Render, si no existe usa la local
-        const NGROK_URL = process.env.URL_OLLAMA || 'http://127.0.0.1:11434';
+        // 🚀 SOLUCIÓN DIRECTA: Escribimos el enlace de ngrok directo en el código.
+        // Cero dependencias de variables de entorno de Render.
+        ollama.default.host = 'https://gave-subduing-lecturer.ngrok-free.dev';
 
-        // 🚀 LA SOLUCIÓN CLAVE: Modificamos directamente el host interno del objeto por defecto
-        ollama.default.host = NGROK_URL;
-
-        // CONFIGURACIÓN DE NGROK: Inyectamos el header obligatorio para saltar la pantalla de advertencia
+        // CONFIGURACIÓN DE NGROK: Inyectamos el header obligatorio para saltar la pantalla gris
         ollama.default.config = {
             headers: {
                 'ngrok-skip-browser-warning': 'true'
             }
         };
 
-        // Hacemos la petición usando el objeto por defecto ya parchado
+        // Hacemos la petición usando el objeto por defecto parchado directamente
         const response = await ollama.default.chat({
             model: 'qwen2.5-coder:1.5b',
             messages: [{ role: 'user', content: prompt }],
